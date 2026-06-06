@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SIV.API/SIV.API.csproj" />
+  <Project Path="SIV.Infrastructure/SIV.Infrastructure.csproj" />
+  <Project Path="SIV.Modules/SIV.Modules.csproj" />
+  <Project Path="SIV.Shared/SIV.Shared.csproj" />
+</Solution>

@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Rider / JetBrains
+.idea/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Variables de entorno (MUY importante)
+.env
+appsettings.Development.json
