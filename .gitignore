@@ -15,3 +15,5 @@ obj/
 # Variables de entorno (MUY importante)
 .env
 appsettings.Development.json
+
+.vs/
