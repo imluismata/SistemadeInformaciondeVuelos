@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SIV.Infrastructure\SIV.Infrastructure.csproj" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
       <ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
     </ItemGroup>
 
