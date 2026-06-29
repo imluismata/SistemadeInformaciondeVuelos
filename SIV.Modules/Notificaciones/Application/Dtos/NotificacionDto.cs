@@ -1,4 +1,4 @@
-namespace SIV.Modules.Notificaciones.Application;
+namespace SIV.Modules.Notificaciones.Application.Dtos;
 
 public record NotificacionDto(
     Guid Id,

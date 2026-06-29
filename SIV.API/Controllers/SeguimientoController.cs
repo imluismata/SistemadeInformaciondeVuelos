@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SIV.Modules.Seguimiento.Application;
+using SIV.Modules.Seguimiento.Application.Dtos;
+using SIV.Modules.Seguimiento.Application.Interfaces;
 
 namespace SIV.API.Controllers;
 
@@ -14,25 +15,29 @@ public class SeguimientoController : ControllerBase
         _servicio = servicio;
     }
 
-    // el usuario se suscribe a un vuelo para recibir notificaciones
     [HttpPost]
     public async Task<IActionResult> RegistrarSeguimiento(
         [FromBody] RegistrarSeguimientoRequest request)
     {
-        await _servicio.RegistrarSeguimientoAsync(request.UsuarioId, request.VueloId);
+        await _servicio.RegistrarAsync(new RegistrarSeguimientoDto(request.UsuarioId, request.VueloId));
         return Created(string.Empty, null);
     }
 
-    // el usuario cancela el seguimiento de un vuelo
     [HttpDelete]
     public async Task<IActionResult> CancelarSeguimiento(
         [FromBody] CancelarSeguimientoRequest request)
     {
-        await _servicio.CancelarSeguimientoAsync(request.UsuarioId, request.VueloId);
+        await _servicio.CancelarAsync(new CancelarSeguimientoDto(request.UsuarioId, request.VueloId));
         return NoContent();
     }
 
-    // retorna los usuarios que estan siguiendo un vuelo
+    [HttpGet("usuario/{usuarioId:guid}")]
+    public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
+    {
+        var seguimientos = await _servicio.ObtenerPorUsuarioAsync(usuarioId);
+        return Ok(seguimientos);
+    }
+
     [HttpGet("vuelo/{vueloId:guid}")]
     public async Task<IActionResult> ObtenerUsuariosPorVuelo(Guid vueloId)
     {

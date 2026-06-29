@@ -41,6 +41,12 @@ internal class UsuarioRepository : IUsuarioRepository
         await Task.CompletedTask;
     }
 
+    public async Task EliminarAsync(Usuario usuario)
+    {
+        _context.Usuarios.Remove(usuario);
+        await Task.CompletedTask;
+    }
+
     public async Task GuardarCambiosAsync()
     {
         await _context.SaveChangesAsync();

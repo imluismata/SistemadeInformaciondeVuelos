@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using SIV.Modules.ConsultaPublica.Application;
+using SIV.Modules.ConsultaPublica.Application.Dtos;
+using SIV.Modules.ConsultaPublica.Application.Interfaces;
 
 namespace SIV.API.Controllers;
 
-// endpoints publicos, cualquier persona puede consultar sin autenticarse
 [ApiController]
 [Route("api/vuelos")]
 public class ConsultaPublicaController : ControllerBase
@@ -15,7 +15,6 @@ public class ConsultaPublicaController : ControllerBase
         _servicio = servicio;
     }
 
-    // lista todos los vuelos activos del dia
     [HttpGet]
     public async Task<IActionResult> ObtenerVuelosActivos()
     {
@@ -23,7 +22,6 @@ public class ConsultaPublicaController : ControllerBase
         return Ok(vuelos);
     }
 
-    // busca un vuelo por su numero, ej: AA123
     [HttpGet("buscar")]
     public async Task<IActionResult> BuscarPorNumero([FromQuery] string numero)
     {
@@ -38,7 +36,17 @@ public class ConsultaPublicaController : ControllerBase
         return Ok(vuelo);
     }
 
-    // retorna el detalle completo de un vuelo por su id
+    [HttpGet("filtro")]
+    public async Task<IActionResult> BuscarConFiltro(
+        [FromQuery] string? origen,
+        [FromQuery] string? destino,
+        [FromQuery] DateTime? fecha)
+    {
+        var filtro = new FiltroConsultaDto(origen, destino, fecha);
+        var vuelos = await _servicio.BuscarConFiltroAsync(filtro);
+        return Ok(vuelos);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ObtenerDetalle(Guid id)
     {

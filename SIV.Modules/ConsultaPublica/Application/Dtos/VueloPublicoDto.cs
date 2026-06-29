@@ -1,4 +1,4 @@
-namespace SIV.Modules.ConsultaPublica.Application;
+namespace SIV.Modules.ConsultaPublica.Application.Dtos;
 
 public record VueloPublicoDto(
     Guid Id,

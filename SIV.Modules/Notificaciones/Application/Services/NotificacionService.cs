@@ -1,9 +1,11 @@
+using SIV.Modules.Notificaciones.Application.Base;
+using SIV.Modules.Notificaciones.Application.Dtos;
+using SIV.Modules.Notificaciones.Application.Interfaces;
 using SIV.Modules.Notificaciones.Domain;
 using SIV.Shared.Contracts;
-using SIV.Shared.Enums;
 using SIV.Shared.Events;
 
-namespace SIV.Modules.Notificaciones.Application;
+namespace SIV.Modules.Notificaciones.Application.Services;
 
 internal class NotificacionService : INotificacionService
 {
@@ -25,7 +27,7 @@ internal class NotificacionService : INotificacionService
 
         foreach (var usuarioId in usuariosInteresados)
         {
-            var notificacion = Notificacion.Crear(usuarioId, evento.VueloId, ConstruirMensaje(evento));
+            var notificacion = Notificacion.Crear(usuarioId, evento.VueloId, MensajeNotificacion.Construir(evento));
             await _repo.AgregarAsync(notificacion);
         }
 
@@ -48,16 +50,6 @@ internal class NotificacionService : INotificacionService
         await _repo.ActualizarAsync(notificacion);
         await _repo.GuardarCambiosAsync();
     }
-
-    private static string ConstruirMensaje(IVueloCambiadoEvento evento) =>
-        evento.TipoCambio switch
-        {
-            TipoCambio.Cancelacion    => $"El vuelo fue cancelado. Motivo: {evento.Causa}",
-            TipoCambio.Retraso        => $"El vuelo fue retrasado. Causa: {evento.Causa}",
-            TipoCambio.Adelanto       => $"El vuelo fue adelantado. Causa: {evento.Causa}",
-            TipoCambio.CambioDePuerta => $"El vuelo cambió de puerta. {evento.Causa}",
-            _ => $"Actualización en el vuelo: {evento.Causa}"
-        };
 
     private static NotificacionDto MapToDto(Notificacion n) =>
         new(n.Id, n.VueloId, n.Mensaje, n.Estado.ToString(), n.GeneradaEn, n.LeidaEn);

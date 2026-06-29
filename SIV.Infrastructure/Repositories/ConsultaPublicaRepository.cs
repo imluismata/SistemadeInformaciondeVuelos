@@ -1,4 +1,5 @@
 using SIV.Modules.ConsultaPublica.Application;
+using SIV.Modules.ConsultaPublica.Application.Dtos;
 
 namespace SIV.Infrastructure.Repositories;
 

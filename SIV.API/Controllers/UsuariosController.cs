@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SIV.Modules.Usuarios.Application;
+using SIV.Modules.Usuarios.Application.Dtos;
+using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Usuarios.Domain;
 
 namespace SIV.API.Controllers;
@@ -15,7 +16,6 @@ public class UsuariosController : ControllerBase
         _servicio = servicio;
     }
 
-    // registra un nuevo usuario en el sistema
     [HttpPost("registro")]
     public async Task<IActionResult> Registrar([FromBody] RegistroUsuarioRequest request)
     {
@@ -24,11 +24,10 @@ public class UsuariosController : ControllerBase
             string.IsNullOrWhiteSpace(request.Password))
             return BadRequest("Nombre, email y contraseña son obligatorios.");
 
-        await _servicio.RegistrarAsync(request.Nombre, request.Email, request.Password);
+        await _servicio.CrearAsync(new RegistrarUsuarioDto(request.Nombre, request.Email, request.Password));
         return Created(string.Empty, null);
     }
 
-    // verifica las credenciales y retorna los datos del usuario si son correctas
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -44,26 +43,35 @@ public class UsuariosController : ControllerBase
         return Ok(usuario);
     }
 
-    // retorna el perfil de un usuario por su id
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ObtenerPorId(Guid id)
     {
         var usuario = await _servicio.ObtenerPorIdAsync(id);
-
-        if (usuario is null)
-            return NotFound($"No se encontró un usuario con Id {id}.");
-
+        if (usuario is null) return NotFound($"No se encontró un usuario con Id {id}.");
         return Ok(usuario);
     }
 
-    // cambia el rol de un usuario, solo lo puede hacer un administrador
+    [HttpGet]
+    public async Task<IActionResult> ObtenerTodos()
+    {
+        var usuarios = await _servicio.ObtenerTodosAsync();
+        return Ok(usuarios);
+    }
+
     [HttpPatch("{id:guid}/rol")]
     public async Task<IActionResult> CambiarRol(Guid id, [FromBody] CambiarRolRequest request)
     {
         if (!Enum.TryParse<RolUsuario>(request.Rol, ignoreCase: true, out var rol))
             return BadRequest($"Rol inválido. Valores permitidos: {string.Join(", ", Enum.GetNames<RolUsuario>())}");
 
-        await _servicio.CambiarRolAsync(id, rol);
+        await _servicio.CambiarRolAsync(new CambiarRolUsuarioDto(id, rol));
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Eliminar(Guid id)
+    {
+        await _servicio.EliminarAsync(id);
         return NoContent();
     }
 }

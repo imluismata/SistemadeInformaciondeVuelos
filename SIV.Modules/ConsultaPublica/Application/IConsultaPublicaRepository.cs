@@ -1,3 +1,5 @@
+using SIV.Modules.ConsultaPublica.Application.Dtos;
+
 namespace SIV.Modules.ConsultaPublica.Application;
 
 public interface IConsultaPublicaRepository

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SIV.Modules.Notificaciones.Application;
+using SIV.Modules.Notificaciones.Application.Interfaces;
 
 namespace SIV.API.Controllers;
 

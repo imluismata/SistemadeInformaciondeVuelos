@@ -45,4 +45,12 @@ public class Usuario
     {
         Rol = nuevoRol;
     }
+
+    public void ActualizarNombre(string nuevoNombre)
+    {
+        if (string.IsNullOrWhiteSpace(nuevoNombre))
+            throw new ArgumentException("El nombre es obligatorio.");
+
+        Nombre = nuevoNombre.Trim();
+    }
 }

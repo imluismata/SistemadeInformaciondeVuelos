@@ -9,5 +9,6 @@ public interface IUsuarioRepository
     Task<Usuario?> ObtenerPorEmailAsync(string email);
     Task<IEnumerable<Usuario>> ObtenerTodosAsync();
     Task ActualizarAsync(Usuario usuario);
+    Task EliminarAsync(Usuario usuario);
     Task GuardarCambiosAsync();
 }

@@ -1,6 +1,7 @@
+using SIV.Modules.Notificaciones.Application.Dtos;
 using SIV.Shared.Events;
 
-namespace SIV.Modules.Notificaciones.Application;
+namespace SIV.Modules.Notificaciones.Application.Interfaces;
 
 public interface INotificacionService
 {

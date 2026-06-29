@@ -1,4 +1,4 @@
-namespace SIV.Modules.Usuarios.Application;
+namespace SIV.Modules.Usuarios.Application.Dtos;
 
 public record UsuarioDto(
     Guid Id,
