@@ -13,7 +13,7 @@ obj/
 *.suo
 *.userprefs
 
-# Secretos y configuración local — NUNCA subir
+# Secretos y configuración local 
 .env
 .env.local
 *.env
@@ -41,3 +41,7 @@ logs/
 # Archivos temporales de Visual Studio
 .vs/
 *.cache
+CLAUDE.md
+" .claude:commands:/"
+CLAUDE.md
+" .claude:commands:/"
