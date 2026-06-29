@@ -6,7 +6,7 @@ public class Notificacion
     public Guid UsuarioId { get; private set; }
     public Guid VueloId { get; private set; }
     public string Mensaje { get; private set; } = string.Empty;
-    public string Estado { get; private set; } = "NoLeida";
+    public EstadoNotificacion Estado { get; private set; }
     public DateTime GeneradaEn { get; private set; }
     public DateTime? LeidaEn { get; private set; }
 
@@ -27,15 +27,15 @@ public class Notificacion
             UsuarioId = usuarioId,
             VueloId = vueloId,
             Mensaje = mensaje,
-            Estado = "NoLeida",
+            Estado = EstadoNotificacion.NoLeida,
             GeneradaEn = DateTime.UtcNow
         };
     }
 
     public void MarcarComoLeida()
     {
-        if (Estado == "Leida") return;
-        Estado = "Leida";
+        if (Estado == EstadoNotificacion.Leida) return;
+        Estado = EstadoNotificacion.Leida;
         LeidaEn = DateTime.UtcNow;
     }
 }

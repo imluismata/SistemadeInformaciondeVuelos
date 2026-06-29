@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -9,6 +9,14 @@
     <ItemGroup>
       <ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
       <ProjectReference Include="..\SIV.Modules\SIV.Modules.csproj" />
+    </ItemGroup>
+
+    <!-- Excluir hasta que Luis corrija y suba su código de Catalogo y VueloConfiguration -->
+    <ItemGroup>
+      <Compile Remove="Migrations\Configurations\AerolineaConfiguration.cs" />
+      <Compile Remove="Migrations\Configurations\AeropuertoConfiguration.cs" />
+      <Compile Remove="Migrations\Configurations\VueloConfiguration.cs" />
+      <Compile Remove="Repositories\CatalogoRepository.cs" />
     </ItemGroup>
 
     <ItemGroup>

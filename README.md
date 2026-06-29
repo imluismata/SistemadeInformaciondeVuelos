@@ -4,11 +4,9 @@ Arquitectura de **monolito modular** en .NET 8.
 
 ---
 
-## Responsable de esta rama
+## Integrantes
 
-**Luis Miguel Mata Miranda**
-
-### Módulos
+### Luis Miguel Mata Miranda
 | Módulo | Descripción |
 |--------|-------------|
 | Vuelos | Registro y consulta de vuelos |
@@ -16,8 +14,19 @@ Arquitectura de **monolito modular** en .NET 8.
 | Cambios operativos | Retrasos, adelantos, cambios de puerta y cancelaciones |
 | Catálogos | Administración de aerolíneas y aeropuertos |
 
-### Aplicación
-**Intranet** — App web para el personal del aeropuerto (agentes, operadores y administradores).
+**Aplicación:** Intranet — app web para el personal del aeropuerto (agentes, operadores y administradores).
+
+---
+
+### Paola Piantini
+| Módulo | Descripción |
+|--------|-------------|
+| Usuarios | Registro, login y gestión de roles |
+| Seguimiento | Suscripción de usuarios a vuelos para recibir notificaciones |
+| Notificaciones | Generación y consulta de notificaciones ante cambios en vuelos |
+| Consulta pública | Búsqueda y detalle de vuelos sin necesidad de autenticarse |
+
+**Aplicación:** App web para pasajeros — consulta de vuelos y gestión de su cuenta.
 
 ---
 
@@ -98,3 +107,31 @@ http://localhost:5102/swagger
 | POST | `/api/catalogo/aeropuertos` | Registrar aeropuerto |
 | PUT | `/api/catalogo/aeropuertos/{id}` | Actualizar aeropuerto |
 | DELETE | `/api/catalogo/aeropuertos/{id}` | Desactivar aeropuerto |
+
+### Usuarios
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/usuarios/registro` | Registrar nuevo usuario |
+| POST | `/api/usuarios/login` | Iniciar sesión |
+| GET | `/api/usuarios/{id}` | Obtener perfil por Id |
+| PATCH | `/api/usuarios/{id}/rol` | Cambiar rol de un usuario |
+
+### Seguimiento
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/seguimiento` | Suscribirse a un vuelo |
+| DELETE | `/api/seguimiento` | Cancelar suscripción |
+| GET | `/api/seguimiento/vuelo/{vueloId}` | Ver usuarios suscritos a un vuelo |
+
+### Notificaciones
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/notificaciones/{usuarioId}` | Ver notificaciones de un usuario |
+| PATCH | `/api/notificaciones/{id}/leida` | Marcar notificación como leída |
+
+### Consulta pública
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/vuelos` | Listar vuelos activos del día |
+| GET | `/api/vuelos/buscar?numero=XX123` | Buscar vuelo por número |
+| GET | `/api/vuelos/{id}` | Ver detalle de un vuelo |

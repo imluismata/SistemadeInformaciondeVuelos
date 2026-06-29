@@ -1,32 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Auditoria\Application\" />
-      <Folder Include="Auditoria\Domain\" />
-      <Folder Include="Auditoria\Infrastructure\" />
-      <Folder Include="Catalogo\Application\" />
-      <Folder Include="Catalogo\Domain\" />
-      <Folder Include="Catalogo\Infrastructure\" />
-      <Folder Include="ConsultaPublica\Application\" />
-      <Folder Include="ConsultaPublica\Domain\" />
-      <Folder Include="ConsultaPublica\Infrastructure\" />
-      <Folder Include="Seguimiento\Application\" />
-      <Folder Include="Seguimiento\Domain\" />
-      <Folder Include="Seguimiento\Infrastructure\" />
-      <Folder Include="Usuarios\Application\" />
-      <Folder Include="Usuarios\Domain\" />
-      <Folder Include="Usuarios\Infrastructure\" />
-    </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Auditoria\Application\" />
+		<Folder Include="Auditoria\Domain\" />
+		<Folder Include="Auditoria\Infrastructure\" />
+		<Folder Include="Catalogo\Application\" />
+		<Folder Include="Catalogo\Domain\" />
+		<Folder Include="Catalogo\Infrastructure\" />
+		<Folder Include="ConsultaPublica\Application\" />
+		<Folder Include="ConsultaPublica\Domain\" />
+		<Folder Include="ConsultaPublica\Infrastructure\" />
+		<Folder Include="Seguimiento\Application\" />
+		<Folder Include="Seguimiento\Domain\" />
+		<Folder Include="Seguimiento\Infrastructure\" />
+		<Folder Include="Usuarios\Application\" />
+		<Folder Include="Usuarios\Domain\" />
+		<Folder Include="Usuarios\Infrastructure\" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
-      <ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+		<ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
+	</ItemGroup>
 
 </Project>

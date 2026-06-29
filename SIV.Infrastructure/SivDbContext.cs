@@ -1,20 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using SIV.Infrastructure.Migrations.Configurations;
-using SIV.Modules.Catalogo.Domain;
+using SIV.Modules.Notificaciones.Domain;
+using SIV.Modules.Usuarios.Domain;
 using SIV.Modules.Vuelos.Domain;
+using SeguimientoEntidad = SIV.Modules.Seguimiento.Domain.Seguimiento;
 
 namespace SIV.Infrastructure;
 
 public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(options)
 {
+    // vuelos es de Luis, lo incluyo aqui para que EF lo reconozca
     public DbSet<Vuelo> Vuelos => Set<Vuelo>();
-    public DbSet<Aerolinea> Aerolineas => Set<Aerolinea>();
-    public DbSet<Aeropuerto> Aeropuertos => Set<Aeropuerto>();
+
+    // tablas de mis modulos
+    public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<SeguimientoEntidad> Seguimientos => Set<SeguimientoEntidad>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new VueloConfiguration());
-        modelBuilder.ApplyConfiguration(new AerolineaConfiguration());
-        modelBuilder.ApplyConfiguration(new AeropuertoConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SivDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

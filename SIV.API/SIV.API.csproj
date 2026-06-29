@@ -16,8 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SIV.Modules\SIV.Modules.csproj" />
       <ProjectReference Include="..\SIV.Infrastructure\SIV.Infrastructure.csproj" />
+      <ProjectReference Include="..\SIV.Modules\SIV.Modules.csproj" />
       <ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
     </ItemGroup>
 
