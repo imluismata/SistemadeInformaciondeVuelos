@@ -1,6 +1,6 @@
 namespace SIV.Modules.Vuelos.Domain;
 
-public sealed class Vuelo
+internal sealed class Vuelo
 {
     private readonly List<HistorialEstado> _historialEstados = [];
     private readonly List<CambioOperativo> _cambiosOperativos = [];

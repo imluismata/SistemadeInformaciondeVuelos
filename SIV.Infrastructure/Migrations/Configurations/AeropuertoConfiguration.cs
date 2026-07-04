@@ -4,7 +4,7 @@ using SIV.Modules.Catalogo.Domain;
 
 namespace SIV.Infrastructure.Migrations.Configurations;
 
-public class AeropuertoConfiguration : IEntityTypeConfiguration<Aeropuerto>
+internal class AeropuertoConfiguration : IEntityTypeConfiguration<Aeropuerto>
 {
     public void Configure(EntityTypeBuilder<Aeropuerto> builder)
     {

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SIV.Modules.Auditoria.Application;
+using SIV.Shared.Contracts;
 
 namespace SIV.API.Controllers;
 

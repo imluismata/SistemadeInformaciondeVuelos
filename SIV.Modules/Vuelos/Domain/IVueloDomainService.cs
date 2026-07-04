@@ -1,6 +1,6 @@
 namespace SIV.Modules.Vuelos.Domain;
 
-public interface IVueloDomainService
+internal interface IVueloDomainService
 {
     Vuelo Registrar(
         string numero,

@@ -1,6 +1,6 @@
 namespace SIV.Modules.Catalogo.Domain;
 
-public sealed class Aerolinea
+internal sealed class Aerolinea
 {
     private Aerolinea()
     {

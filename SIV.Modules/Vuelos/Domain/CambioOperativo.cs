@@ -9,7 +9,7 @@ public enum TipoCambioOperativo
     ActualizacionDatos
 }
 
-public sealed record CambioOperativo(
+internal sealed record CambioOperativo(
     Guid Id,
     Guid VueloId,
     TipoCambioOperativo Tipo,

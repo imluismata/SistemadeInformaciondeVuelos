@@ -2,7 +2,7 @@ using SIV.Modules.Vuelos.Domain;
 
 namespace SIV.Modules.Vuelos.Application;
 
-public interface IVueloRepository
+internal interface IVueloRepository
 {
     Task<IReadOnlyList<Vuelo>> ObtenerTodosAsync();
     Task<IReadOnlyList<Vuelo>> ConsultarAsync(ConsultarVuelosQuery filtro);

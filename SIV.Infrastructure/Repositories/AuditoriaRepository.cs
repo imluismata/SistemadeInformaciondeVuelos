@@ -4,7 +4,7 @@ using SIV.Modules.Auditoria.Domain;
 
 namespace SIV.Infrastructure.Repositories;
 
-public sealed class AuditoriaRepository(SivDbContext db) : IAuditoriaRepository
+internal sealed class AuditoriaRepository(SivDbContext db) : IAuditoriaRepository
 {
     public async Task GuardarAsync(RegistroAuditoria registro)
     {

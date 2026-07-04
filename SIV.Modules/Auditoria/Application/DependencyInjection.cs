@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SIV.Shared.Contracts;
 
 namespace SIV.Modules.Auditoria.Application;
 

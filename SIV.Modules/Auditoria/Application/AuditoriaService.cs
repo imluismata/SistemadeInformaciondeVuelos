@@ -1,9 +1,10 @@
 using SIV.Modules.Auditoria.Domain;
+using SIV.Shared.Contracts;
 using SIV.Shared.DTOs;
 
 namespace SIV.Modules.Auditoria.Application;
 
-public sealed class AuditoriaService(IAuditoriaRepository repository) : IAuditoriaService
+internal sealed class AuditoriaService(IAuditoriaRepository repository) : IAuditoriaService
 {
     public async Task RegistrarAsync(string modulo, string accion, string resultado, string? detalle = null)
     {

@@ -6,4 +6,7 @@ public sealed class VueloNoEncontradoException : Exception
         : base($"No se encontró el vuelo con identificador {vueloId}.")
     {
     }
+
+    public VueloNoEncontradoException(string numeroVuelo)
+        : base($"No se encontró un vuelo con número {numeroVuelo}.") { }
 }

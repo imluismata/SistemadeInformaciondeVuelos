@@ -1,6 +1,6 @@
 namespace SIV.Modules.Auditoria.Domain;
 
-public sealed class RegistroAuditoria
+internal sealed class RegistroAuditoria
 {
     private RegistroAuditoria() { }
 
