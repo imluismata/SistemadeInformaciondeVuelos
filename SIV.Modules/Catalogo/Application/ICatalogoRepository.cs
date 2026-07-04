@@ -2,7 +2,7 @@ using SIV.Modules.Catalogo.Domain;
 
 namespace SIV.Modules.Catalogo.Application;
 
-public interface ICatalogoRepository
+internal interface ICatalogoRepository
 {
     Task<IReadOnlyList<Aerolinea>> ObtenerAerolineasAsync();
     Task<Aerolinea?> ObtenerAerolineaPorIdAsync(Guid id);

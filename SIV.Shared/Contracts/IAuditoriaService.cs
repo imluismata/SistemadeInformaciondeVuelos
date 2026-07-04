@@ -1,6 +1,6 @@
 using SIV.Shared.DTOs;
 
-namespace SIV.Modules.Auditoria.Application;
+namespace SIV.Shared.Contracts;
 
 public interface IAuditoriaService
 {

@@ -4,7 +4,7 @@ using SIV.Modules.Vuelos.Domain;
 
 namespace SIV.Infrastructure.Repositories;
 
-public sealed class VueloRepository(SivDbContext db) : IVueloRepository
+internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
 {
     public async Task<IReadOnlyList<Vuelo>> ObtenerTodosAsync()
         => await db.Vuelos.ToListAsync();

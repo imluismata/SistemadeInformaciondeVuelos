@@ -4,7 +4,7 @@ using SIV.Modules.Auditoria.Domain;
 
 namespace SIV.Infrastructure.Migrations.Configurations;
 
-public class AuditoriaConfiguration : IEntityTypeConfiguration<RegistroAuditoria>
+internal class AuditoriaConfiguration : IEntityTypeConfiguration<RegistroAuditoria>
 {
     public void Configure(EntityTypeBuilder<RegistroAuditoria> builder)
     {

@@ -1,10 +1,10 @@
-using SIV.Modules.Auditoria.Application;
 using SIV.Modules.Catalogo.Domain;
+using SIV.Shared.Contracts;
 using SIV.Shared.DTOs;
 
 namespace SIV.Modules.Catalogo.Application;
 
-public sealed class CatalogoService : ICatalogoService
+internal sealed class CatalogoService : ICatalogoService
 {
     private readonly ICatalogoRepository _repository;
     private readonly IAuditoriaService _auditoria;

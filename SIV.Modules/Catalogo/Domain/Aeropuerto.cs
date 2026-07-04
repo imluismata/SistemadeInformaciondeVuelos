@@ -1,6 +1,6 @@
 namespace SIV.Modules.Catalogo.Domain;
 
-public sealed class Aeropuerto
+internal sealed class Aeropuerto
 {
     private Aeropuerto()
     {

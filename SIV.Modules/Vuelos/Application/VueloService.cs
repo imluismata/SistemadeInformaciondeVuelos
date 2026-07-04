@@ -1,11 +1,11 @@
-using SIV.Modules.Auditoria.Application;
 using SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Contracts;
 using SIV.Shared.DTOs;
 using SIV.Shared.Exceptions;
 
 namespace SIV.Modules.Vuelos.Application;
 
-public sealed class VueloService : IVueloService
+internal sealed class VueloService : IVueloService
 {
     private readonly IVueloRepository _repository;
     private readonly IVueloDomainService _domainService;

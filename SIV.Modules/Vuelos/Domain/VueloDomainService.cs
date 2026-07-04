@@ -2,7 +2,7 @@ using SIV.Shared.Exceptions;
 
 namespace SIV.Modules.Vuelos.Domain;
 
-public sealed class VueloDomainService : IVueloDomainService
+internal sealed class VueloDomainService : IVueloDomainService
 {
     private static readonly IReadOnlyDictionary<EstadoVuelo, EstadoVuelo[]> TransicionesValidas =
         new Dictionary<EstadoVuelo, EstadoVuelo[]>

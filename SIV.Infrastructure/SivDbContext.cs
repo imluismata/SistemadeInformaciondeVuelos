@@ -2,16 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using SIV.Infrastructure.Migrations.Configurations;
 using SIV.Modules.Auditoria.Domain;
 using SIV.Modules.Catalogo.Domain;
+using SIV.Modules.Notificaciones.Domain;
+using SIV.Modules.Usuarios.Domain;
 using SIV.Modules.Vuelos.Domain;
+using SeguimientoEntidad = SIV.Modules.Seguimiento.Domain.Seguimiento;
 
 namespace SIV.Infrastructure;
 
 public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(options)
 {
-    public DbSet<Vuelo> Vuelos => Set<Vuelo>();
-    public DbSet<Aerolinea> Aerolineas => Set<Aerolinea>();
-    public DbSet<Aeropuerto> Aeropuertos => Set<Aeropuerto>();
-    public DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
+    internal DbSet<Vuelo> Vuelos => Set<Vuelo>();
+    internal DbSet<Aerolinea> Aerolineas => Set<Aerolinea>();
+    internal DbSet<Aeropuerto> Aeropuertos => Set<Aeropuerto>();
+    internal DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
+    public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<SeguimientoEntidad> Seguimientos => Set<SeguimientoEntidad>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,5 +25,6 @@ public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(op
         modelBuilder.ApplyConfiguration(new AerolineaConfiguration());
         modelBuilder.ApplyConfiguration(new AeropuertoConfiguration());
         modelBuilder.ApplyConfiguration(new AuditoriaConfiguration());
+        base.OnModelCreating(modelBuilder);
     }
 }

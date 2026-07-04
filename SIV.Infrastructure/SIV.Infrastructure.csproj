@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +10,7 @@
       <ProjectReference Include="..\SIV.Shared\SIV.Shared.csproj" />
       <ProjectReference Include="..\SIV.Modules\SIV.Modules.csproj" />
     </ItemGroup>
+
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
