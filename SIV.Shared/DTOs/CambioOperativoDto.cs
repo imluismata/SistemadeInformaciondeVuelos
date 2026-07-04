@@ -1,6 +1,10 @@
 namespace SIV.Shared.DTOs;
 
-public class CambioOperativoDto
-{
-    
-}
+public sealed record CambioOperativoDto(
+    Guid Id,
+    Guid VueloId,
+    string Tipo,
+    string Motivo,
+    string? ValorAnterior,
+    string? ValorNuevo,
+    DateTime RegistradoEn);

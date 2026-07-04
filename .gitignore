@@ -11,7 +11,37 @@ bin/
 obj/
 *.user
 *.suo
+*.userprefs
 
-# Variables de entorno (MUY importante)
+# Secretos y configuración local 
 .env
+.env.local
+*.env
 appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# Publicación
+publish/
+*.pubxml
+*.pubxml.user
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Documentos internos
+*.pdf
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales de Visual Studio
+.vs/
+*.cache
+CLAUDE.md
+" .claude:commands:/"
+CLAUDE.md
+" .claude:commands:/"

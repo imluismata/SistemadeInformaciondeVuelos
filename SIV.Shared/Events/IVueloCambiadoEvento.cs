@@ -1,6 +1,14 @@
+using SIV.Shared.Enums;
+
 namespace SIV.Shared.Events;
 
 public interface IVueloCambiadoEvento
 {
-    
+    Guid VueloId { get; }
+    string NumeroVuelo { get; }
+    string EstadoAnterior { get; }
+    string EstadoNuevo { get; }
+    TipoCambio TipoCambio { get; }
+    string Causa { get; }
+    DateTime OcurridoEn { get; }
 }

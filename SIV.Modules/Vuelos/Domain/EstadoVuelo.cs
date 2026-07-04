@@ -1,6 +1,12 @@
 namespace SIV.Modules.Vuelos.Domain;
 
-public class EstadoVuelo
+public enum EstadoVuelo
 {
-    
+    Programado,
+    Retrasado,
+    Embarcando,
+    EnVuelo,
+    Aterrizado,
+    Completado,
+    Cancelado
 }
