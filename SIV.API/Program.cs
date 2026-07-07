@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SIV.Infrastructure;
 using SIV.Modules;
 
@@ -14,6 +13,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddModules();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PortalPublico", policy =>
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -22,14 +29,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<SivDbContext>();
-    db.Database.Migrate();
-}
-
 app.UseMiddleware<SIV.API.Middleware.ExceptionMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("PortalPublico");
 app.MapControllers();
 
 app.Run();

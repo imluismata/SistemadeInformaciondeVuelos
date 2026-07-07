@@ -26,7 +26,7 @@ public class NotificacionConfiguration : IEntityTypeConfiguration<Notificacion>
             .IsRequired()
             .HasConversion<string>()
             .HasMaxLength(20)
-            .HasDefaultValue("NoLeida");
+            .HasDefaultValue(EstadoNotificacion.NoLeida);
 
         builder.Property(n => n.GeneradaEn)
             .IsRequired();

@@ -8,4 +8,6 @@ public interface IConsultaPublicaService
     Task<VueloPublicoDto?> BuscarPorNumeroAsync(string numeroVuelo);
     Task<IEnumerable<VueloPublicoDto>> BuscarConFiltroAsync(FiltroConsultaDto filtro);
     Task<VueloPublicoDto?> ObtenerDetallePorIdAsync(Guid vueloId);
+    Task<IEnumerable<VueloPublicoDto>> ObtenerSalidasAsync(DateTime? fecha = null);
+    Task<IEnumerable<VueloPublicoDto>> ObtenerLlegadasAsync(DateTime? fecha = null);
 }

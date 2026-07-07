@@ -42,7 +42,7 @@ internal class SeguimientoService : ISeguimientoService, ISeguimientoConsulta
     {
         var seguimientos = await _repo.ObtenerActivosPorUsuarioAsync(usuarioId);
         return seguimientos.Select(s => new SeguimientoDto(
-            s.Id, s.UsuarioId, s.VueloId, s.Estado.ToString(), s.CreadoEn));
+            s.Id, s.UsuarioId, s.VueloId, s.Estado.ToString(), s.CreadoEn, s.CanceladoEn));
     }
 
     public async Task<IEnumerable<Guid>> ObtenerUsuariosPorVueloAsync(Guid vueloId)
