@@ -4,7 +4,7 @@ using SIV.Modules.Catalogo.Domain;
 
 namespace SIV.Infrastructure.Migrations.Configurations;
 
-public class AerolineaConfiguration : IEntityTypeConfiguration<Aerolinea>
+internal class AerolineaConfiguration : IEntityTypeConfiguration<Aerolinea>
 {
     public void Configure(EntityTypeBuilder<Aerolinea> builder)
     {

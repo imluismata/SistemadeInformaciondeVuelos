@@ -4,7 +4,7 @@ using SIV.Modules.Vuelos.Domain;
 
 namespace SIV.Infrastructure.Migrations.Configurations;
 
-public class VueloConfiguration : IEntityTypeConfiguration<Vuelo>
+internal class VueloConfiguration : IEntityTypeConfiguration<Vuelo>
 {
     public void Configure(EntityTypeBuilder<Vuelo> builder)
     {

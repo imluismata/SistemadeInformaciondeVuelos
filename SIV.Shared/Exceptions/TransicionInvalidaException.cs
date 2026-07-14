@@ -1,9 +1,11 @@
 namespace SIV.Shared.Exceptions;
 
-public class TransicionInvalidaException : Exception
+public sealed class TransicionInvalidaException : Exception
 {
     public TransicionInvalidaException(string mensaje) : base(mensaje) { }
 
-    public TransicionInvalidaException(string estadoOrigen, string estadoDestino)
-        : base($"Transición inválida de '{estadoOrigen}' a '{estadoDestino}'.") { }
+    public TransicionInvalidaException(string estadoAnterior, string estadoNuevo)
+        : base($"La transición desde {estadoAnterior} hacia {estadoNuevo} no es válida.")
+    {
+    }
 }

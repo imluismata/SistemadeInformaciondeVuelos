@@ -11,13 +11,6 @@
       <ProjectReference Include="..\SIV.Modules\SIV.Modules.csproj" />
     </ItemGroup>
 
-    <!-- Excluir hasta que Luis corrija y suba su código de Catalogo y VueloConfiguration -->
-    <ItemGroup>
-      <Compile Remove="Migrations\Configurations\AerolineaConfiguration.cs" />
-      <Compile Remove="Migrations\Configurations\AeropuertoConfiguration.cs" />
-      <Compile Remove="Migrations\Configurations\VueloConfiguration.cs" />
-      <Compile Remove="Repositories\CatalogoRepository.cs" />
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />

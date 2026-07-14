@@ -4,7 +4,7 @@ using SIV.Modules.Catalogo.Domain;
 
 namespace SIV.Infrastructure.Repositories;
 
-public sealed class CatalogoRepository(SivDbContext db) : ICatalogoRepository
+internal sealed class CatalogoRepository(SivDbContext db) : ICatalogoRepository
 {
     public async Task<IReadOnlyList<Aerolinea>> ObtenerAerolineasAsync()
         => await db.Aerolineas.ToListAsync();
