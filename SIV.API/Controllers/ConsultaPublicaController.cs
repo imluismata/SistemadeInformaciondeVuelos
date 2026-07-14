@@ -5,7 +5,7 @@ using SIV.Modules.ConsultaPublica.Application.Interfaces;
 namespace SIV.API.Controllers;
 
 [ApiController]
-[Route("api/vuelos")]
+[Route("api/consulta-publica")]
 public class ConsultaPublicaController : ControllerBase
 {
     private readonly IConsultaPublicaService _servicio;

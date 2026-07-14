@@ -7,7 +7,7 @@ import { FiltroConsulta, VueloPublico } from '../models/vuelo.model';
 @Injectable({ providedIn: 'root' })
 export class VuelosService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/vuelos`;
+  private readonly baseUrl = `${environment.apiUrl}/consulta-publica`;
 
   obtenerActivos(): Observable<VueloPublico[]> {
     return this.http.get<VueloPublico[]>(this.baseUrl);

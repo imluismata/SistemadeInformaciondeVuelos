@@ -12,8 +12,8 @@ using SIV.Infrastructure;
 namespace SIV.Infrastructure.Migrations
 {
     [DbContext(typeof(SivDbContext))]
-    [Migration("20260714014653_IntegracionCompleta")]
-    partial class IntegracionCompleta
+    [Migration("20260714020042_EstadoFinal")]
+    partial class EstadoFinal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
