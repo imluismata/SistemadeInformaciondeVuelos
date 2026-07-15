@@ -35,19 +35,27 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
     }
 
     public async Task<Vuelo?> ObtenerPorIdAsync(Guid id)
-        => await db.Vuelos.FirstOrDefaultAsync(v => v.Id == id);
+        => await db.Vuelos
+            .Include(v => v.HistorialEstados)
+            .Include(v => v.CambiosOperativos)
+            .FirstOrDefaultAsync(v => v.Id == id);
 
     public async Task<Vuelo?> ObtenerPorNumeroAsync(string numero)
         => await db.Vuelos
+            .Include(v => v.HistorialEstados)
+            .Include(v => v.CambiosOperativos)
             .FirstOrDefaultAsync(v => v.Numero == numero);
 
     public async Task GuardarAsync(Vuelo vuelo)
     {
-        var existe = await db.Vuelos.AnyAsync(v => v.Id == vuelo.Id);
-        if (!existe)
-            db.Vuelos.Add(vuelo);
-        else
-            db.Vuelos.Update(vuelo);
+        if (db.Entry(vuelo).State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+        {
+            var existe = await db.Vuelos.AnyAsync(v => v.Id == vuelo.Id);
+            if (!existe)
+                db.Vuelos.Add(vuelo);
+            else
+                db.Vuelos.Update(vuelo);
+        }
 
         await db.SaveChangesAsync();
     }
