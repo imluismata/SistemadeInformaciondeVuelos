@@ -5,5 +5,6 @@ public record SeguimientoDto(
     Guid UsuarioId,
     Guid VueloId,
     string Estado,
-    DateTime CreadoEn
+    DateTime CreadoEn,
+    DateTime? CanceladoEn
 );

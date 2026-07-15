@@ -1,0 +1,48 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #1a2940;
+  color: #fff;
+
+  .brand {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    a {
+      color: #d6e0f0;
+      text-decoration: none;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    .usuario {
+      color: #9fb3d1;
+      font-size: 0.9rem;
+    }
+
+    button {
+      background: #2e4a73;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background: #3a5d8f;
+      }
+    }
+  }
+}
