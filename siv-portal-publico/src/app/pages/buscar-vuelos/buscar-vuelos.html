@@ -1,0 +1,50 @@
+<h1>Vuelos</h1>
+
+<form class="filtros" (ngSubmit)="buscar()">
+  <input type="text" name="origen" placeholder="Origen" [(ngModel)]="origen" />
+  <input type="text" name="destino" placeholder="Destino" [(ngModel)]="destino" />
+  <input type="date" name="fecha" [(ngModel)]="fecha" />
+  <button type="submit">Buscar</button>
+  <button type="button" (click)="cargarActivos()">Ver todos</button>
+</form>
+
+@if (cargando()) {
+  <p>Cargando vuelos...</p>
+}
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+
+@if (!cargando() && vuelos().length === 0) {
+  <p>No hay vuelos para mostrar.</p>
+}
+
+<table class="tabla-vuelos" *ngIf="vuelos().length > 0">
+  <thead>
+    <tr>
+      <th>Aerolínea</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      <th>Salida</th>
+      <th>Llegada</th>
+      <th>Puerta</th>
+      <th>Estado</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (vuelo of vuelos(); track vuelo.id) {
+      <tr>
+        <td>{{ vuelo.aerolinea }}</td>
+        <td>{{ vuelo.origen }}</td>
+        <td>{{ vuelo.destino }}</td>
+        <td>{{ vuelo.horarioSalida | date: 'short' }}</td>
+        <td>{{ vuelo.horarioLlegada | date: 'short' }}</td>
+        <td>{{ vuelo.puerta || '—' }}</td>
+        <td>{{ vuelo.estado }}</td>
+        <td><a [routerLink]="['/vuelos', vuelo.id]">Ver detalle</a></td>
+      </tr>
+    }
+  </tbody>
+</table>

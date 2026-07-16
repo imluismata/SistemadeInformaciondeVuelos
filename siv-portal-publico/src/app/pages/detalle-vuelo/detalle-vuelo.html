@@ -1,0 +1,41 @@
+@if (cargando()) {
+  <p>Cargando...</p>
+}
+
+@if (!cargando() && !vuelo()) {
+  <p>No se encontró el vuelo.</p>
+}
+
+@if (vuelo(); as v) {
+  <h1>{{ v.aerolinea }}</h1>
+
+  <dl class="detalle">
+    <dt>Origen</dt>
+    <dd>{{ v.origen }}</dd>
+
+    <dt>Destino</dt>
+    <dd>{{ v.destino }}</dd>
+
+    <dt>Salida</dt>
+    <dd>{{ v.horarioSalida | date: 'medium' }}</dd>
+
+    <dt>Llegada</dt>
+    <dd>{{ v.horarioLlegada | date: 'medium' }}</dd>
+
+    <dt>Puerta</dt>
+    <dd>{{ v.puerta || '—' }}</dd>
+
+    <dt>Estado</dt>
+    <dd>{{ v.estado }}</dd>
+  </dl>
+
+  @if (auth.estaAutenticado()) {
+    <button type="button" (click)="seguirVuelo()">Seguir este vuelo</button>
+  } @else {
+    <p>Inicia sesión para seguir este vuelo.</p>
+  }
+
+  @if (mensaje()) {
+    <p class="mensaje">{{ mensaje() }}</p>
+  }
+}

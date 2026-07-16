@@ -1,0 +1,21 @@
+<h1>Iniciar sesión</h1>
+
+<form class="formulario" (ngSubmit)="iniciarSesion()">
+  <label>
+    Email
+    <input type="email" name="email" required [(ngModel)]="email" />
+  </label>
+
+  <label>
+    Contraseña
+    <input type="password" name="password" required [(ngModel)]="password" />
+  </label>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <button type="submit" [disabled]="enviando()">Entrar</button>
+</form>
+
+<p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>

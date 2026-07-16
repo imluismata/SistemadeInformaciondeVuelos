@@ -1,0 +1,21 @@
+<h1>Mis seguimientos</h1>
+
+@if (cargando()) {
+  <p>Cargando...</p>
+}
+
+@if (!cargando() && seguimientos().length === 0) {
+  <p>No tienes vuelos en seguimiento. <a routerLink="/vuelos">Buscar vuelos</a></p>
+}
+
+@if (seguimientos().length > 0) {
+  <ul class="lista">
+    @for (s of seguimientos(); track s.id) {
+      <li>
+        <a [routerLink]="['/vuelos', s.vueloId]">Vuelo {{ s.vueloId }}</a>
+        <span class="estado">{{ s.estado }}</span>
+        <button type="button" (click)="cancelar(s)">Cancelar</button>
+      </li>
+    }
+  </ul>
+}

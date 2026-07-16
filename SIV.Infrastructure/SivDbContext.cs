@@ -21,10 +21,7 @@ public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new VueloConfiguration());
-        modelBuilder.ApplyConfiguration(new AerolineaConfiguration());
-        modelBuilder.ApplyConfiguration(new AeropuertoConfiguration());
-        modelBuilder.ApplyConfiguration(new AuditoriaConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SivDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }
 }

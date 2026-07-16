@@ -1,0 +1,16 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand">SIV &middot; Portal Público</a>
+
+  <div class="links">
+    <a routerLink="/vuelos">Vuelos</a>
+
+    @if (auth.estaAutenticado()) {
+      <a routerLink="/mis-seguimientos">Mis seguimientos</a>
+      <span class="usuario">{{ auth.usuarioActual()?.nombre }}</span>
+      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login">Iniciar sesión</a>
+      <a routerLink="/registro">Registrarse</a>
+    }
+  </div>
+</nav>
