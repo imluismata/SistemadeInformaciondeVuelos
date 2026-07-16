@@ -124,8 +124,12 @@ namespace SIV.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("NoLeida");
 
                     b.Property<DateTime>("GeneradaEn")
                         .HasColumnType("datetime2");
@@ -135,7 +139,8 @@ namespace SIV.Infrastructure.Migrations
 
                     b.Property<string>("Mensaje")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
@@ -145,7 +150,10 @@ namespace SIV.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notificaciones");
+                    b.HasIndex("UsuarioId")
+                        .HasDatabaseName("IX_Notificaciones_UsuarioId");
+
+                    b.ToTable("Notificaciones", (string)null);
                 });
 
             modelBuilder.Entity("SIV.Modules.Seguimiento.Domain.Seguimiento", b =>
@@ -160,8 +168,10 @@ namespace SIV.Infrastructure.Migrations
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
@@ -171,7 +181,10 @@ namespace SIV.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Seguimientos");
+                    b.HasIndex("UsuarioId", "VueloId")
+                        .HasDatabaseName("IX_Seguimientos_UsuarioId_VueloId");
+
+                    b.ToTable("Seguimientos", (string)null);
                 });
 
             modelBuilder.Entity("SIV.Modules.Usuarios.Domain.Usuario", b =>
@@ -185,28 +198,35 @@ namespace SIV.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Rol")
-                        .HasColumnType("int");
+                    b.Property<string>("Rol")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios");
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Usuarios_Email");
+
+                    b.ToTable("Usuarios", (string)null);
                 });
 
             modelBuilder.Entity("SIV.Modules.Vuelos.Domain.Vuelo", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AerolineaId")
@@ -254,7 +274,6 @@ namespace SIV.Infrastructure.Migrations
                     b.OwnsMany("SIV.Modules.Vuelos.Domain.CambioOperativo", "CambiosOperativos", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Motivo")
@@ -294,7 +313,6 @@ namespace SIV.Infrastructure.Migrations
                     b.OwnsMany("SIV.Modules.Vuelos.Domain.HistorialEstado", "HistorialEstados", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("EstadoAnterior")
