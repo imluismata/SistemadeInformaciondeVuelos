@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · SIV Intranet</title>
+    <partial name="_DesignHead" />
+</head>
+<body class="min-h-screen flex items-center justify-center bg-primary">
+    <div class="w-full max-w-md px-4">
+        @RenderBody()
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
