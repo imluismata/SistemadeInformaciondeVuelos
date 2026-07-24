@@ -1,0 +1,146 @@
+@using SIV.Intranet.Models
+@model SIV.Intranet.Models.VueloDetalleApi
+@{
+    ViewData["Title"] = $"Vuelo {Model.Numero}";
+    ViewData["Subtitulo"] = "Detalle, historial y operaciones";
+    var puedeOperar = User.IsInRole("OperadorVuelos") || User.IsInRole("Administrador");
+}
+
+<a asp-action="Index" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary">
+    <span class="material-symbols-outlined text-base">arrow_back</span> Volver a vuelos
+</a>
+
+<!-- Resumen -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
+    <div class="flex justify-between items-start flex-wrap gap-4">
+        <div>
+            <div class="font-mono text-2xl font-bold text-on-surface">@Model.Numero</div>
+            <div class="text-sm text-on-surface-variant mt-1">
+                Salida @Model.HorarioSalida.ToString("dd/MM/yyyy HH:mm") ·
+                Llegada @Model.HorarioLlegada.ToString("dd/MM/yyyy HH:mm")
+            </div>
+            <div class="text-sm text-on-surface-variant">
+                Puerta: <span class="font-semibold">@(string.IsNullOrEmpty(Model.Puerta) ? "—" : Model.Puerta)</span>
+            </div>
+        </div>
+        <span class="status-pill @EstadoVueloEstilo.ClasePill(Model.EstadoActual)">@Model.EstadoActual</span>
+    </div>
+</div>
+
+@if (puedeOperar)
+{
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Cambiar estado -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-bold text-primary mb-1">Cambiar estado</h3>
+            <p class="text-sm text-on-surface-variant mb-4">
+                Estado actual:
+                <span class="status-pill @EstadoVueloEstilo.ClasePill(Model.EstadoActual)">@Model.EstadoActual</span>
+                · el sistema valida que la transición sea permitida.
+            </p>
+            @* Prevención de errores: el valor por defecto no es una acción ejecutable.
+               El operador debe elegir conscientemente, y se confirma antes de aplicar. *@
+            <form asp-action="CambiarEstado" method="post" class="flex gap-3"
+                  onsubmit="return confirm('¿Cambiar el estado del vuelo @Model.Numero a ' + this.estadoNuevo.value + '?');">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <select name="estadoNuevo" required
+                        class="flex-grow rounded-lg border border-outline-variant px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-container">
+                    <option value="" disabled selected>— Seleccionar nuevo estado —</option>
+                    @* Se omite el estado actual: cambiar a sí mismo no produce ningún efecto. *@
+                    @foreach (var estado in EstadosVuelo.Todos.Where(e => e != Model.EstadoActual))
+                    {
+                        <option value="@estado">@estado</option>
+                    }
+                </select>
+                <button type="submit" class="bg-primary text-on-primary rounded-lg px-5 py-2.5 font-semibold hover:opacity-90 transition-opacity">
+                    Aplicar
+                </button>
+            </form>
+        </div>
+
+        <!-- Cambio operativo -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-bold text-primary mb-1">Registrar cambio operativo</h3>
+            <p class="text-sm text-on-surface-variant mb-4">El motivo es obligatorio y queda registrado de forma inmutable.</p>
+            @* Mismo criterio que el cambio de estado: sin opción preseleccionada. *@
+            <form asp-action="RegistrarCambioOperativo" method="post" class="space-y-3"
+                  onsubmit="return confirm('¿Registrar un cambio de tipo ' + this.Tipo.value + ' en el vuelo @Model.Numero?');">
+                <input type="hidden" name="VueloId" value="@Model.Id" />
+                <select name="Tipo" required
+                        class="w-full rounded-lg border border-outline-variant px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-container">
+                    <option value="" disabled selected>— Seleccionar tipo de cambio —</option>
+                    @foreach (var tipo in CambioOperativoViewModel.TiposDisponibles)
+                    {
+                        <option value="@tipo">@tipo</option>
+                    }
+                </select>
+                <input name="Motivo" placeholder="Motivo (obligatorio)" required
+                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-container" />
+                <div class="grid grid-cols-2 gap-3">
+                    <input name="Duracion" placeholder="Duración hh:mm:ss"
+                           class="w-full rounded-lg border border-outline-variant px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-container" />
+                    <input name="NuevaPuerta" placeholder="Nueva puerta"
+                           class="w-full rounded-lg border border-outline-variant px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-container" />
+                </div>
+                <button type="submit" class="w-full bg-secondary text-white rounded-lg px-5 py-2.5 font-semibold hover:opacity-90 transition-opacity">
+                    Registrar cambio
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- Historial de estados -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant">
+        <h3 class="text-lg font-bold text-primary">Historial de estados</h3>
+    </div>
+    @if (!Model.HistorialEstados.Any())
+    {
+        <div class="p-6 text-on-surface-variant">Sin historial.</div>
+    }
+    else
+    {
+        <div class="divide-y divide-outline-variant">
+            @foreach (var h in Model.HistorialEstados)
+            {
+                <div class="px-6 py-3 flex items-center gap-4">
+                    <span class="font-mono text-sm text-on-surface-variant w-40">@h.OcurridoEn.ToString("dd/MM/yyyy HH:mm")</span>
+                    <span class="text-sm">@h.EstadoAnterior</span>
+                    <span class="material-symbols-outlined text-base text-on-surface-variant">trending_flat</span>
+                    <span class="status-pill @EstadoVueloEstilo.ClasePill(h.EstadoNuevo)">@h.EstadoNuevo</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Cambios operativos -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant">
+        <h3 class="text-lg font-bold text-primary">Cambios operativos</h3>
+    </div>
+    @if (!Model.CambiosOperativos.Any())
+    {
+        <div class="p-6 text-on-surface-variant">Sin cambios operativos registrados.</div>
+    }
+    else
+    {
+        <div class="divide-y divide-outline-variant">
+            @foreach (var c in Model.CambiosOperativos)
+            {
+                <div class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-sm text-on-surface-variant">@c.RegistradoEn.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="status-pill bg-surface-container text-on-surface-variant">@c.Tipo</span>
+                    </div>
+                    <p class="mt-1 font-medium">@c.Motivo</p>
+                    @if (!string.IsNullOrEmpty(c.ValorAnterior))
+                    {
+                        <p class="text-xs text-on-surface-variant mt-1">@c.ValorAnterior → @c.ValorNuevo</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

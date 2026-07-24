@@ -3,12 +3,38 @@ using SIV.Intranet.Models;
 namespace SIV.Intranet.Services;
 
 /// <summary>
-/// Cliente de la API del SIV. Es la única pieza de la intranet que conoce
-/// los endpoints HTTP; los controladores delegan en ella (igual que los
-/// controladores de la API delegan en los Services).
+/// Contratos del cliente de la API, separados por área funcional para que
+/// cada controlador dependa únicamente de lo que usa (Interface Segregation).
 /// </summary>
-public interface ISivApiClient
+
+public interface IAutenticacionApi
 {
     Task<ResultadoLogin?> LoginAsync(string email, string password);
-    Task<IReadOnlyList<VueloApi>> ObtenerVuelosAsync();
+}
+
+public interface ICatalogoApi
+{
+    Task<IReadOnlyList<AerolineaApi>> ObtenerAerolineasAsync();
+    Task<IReadOnlyList<AeropuertoApi>> ObtenerAeropuertosAsync();
+
+    Task<ResultadoOperacion> GuardarAerolineaAsync(AerolineaViewModel aerolinea);
+    Task<ResultadoOperacion> DesactivarAerolineaAsync(Guid id);
+
+    Task<ResultadoOperacion> GuardarAeropuertoAsync(AeropuertoViewModel aeropuerto);
+    Task<ResultadoOperacion> DesactivarAeropuertoAsync(Guid id);
+}
+
+public interface IAuditoriaApi
+{
+    /// <summary>Consulta el log. Solo lectura: no hay escritura por diseño (RNF-SEG-04).</summary>
+    Task<IReadOnlyList<AuditoriaApi>> ConsultarAsync(string? modulo, string? accion, DateTime? desde, DateTime? hasta);
+}
+
+public interface IVuelosApi
+{
+    Task<IReadOnlyList<VueloApi>> ObtenerTodosAsync();
+    Task<VueloDetalleApi?> ObtenerPorIdAsync(Guid id);
+    Task<ResultadoOperacion> RegistrarAsync(RegistrarVueloViewModel vuelo);
+    Task<ResultadoOperacion> CambiarEstadoAsync(Guid id, string estadoNuevo);
+    Task<ResultadoOperacion> RegistrarCambioOperativoAsync(Guid id, CambioOperativoViewModel cambio);
 }

@@ -3,12 +3,16 @@
 @{
     ViewData["Title"] = "Gestión de Vuelos";
     ViewData["Subtitulo"] = "Estado en tiempo real de SDQ";
+
+    // Determina si el usuario puede operar sobre los vuelos; se usa tanto para
+    // el botón de alta como para la acción de cada fila.
+    var puedeOperar = User.IsInRole("OperadorVuelos") || User.IsInRole("Administrador");
 }
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
     <div class="p-6 border-b border-outline-variant flex justify-between items-center">
         <h3 class="text-lg font-bold text-primary">Programación de vuelos</h3>
-        @if (User.IsInRole("OperadorVuelos") || User.IsInRole("Administrador"))
+        @if (puedeOperar)
         {
             <a asp-controller="Vuelos" asp-action="Registrar"
                class="flex items-center gap-1 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm hover:opacity-90 transition-all">
@@ -32,13 +36,17 @@
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Llegada</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Puerta</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant">
                     @foreach (var v in Model)
                     {
                         <tr class="hover:bg-surface-container-low transition-colors">
-                            <td class="px-6 py-4 font-mono font-semibold text-on-surface">@v.Numero</td>
+                            <td class="px-6 py-4">
+                                <a asp-action="Detalle" asp-route-id="@v.Id"
+                                   class="font-mono font-semibold text-primary hover:underline">@v.Numero</a>
+                            </td>
                             <td class="px-6 py-4 font-mono">@v.HorarioSalida.ToString("dd/MM HH:mm")</td>
                             <td class="px-6 py-4 font-mono">@v.HorarioLlegada.ToString("dd/MM HH:mm")</td>
                             <td class="px-6 py-4">
@@ -46,6 +54,15 @@
                             </td>
                             <td class="px-6 py-4">
                                 <span class="status-pill @EstadoVueloEstilo.ClasePill(v.EstadoActual)">@v.EstadoActual</span>
+                            </td>
+                            @* Acción explícita: el icono refleja lo que el rol permite hacer. *@
+                            <td class="px-6 py-4 text-right">
+                                <a asp-action="Detalle" asp-route-id="@v.Id"
+                                   title="@(puedeOperar ? $"Gestionar el vuelo {v.Numero}" : $"Ver detalle del vuelo {v.Numero}")"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-base">@(puedeOperar ? "settings" : "visibility")</span>
+                                    <span class="text-sm">@(puedeOperar ? "Gestionar" : "Ver")</span>
+                                </a>
                             </td>
                         </tr>
                     }

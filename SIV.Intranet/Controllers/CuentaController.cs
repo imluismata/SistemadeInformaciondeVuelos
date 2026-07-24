@@ -14,9 +14,9 @@ namespace SIV.Intranet.Controllers;
 /// </summary>
 public sealed class CuentaController : Controller
 {
-    private readonly ISivApiClient _api;
+    private readonly IAutenticacionApi _api;
 
-    public CuentaController(ISivApiClient api)
+    public CuentaController(IAutenticacionApi api)
     {
         _api = api;
     }

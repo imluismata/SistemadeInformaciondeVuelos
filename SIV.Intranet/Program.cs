@@ -19,13 +19,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// --- Cliente HTTP tipado hacia la API del SIV ---
+// --- Clientes HTTP tipados hacia la API del SIV ---
 // El TokenHandler adjunta el JWT del usuario a cada llamada.
 builder.Services.AddTransient<TokenHandler>();
-builder.Services.AddHttpClient<ISivApiClient, SivApiClient>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["SivApi:BaseUrl"]!);
-}).AddHttpMessageHandler<TokenHandler>();
+
+var urlApi = new Uri(builder.Configuration["SivApi:BaseUrl"]!);
+void ConfigurarCliente(HttpClient client) => client.BaseAddress = urlApi;
+
+builder.Services.AddHttpClient<IAutenticacionApi, AutenticacionApi>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<ICatalogoApi, CatalogoApi>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IVuelosApi, VuelosApi>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IAuditoriaApi, AuditoriaApiClient>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
 
 var app = builder.Build();
 

@@ -1,0 +1,138 @@
+@model SIV.Intranet.Models.CatalogoViewModel
+@{
+    ViewData["Title"] = "Catálogo aeroportuario";
+    ViewData["Subtitulo"] = "Aerolíneas y aeropuertos del sistema";
+    var esAdmin = User.IsInRole("Administrador");
+}
+
+<!-- Aerolíneas -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Aerolíneas</h3>
+            <p class="text-sm text-on-surface-variant">@Model.Aerolineas.Count registrada(s)</p>
+        </div>
+        @if (esAdmin)
+        {
+            <a asp-action="Aerolinea" class="flex items-center gap-1 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm hover:opacity-90 transition-all">
+                <span class="material-symbols-outlined text-sm">add</span> Nueva aerolínea
+            </a>
+        }
+    </div>
+
+    @if (!Model.Aerolineas.Any())
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay aerolíneas registradas.</div>
+    }
+    else
+    {
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-surface-container-low border-b border-outline-variant">
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+                    @if (esAdmin)
+                    {
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                @foreach (var a in Model.Aerolineas)
+                {
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                        <td class="px-6 py-4 font-mono font-semibold">@a.Codigo</td>
+                        <td class="px-6 py-4">@a.Nombre</td>
+                        <td class="px-6 py-4">
+                            <span class="status-pill @(a.Activa ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
+                                @(a.Activa ? "Activa" : "Inactiva")
+                            </span>
+                        </td>
+                        @if (esAdmin)
+                        {
+                            <td class="px-6 py-4 text-right">
+                                <a asp-action="Aerolinea" asp-route-id="@a.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
+                                @if (a.Activa)
+                                {
+                                    <form asp-action="DesactivarAerolinea" method="post" class="inline"
+                                          onsubmit="return confirm('¿Desactivar la aerolínea @a.Codigo?');">
+                                        <input type="hidden" name="id" value="@a.Id" />
+                                        <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- Aeropuertos -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Aeropuertos</h3>
+            <p class="text-sm text-on-surface-variant">@Model.Aeropuertos.Count registrado(s)</p>
+        </div>
+        @if (esAdmin)
+        {
+            <a asp-action="Aeropuerto" class="flex items-center gap-1 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm hover:opacity-90 transition-all">
+                <span class="material-symbols-outlined text-sm">add</span> Nuevo aeropuerto
+            </a>
+        }
+    </div>
+
+    @if (!Model.Aeropuertos.Any())
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay aeropuertos registrados.</div>
+    }
+    else
+    {
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-surface-container-low border-b border-outline-variant">
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">País</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+                    @if (esAdmin)
+                    {
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                @foreach (var a in Model.Aeropuertos)
+                {
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                        <td class="px-6 py-4 font-mono font-semibold">@a.Codigo</td>
+                        <td class="px-6 py-4">@a.Nombre</td>
+                        <td class="px-6 py-4 text-on-surface-variant">@a.Pais</td>
+                        <td class="px-6 py-4">
+                            <span class="status-pill @(a.Activo ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
+                                @(a.Activo ? "Activo" : "Inactivo")
+                            </span>
+                        </td>
+                        @if (esAdmin)
+                        {
+                            <td class="px-6 py-4 text-right">
+                                <a asp-action="Aeropuerto" asp-route-id="@a.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
+                                @if (a.Activo)
+                                {
+                                    <form asp-action="DesactivarAeropuerto" method="post" class="inline"
+                                          onsubmit="return confirm('¿Desactivar el aeropuerto @a.Codigo?');">
+                                        <input type="hidden" name="id" value="@a.Id" />
+                                        <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
