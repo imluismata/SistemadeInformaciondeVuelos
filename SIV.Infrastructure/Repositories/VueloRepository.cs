@@ -45,9 +45,18 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
     {
         var existe = await db.Vuelos.AnyAsync(v => v.Id == vuelo.Id);
         if (!existe)
+        {
             db.Vuelos.Add(vuelo);
+        }
         else
+        {
             db.Vuelos.Update(vuelo);
+            foreach (var entry in db.ChangeTracker.Entries()
+                .Where(e => e.Metadata.IsOwned() && e.State == Microsoft.EntityFrameworkCore.EntityState.Modified))
+            {
+                entry.State = Microsoft.EntityFrameworkCore.EntityState.Added;
+            }
+        }
 
         await db.SaveChangesAsync();
     }
