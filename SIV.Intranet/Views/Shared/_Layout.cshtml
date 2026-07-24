@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Quisqueya Flight Hub</title>
+    <partial name="_Favicons" />
+    <partial name="_DesignHead" />
+</head>
+<body class="text-on-surface overflow-hidden">
+    <partial name="_Sidebar" />
+
+    <main class="ml-64 h-screen overflow-y-auto custom-scrollbar bg-background">
+        <partial name="_Header" />
+        <div class="p-8 max-w-[1280px] mx-auto space-y-6">
+            <partial name="_Alertas" />
+            @RenderBody()
+        </div>
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

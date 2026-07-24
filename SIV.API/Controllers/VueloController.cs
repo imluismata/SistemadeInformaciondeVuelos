@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIV.Modules.Vuelos.Application;
 using SIV.Modules.Vuelos.Domain;
@@ -6,6 +7,7 @@ namespace SIV.API.Controllers;
 
 [ApiController]
 [Route("api/vuelos")]
+[Authorize] // Todo endpoint de vuelos requiere estar autenticado.
 public sealed class VueloController : ControllerBase
 {
     private readonly IVueloService _service;
@@ -40,6 +42,7 @@ public sealed class VueloController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "OperadorVuelos,Administrador")]
     public async Task<IActionResult> Registrar([FromBody] RegistrarVueloCommand command)
     {
         var vuelo = await _service.RegistrarAsync(command);
@@ -47,14 +50,17 @@ public sealed class VueloController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "OperadorVuelos,Administrador")]
     public async Task<IActionResult> ActualizarDatos(Guid id, [FromBody] ActualizarDatosVueloCommand command)
         => Ok(await _service.ActualizarDatosAsync(id, command));
 
     [HttpPut("{id:guid}/estado")]
+    [Authorize(Roles = "OperadorVuelos,Administrador")]
     public async Task<IActionResult> CambiarEstado(Guid id, [FromBody] ActualizarEstadoVueloCommand command)
         => Ok(await _service.CambiarEstadoAsync(id, command));
 
     [HttpPost("{id:guid}/cambios-operativos")]
+    [Authorize(Roles = "OperadorVuelos,Administrador")]
     public async Task<IActionResult> RegistrarCambioOperativo(Guid id, [FromBody] RegistrarCambioOperativoCommand command)
         => Ok(await _service.RegistrarCambioOperativoAsync(id, command));
 }

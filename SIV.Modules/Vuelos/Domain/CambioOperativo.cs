@@ -9,11 +9,26 @@ public enum TipoCambioOperativo
     ActualizacionDatos
 }
 
-internal sealed record CambioOperativo(
-    Guid Id,
-    Guid VueloId,
-    TipoCambioOperativo Tipo,
-    string Motivo,
-    string? ValorAnterior,
-    string? ValorNuevo,
-    DateTime RegistradoEn);
+internal sealed class CambioOperativo
+{
+    private CambioOperativo() { }
+
+    public CambioOperativo(Guid id, Guid vueloId, TipoCambioOperativo tipo, string motivo, string? valorAnterior, string? valorNuevo, DateTime registradoEn)
+    {
+        Id = id;
+        VueloId = vueloId;
+        Tipo = tipo;
+        Motivo = motivo;
+        ValorAnterior = valorAnterior;
+        ValorNuevo = valorNuevo;
+        RegistradoEn = registradoEn;
+    }
+
+    public Guid Id { get; private set; }
+    public Guid VueloId { get; private set; }
+    public TipoCambioOperativo Tipo { get; private set; }
+    public string Motivo { get; private set; } = string.Empty;
+    public string? ValorAnterior { get; private set; }
+    public string? ValorNuevo { get; private set; }
+    public DateTime RegistradoEn { get; private set; }
+}

@@ -17,11 +17,14 @@ internal sealed class CatalogoRepository(SivDbContext db) : ICatalogoRepository
 
     public async Task GuardarAerolineaAsync(Aerolinea aerolinea)
     {
-        var existe = await db.Aerolineas.AnyAsync(a => a.Id == aerolinea.Id);
-        if (!existe)
-            db.Aerolineas.Add(aerolinea);
-        else
-            db.Aerolineas.Update(aerolinea);
+        if (db.Entry(aerolinea).State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+        {
+            var existe = await db.Aerolineas.AnyAsync(a => a.Id == aerolinea.Id);
+            if (!existe)
+                db.Aerolineas.Add(aerolinea);
+            else
+                db.Aerolineas.Update(aerolinea);
+        }
 
         await db.SaveChangesAsync();
     }
@@ -47,11 +50,14 @@ internal sealed class CatalogoRepository(SivDbContext db) : ICatalogoRepository
 
     public async Task GuardarAeropuertoAsync(Aeropuerto aeropuerto)
     {
-        var existe = await db.Aeropuertos.AnyAsync(a => a.Id == aeropuerto.Id);
-        if (!existe)
-            db.Aeropuertos.Add(aeropuerto);
-        else
-            db.Aeropuertos.Update(aeropuerto);
+        if (db.Entry(aeropuerto).State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+        {
+            var existe = await db.Aeropuertos.AnyAsync(a => a.Id == aeropuerto.Id);
+            if (!existe)
+                db.Aeropuertos.Add(aeropuerto);
+            else
+                db.Aeropuertos.Update(aeropuerto);
+        }
 
         await db.SaveChangesAsync();
     }

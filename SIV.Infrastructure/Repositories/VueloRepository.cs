@@ -35,10 +35,15 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
     }
 
     public async Task<Vuelo?> ObtenerPorIdAsync(Guid id)
-        => await db.Vuelos.FirstOrDefaultAsync(v => v.Id == id);
+        => await db.Vuelos
+            .Include(v => v.HistorialEstados)
+            .Include(v => v.CambiosOperativos)
+            .FirstOrDefaultAsync(v => v.Id == id);
 
     public async Task<Vuelo?> ObtenerPorNumeroAsync(string numero)
         => await db.Vuelos
+            .Include(v => v.HistorialEstados)
+            .Include(v => v.CambiosOperativos)
             .FirstOrDefaultAsync(v => v.Numero == numero);
 
     public async Task GuardarAsync(Vuelo vuelo)

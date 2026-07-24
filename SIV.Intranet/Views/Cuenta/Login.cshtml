@@ -1,0 +1,40 @@
+@model SIV.Intranet.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+    Layout = "_LayoutAuth";
+}
+
+<div class="bg-surface-container-lowest rounded-xl shadow-xl p-8">
+    <div class="text-center mb-8">
+        <img src="~/images/logocompleto.png" alt="Quisqueya Flight Hub · Sistema de Información de Vuelo"
+             class="w-full max-w-[260px] mx-auto" />
+        <p class="text-sm text-on-surface-variant mt-3">Acceso al personal del aeropuerto</p>
+    </div>
+
+    <form asp-controller="Cuenta" asp-action="Login" method="post" class="space-y-4">
+        <div asp-validation-summary="ModelOnly" class="text-sm text-secondary bg-red-50 rounded-lg px-4 py-2"></div>
+
+        <div>
+            <label asp-for="Email" class="block text-sm font-medium text-on-surface-variant mb-1">Correo</label>
+            <input asp-for="Email" autofocus
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none transition-all" />
+            <span asp-validation-for="Email" class="text-xs text-secondary"></span>
+        </div>
+
+        <div>
+            <label asp-for="Password" class="block text-sm font-medium text-on-surface-variant mb-1">Contraseña</label>
+            <input asp-for="Password"
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none transition-all" />
+            <span asp-validation-for="Password" class="text-xs text-secondary"></span>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-primary text-on-primary rounded-lg py-2.5 font-semibold hover:opacity-90 transition-opacity">
+            Ingresar
+        </button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

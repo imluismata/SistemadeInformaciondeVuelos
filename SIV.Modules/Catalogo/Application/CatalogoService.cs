@@ -55,6 +55,7 @@ internal sealed class CatalogoService : ICatalogoService
         var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
         aerolinea.Desactivar();
         await _repository.GuardarAerolineaAsync(aerolinea);
+        await _auditoria.RegistrarAsync("Catalogo", "DesactivarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} desactivada.");
     }
 
     public async Task<AeropuertoDto> RegistrarAeropuertoAsync(RegistrarAeropuertoCommand command)
@@ -76,6 +77,7 @@ internal sealed class CatalogoService : ICatalogoService
         var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
         aeropuerto.Actualizar(command.Codigo, command.Nombre, command.Pais);
         await _repository.GuardarAeropuertoAsync(aeropuerto);
+        await _auditoria.RegistrarAsync("Catalogo", "ActualizarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} actualizado.");
         return Mapear(aeropuerto);
     }
 
@@ -84,6 +86,7 @@ internal sealed class CatalogoService : ICatalogoService
         var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
         aeropuerto.Desactivar();
         await _repository.GuardarAeropuertoAsync(aeropuerto);
+        await _auditoria.RegistrarAsync("Catalogo", "DesactivarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} desactivado.");
     }
 
     private async Task<Aerolinea> ObtenerAerolineaRequeridaAsync(Guid id)

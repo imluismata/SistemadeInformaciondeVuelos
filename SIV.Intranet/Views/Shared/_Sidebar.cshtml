@@ -1,0 +1,48 @@
+@{
+    // Marca el enlace activo según el controlador actual.
+    var controllerActual = ViewContext.RouteData.Values["controller"]?.ToString();
+    string ClaseNav(string controller) => controller == controllerActual
+        ? "bg-secondary-container text-on-secondary-container font-bold"
+        : "text-on-surface-variant hover:bg-surface-container-high";
+}
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low shadow-md flex flex-col p-6 gap-4 z-50">
+    <div class="mb-8 flex items-center gap-3">
+        <img src="~/images/logo.png" alt="Quisqueya Flight Hub" class="w-11 h-11 object-contain" />
+        <div>
+            <h1 class="text-lg font-bold text-primary leading-tight">Quisqueya<br />Flight Hub</h1>
+            <p class="text-xs text-on-surface-variant">Santo Domingo (SDQ)</p>
+        </div>
+    </div>
+
+    <nav class="flex flex-col gap-1 flex-grow">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Vuelos")" asp-controller="Vuelos" asp-action="Index">
+            <span class="material-symbols-outlined">flight_takeoff</span>
+            <span>Vuelos</span>
+        </a>
+
+        @if (User.IsInRole("Administrador"))
+        {
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Catalogo")" asp-controller="Catalogo" asp-action="Index">
+                <span class="material-symbols-outlined">menu_book</span>
+                <span>Catálogo</span>
+            </a>
+        }
+
+        @if (User.IsInRole("Auditor") || User.IsInRole("Administrador"))
+        {
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Auditoria")" asp-controller="Auditoria" asp-action="Index">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Auditoría</span>
+            </a>
+        }
+    </nav>
+
+    <div class="mt-auto border-t border-outline-variant pt-4">
+        <form asp-controller="Cuenta" asp-action="Logout" method="post">
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Cerrar sesión</span>
+            </button>
+        </form>
+    </div>
+</aside>

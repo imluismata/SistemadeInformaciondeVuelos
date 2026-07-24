@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Acceso denegado";
+    Layout = "_LayoutAuth";
+}
+
+<div class="bg-surface-container-lowest rounded-xl shadow-xl p-8 text-center">
+    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-red-50 text-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-3xl">lock</span>
+    </div>
+    <h3 class="text-xl font-bold text-primary">Acceso denegado</h3>
+    <p class="text-sm text-on-surface-variant mt-2 mb-6">Tu rol no tiene permiso para acceder a esta sección.</p>
+    <a asp-controller="Vuelos" asp-action="Index"
+       class="inline-block bg-primary text-on-primary rounded-lg px-6 py-2.5 font-semibold hover:opacity-90 transition-opacity">
+        Volver a vuelos
+    </a>
+</div>

@@ -5,5 +5,9 @@ public enum TipoCambio
     Retraso,
     Adelanto,
     CambioDePuerta,
-    Cancelacion
+    Cancelacion,
+
+    // Transición de estado que no corresponde a un cambio operativo
+    // (Embarcando, EnVuelo, Aterrizado, Completado).
+    CambioDeEstado
 }
