@@ -1,28 +1,114 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .hero {
-  text-align: center;
-  padding: 4rem 1rem;
+  position: relative;
+  flex: 1;
+  min-height: 480px;
+  background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1400&q=80') center/cover no-repeat;
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(13,31,76,0.88) 50%, rgba(13,31,76,0.4));
+    display: flex;
+    align-items: center;
+    padding: 0 4rem;
   }
 
-  p {
-    color: #555;
-    max-width: 480px;
-    margin: 0 auto 2rem;
-  }
-
-  .cta {
-    display: inline-block;
-    background: #1a2940;
+  .hero-content {
+    max-width: 560px;
     color: #fff;
-    text-decoration: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
 
-    &:hover {
-      background: #2e4a73;
+    .hero-tag {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #c0152a;
+      font-weight: 600;
+      margin: 0 0 0.75rem;
     }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0 0 1rem;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: #c5d4ed;
+      margin: 0 0 2rem;
+    }
+
+    .cta {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.95rem;
+
+      &:hover { background: var(--red-hover); }
+    }
+  }
+}
+
+.slogan-banner {
+  display: block;
+  background: var(--navy);
+  padding: 1.5rem 2rem;
+  text-decoration: none;
+  transition: background 0.25s ease;
+
+  .slogan-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .slogan-text {
+    color: #c5d4ed;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+    transition: color 0.25s ease;
+  }
+
+  .slogan-cta {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    background: var(--red);
+    padding: 0.65rem 1.4rem;
+    border-radius: 4px;
+    transition: transform 0.25s ease, background 0.25s ease;
+  }
+
+  &:hover {
+    background: var(--navy-mid);
+
+    .slogan-text { color: #fff; }
+    .slogan-cta {
+      background: var(--red-hover);
+      transform: translateX(4px);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .slogan-banner .slogan-content {
+    flex-direction: column;
+    text-align: center;
   }
 }

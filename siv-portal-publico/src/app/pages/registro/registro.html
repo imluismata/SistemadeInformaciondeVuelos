@@ -1,26 +1,35 @@
-<h1>Crear cuenta</h1>
+<div class="registro-wrap">
+  <div class="registro-card">
+    <div class="registro-header">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+      <p>Crea tu cuenta para seguir vuelos y recibir notificaciones</p>
+    </div>
 
-<form class="formulario" (ngSubmit)="registrar()">
-  <label>
-    Nombre
-    <input type="text" name="nombre" required [(ngModel)]="nombre" />
-  </label>
+    <form class="formulario" (ngSubmit)="registrar()">
+      <label>
+        Nombre completo
+        <input type="text" name="nombre" placeholder="Tu nombre" required [(ngModel)]="nombre" />
+      </label>
 
-  <label>
-    Email
-    <input type="email" name="email" required [(ngModel)]="email" />
-  </label>
+      <label>
+        Correo electrónico
+        <input type="email" name="email" placeholder="correo@ejemplo.com" required [(ngModel)]="email" />
+      </label>
 
-  <label>
-    Contraseña
-    <input type="password" name="password" required [(ngModel)]="password" />
-  </label>
+      <label>
+        Contraseña
+        <input type="password" name="password" placeholder="••••••••" required [(ngModel)]="password" />
+      </label>
 
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
 
-  <button type="submit" [disabled]="enviando()">Registrarme</button>
-</form>
+      <button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Creando cuenta...' : 'Crear cuenta' }}
+      </button>
+    </form>
 
-<p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    <p class="pie">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+  </div>
+</div>

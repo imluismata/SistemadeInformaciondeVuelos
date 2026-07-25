@@ -1,16 +1,43 @@
-<nav class="navbar">
-  <a routerLink="/" class="brand">SIV &middot; Portal Público</a>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <a routerLink="/" class="brand-logo">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+    </a>
+  </div>
 
-  <div class="links">
-    <a routerLink="/vuelos">Vuelos</a>
-
+  <nav class="sidebar-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+      <span class="nav-icon">⊞</span> Inicio
+    </a>
+    <a routerLink="/vuelos" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">✈</span> Vuelos
+    </a>
     @if (auth.estaAutenticado()) {
-      <a routerLink="/mis-seguimientos">Mis seguimientos</a>
-      <span class="usuario">{{ auth.usuarioActual()?.nombre }}</span>
-      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+      <a routerLink="/mis-seguimientos" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🔔</span> Mis seguimientos
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    @if (auth.estaAutenticado()) {
+      <div class="user-info">
+        <div class="user-avatar">{{ auth.usuarioActual()?.nombre?.charAt(0) }}</div>
+        <div class="user-data">
+          <span class="user-name">{{ auth.usuarioActual()?.nombre }}</span>
+          <span class="user-role">Pasajero</span>
+        </div>
+      </div>
+      <button class="btn-salir" type="button" (click)="cerrarSesion()">
+        <span>⏻</span> Cerrar sesión
+      </button>
     } @else {
-      <a routerLink="/login">Iniciar sesión</a>
-      <a routerLink="/registro">Registrarse</a>
+      <a routerLink="/login" class="nav-item">
+        <span class="nav-icon">→</span> Iniciar sesión
+      </a>
+      <a routerLink="/registro" class="nav-item nav-item-registro">
+        <span class="nav-icon">+</span> Registrarse
+      </a>
     }
   </div>
-</nav>
+</aside>

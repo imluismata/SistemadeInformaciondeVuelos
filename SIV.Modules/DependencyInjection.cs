@@ -8,6 +8,7 @@ using SIV.Modules.Seguimiento.Application.Services;
 using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Usuarios.Application.Services;
 using SIV.Shared.Contracts;
+using SIV.Shared.Events;
 
 namespace SIV.Modules;
 
@@ -25,6 +26,8 @@ public static class DependencyInjection
 
         // Notificaciones
         services.AddScoped<INotificacionService, NotificacionService>();
+        // Conecta el evento de cambio de vuelo con la generación de notificaciones.
+        services.AddScoped<IManejadorVueloCambiado, ManejadorVueloCambiado>();
 
         // Consulta Pública
         services.AddScoped<IConsultaPublicaService, ConsultaPublicaService>();

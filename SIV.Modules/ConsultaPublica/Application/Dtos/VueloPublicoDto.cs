@@ -2,6 +2,7 @@ namespace SIV.Modules.ConsultaPublica.Application.Dtos;
 
 public record VueloPublicoDto(
     Guid Id,
+    string Numero,
     string Aerolinea,
     string Origen,
     string Destino,

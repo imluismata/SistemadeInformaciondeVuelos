@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { VuelosService } from '../../core/services/vuelos';
 import { SeguimientoService } from '../../core/services/seguimiento';
 import { AuthService } from '../../core/services/auth';
@@ -8,7 +8,7 @@ import { VueloPublico } from '../../core/models/vuelo.model';
 
 @Component({
   selector: 'app-detalle-vuelo',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './detalle-vuelo.html',
   styleUrl: './detalle-vuelo.scss',
 })
@@ -27,10 +27,7 @@ export class DetalleVuelo implements OnInit {
     if (!id) return;
 
     this.vuelosService.obtenerDetalle(id).subscribe({
-      next: (vuelo) => {
-        this.vuelo.set(vuelo);
-        this.cargando.set(false);
-      },
+      next: (vuelo) => { this.vuelo.set(vuelo); this.cargando.set(false); },
       error: () => this.cargando.set(false),
     });
   }
@@ -43,8 +40,17 @@ export class DetalleVuelo implements OnInit {
     this.seguimientoService
       .registrar({ usuarioId: usuario.id, vueloId: vuelo.id })
       .subscribe({
-        next: () => this.mensaje.set('Ahora sigues este vuelo.'),
+        next: () => this.mensaje.set('Ahora sigues este vuelo. Recibirás notificaciones de cambios.'),
         error: () => this.mensaje.set('No se pudo registrar el seguimiento.'),
       });
+  }
+
+  getBadge(estado: string): string {
+    const map: Record<string, string> = {
+      'Programado': 'on-time', 'EnVuelo': 'boarding', 'Aterrizado': 'arrived',
+      'Retrasado': 'delayed', 'Cancelado': 'cancelled', 'Embarcando': 'boarding',
+      'Completado': 'departed',
+    };
+    return map[estado] ?? 'default';
   }
 }

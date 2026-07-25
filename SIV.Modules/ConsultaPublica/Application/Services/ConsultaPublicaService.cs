@@ -33,8 +33,8 @@ internal class ConsultaPublicaService : IConsultaPublicaService
 
         vuelos = filtro.Tipo switch
         {
-            TipoConsulta.Salidas  => vuelos.Where(v => v.HorarioSalida >= DateTime.UtcNow),
-            TipoConsulta.Llegadas => vuelos.Where(v => v.HorarioLlegada >= DateTime.UtcNow),
+            TipoConsulta.Salidas  => vuelos.Where(v => v.HorarioSalida >= DateTime.Now),
+            TipoConsulta.Llegadas => vuelos.Where(v => v.HorarioLlegada >= DateTime.Now),
             _                     => vuelos
         };
 
@@ -47,7 +47,7 @@ internal class ConsultaPublicaService : IConsultaPublicaService
     public async Task<IEnumerable<VueloPublicoDto>> ObtenerSalidasAsync(DateTime? fecha = null)
     {
         var vuelos = await _repo.ObtenerVuelosActivosAsync();
-        vuelos = vuelos.Where(v => v.HorarioSalida >= DateTime.UtcNow);
+        vuelos = vuelos.Where(v => v.HorarioSalida >= DateTime.Now);
         if (fecha.HasValue)
             vuelos = vuelos.Where(v => v.HorarioSalida.Date == fecha.Value.Date);
         return vuelos.OrderBy(v => v.HorarioSalida);
@@ -56,7 +56,7 @@ internal class ConsultaPublicaService : IConsultaPublicaService
     public async Task<IEnumerable<VueloPublicoDto>> ObtenerLlegadasAsync(DateTime? fecha = null)
     {
         var vuelos = await _repo.ObtenerVuelosActivosAsync();
-        vuelos = vuelos.Where(v => v.HorarioLlegada >= DateTime.UtcNow);
+        vuelos = vuelos.Where(v => v.HorarioLlegada >= DateTime.Now);
         if (fecha.HasValue)
             vuelos = vuelos.Where(v => v.HorarioLlegada.Date == fecha.Value.Date);
         return vuelos.OrderBy(v => v.HorarioLlegada);

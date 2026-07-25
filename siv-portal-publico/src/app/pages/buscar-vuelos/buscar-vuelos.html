@@ -1,50 +1,79 @@
-<h1>Vuelos</h1>
+<div class="page-header">
+  <h1>Vuelos</h1>
+  <p>Información actualizada de vuelos en tiempo real</p>
+</div>
 
-<form class="filtros" (ngSubmit)="buscar()">
-  <input type="text" name="origen" placeholder="Origen" [(ngModel)]="origen" />
-  <input type="text" name="destino" placeholder="Destino" [(ngModel)]="destino" />
-  <input type="date" name="fecha" [(ngModel)]="fecha" />
-  <button type="submit">Buscar</button>
-  <button type="button" (click)="cargarActivos()">Ver todos</button>
-</form>
+<div class="tabs">
+  <button [class.active]="vista() === 'todos'"   (click)="setVista('todos')">Todos</button>
+  <button [class.active]="vista() === 'salidas'" (click)="setVista('salidas')">Salidas</button>
+  <button [class.active]="vista() === 'llegadas'" (click)="setVista('llegadas')">Llegadas</button>
+</div>
+
+<div class="busqueda-bar">
+  <form class="filtros" (ngSubmit)="buscar()">
+    <input type="text" name="numero" placeholder="Nº de vuelo" [(ngModel)]="numero" />
+    <input type="text" name="origen" placeholder="Origen" [(ngModel)]="origen" />
+    <input type="text" name="destino" placeholder="Destino" [(ngModel)]="destino" />
+    <input type="date" name="fecha" [(ngModel)]="fecha" />
+    <button type="submit">Buscar</button>
+    <button type="button" class="btn-secondary" (click)="cargarVista()">Ver todos</button>
+  </form>
+</div>
+
+@if (vuelos().length > 0) {
+  <div class="estado-chips">
+    <button type="button" [class.active]="estadoFiltro() === ''" (click)="filtrarPorEstado('')">Todos</button>
+    @for (e of estados; track e.valor) {
+      <button type="button" [class.active]="estadoFiltro() === e.valor" (click)="filtrarPorEstado(e.valor)">
+        {{ e.etiqueta }}
+      </button>
+    }
+  </div>
+}
 
 @if (cargando()) {
-  <p>Cargando vuelos...</p>
+  <div class="estado-msg">Cargando vuelos...</div>
 }
 
 @if (error()) {
-  <p class="error">{{ error() }}</p>
+  <div class="estado-msg error">{{ error() }}</div>
 }
 
-@if (!cargando() && vuelos().length === 0) {
-  <p>No hay vuelos para mostrar.</p>
+@if (!cargando() && vuelosFiltrados().length === 0) {
+  <div class="estado-msg">No hay vuelos para mostrar.</div>
 }
 
-<table class="tabla-vuelos" *ngIf="vuelos().length > 0">
-  <thead>
-    <tr>
-      <th>Aerolínea</th>
-      <th>Origen</th>
-      <th>Destino</th>
-      <th>Salida</th>
-      <th>Llegada</th>
-      <th>Puerta</th>
-      <th>Estado</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (vuelo of vuelos(); track vuelo.id) {
-      <tr>
-        <td>{{ vuelo.aerolinea }}</td>
-        <td>{{ vuelo.origen }}</td>
-        <td>{{ vuelo.destino }}</td>
-        <td>{{ vuelo.horarioSalida | date: 'short' }}</td>
-        <td>{{ vuelo.horarioLlegada | date: 'short' }}</td>
-        <td>{{ vuelo.puerta || '—' }}</td>
-        <td>{{ vuelo.estado }}</td>
-        <td><a [routerLink]="['/vuelos', vuelo.id]">Ver detalle</a></td>
-      </tr>
-    }
-  </tbody>
-</table>
+@if (vuelosFiltrados().length > 0) {
+  <div class="tabla-wrap">
+    <table class="tabla-vuelos">
+      <thead>
+        <tr>
+          <th>Vuelo</th>
+          <th>Aerolínea</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Salida</th>
+          <th>Llegada</th>
+          <th>Puerta</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (vuelo of vuelosFiltrados(); track vuelo.id) {
+          <tr>
+            <td class="num-vuelo">{{ vuelo.numero }}</td>
+            <td>{{ vuelo.aerolinea }}</td>
+            <td>{{ vuelo.origen }}</td>
+            <td>{{ vuelo.destino }}</td>
+            <td>{{ vuelo.horarioSalida | date: 'dd/MM HH:mm' }}</td>
+            <td>{{ vuelo.horarioLlegada | date: 'dd/MM HH:mm' }}</td>
+            <td>{{ vuelo.puerta || '—' }}</td>
+            <td><span [class]="'badge ' + getBadgeClass(vuelo.estado)">{{ vuelo.estado }}</span></td>
+            <td><a [routerLink]="['/vuelos', vuelo.id]" class="link-detalle">Detalle</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

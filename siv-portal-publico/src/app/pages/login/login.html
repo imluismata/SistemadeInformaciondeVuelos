@@ -1,21 +1,29 @@
-<h1>Iniciar sesión</h1>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+    </div>
 
-<form class="formulario" (ngSubmit)="iniciarSesion()">
-  <label>
-    Email
-    <input type="email" name="email" required [(ngModel)]="email" />
-  </label>
+    <form class="formulario" (ngSubmit)="iniciarSesion()">
+      <label>
+        Usuario
+        <input type="email" name="email" placeholder="correo@ejemplo.com" required [(ngModel)]="email" />
+      </label>
 
-  <label>
-    Contraseña
-    <input type="password" name="password" required [(ngModel)]="password" />
-  </label>
+      <label>
+        Contraseña
+        <input type="password" name="password" placeholder="••••••••" required [(ngModel)]="password" />
+      </label>
 
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
 
-  <button type="submit" [disabled]="enviando()">Entrar</button>
-</form>
+      <button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Ingresando...' : 'Iniciar sesión' }}
+      </button>
+    </form>
 
-<p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+    <p class="pie">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+  </div>
+</div>
