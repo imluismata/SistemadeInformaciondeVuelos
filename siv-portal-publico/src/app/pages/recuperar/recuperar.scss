@@ -1,4 +1,4 @@
-.login-wrap {
+.recuperar-wrap {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -14,25 +14,33 @@
   }
 }
 
-.login-card {
+.recuperar-card {
   position: relative;
   background: #fff;
   border-radius: 8px;
   padding: 2.5rem 2rem;
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
-.login-header {
+.recuperar-header {
   text-align: center;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
 
   .brand-img {
     width: 200px;
     height: auto;
     object-fit: contain;
   }
+}
+
+.intro {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
 }
 
 .formulario {
@@ -77,16 +85,6 @@
   color: var(--red);
   font-size: 0.85rem;
   margin: 0;
-}
-
-.aviso-ok {
-  color: #15803d;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 4px;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.85rem;
-  margin: 0 0 1rem;
 }
 
 .pie {

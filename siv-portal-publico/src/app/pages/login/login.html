@@ -4,6 +4,13 @@
       <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
     </div>
 
+    @if (verificado()) {
+      <p class="aviso-ok">✓ Tu correo fue verificado. Ya puedes iniciar sesión.</p>
+    }
+    @if (restablecida()) {
+      <p class="aviso-ok">✓ Tu contraseña fue restablecida. Inicia sesión con la nueva.</p>
+    }
+
     <form class="formulario" (ngSubmit)="iniciarSesion()">
       <label>
         Usuario
@@ -24,6 +31,7 @@
       </button>
     </form>
 
+    <p class="pie"><a routerLink="/recuperar">¿Olvidaste tu contraseña?</a></p>
     <p class="pie">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
   </div>
 </div>

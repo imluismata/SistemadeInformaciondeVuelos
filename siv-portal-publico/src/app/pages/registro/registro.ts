@@ -28,7 +28,7 @@ export class Registro {
       .subscribe({
         next: () => {
           this.enviando.set(false);
-          this.router.navigateByUrl('/login');
+          this.router.navigate(['/verificar'], { queryParams: { email: this.email } });
         },
         error: () => {
           this.error.set('No se pudo completar el registro. Verifica los datos.');

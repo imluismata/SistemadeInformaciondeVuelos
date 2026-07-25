@@ -9,11 +9,22 @@
   </div>
 </section>
 
-<a routerLink="/registro" class="slogan-banner">
-  <div class="slogan-content">
-    <p class="slogan-text">
-      No pierdas tu vuelo de vista — seguimiento personalizado y alertas al instante.
-    </p>
-    <span class="slogan-cta">Crear cuenta gratis →</span>
-  </div>
-</a>
+@if (auth.estaAutenticado()) {
+  <a routerLink="/mis-seguimientos" class="slogan-banner">
+    <div class="slogan-content">
+      <p class="slogan-text">
+        Hola, {{ auth.usuarioActual()?.nombre }} 👋 Mantente al día con tus vuelos — revisa el estado de los que sigues.
+      </p>
+      <span class="slogan-cta">Ver mis seguimientos →</span>
+    </div>
+  </a>
+} @else {
+  <a routerLink="/registro" class="slogan-banner">
+    <div class="slogan-content">
+      <p class="slogan-text">
+        No pierdas tu vuelo de vista — seguimiento personalizado y alertas al instante.
+      </p>
+      <span class="slogan-cta">Crear cuenta gratis →</span>
+    </div>
+  </a>
+}

@@ -1,0 +1,60 @@
+<div class="recuperar-wrap">
+  <div class="recuperar-card">
+    <div class="recuperar-header">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+    </div>
+
+    @if (fase() === 1) {
+      <p class="intro">Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.</p>
+      <form class="formulario" (ngSubmit)="solicitar()">
+        <label>
+          Correo electrónico
+          <input type="email" name="email" placeholder="correo@ejemplo.com" required [(ngModel)]="email" />
+        </label>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <button type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Enviando...' : 'Enviar código' }}
+        </button>
+      </form>
+    } @else if (fase() === 2) {
+      <p class="intro">Revisa tu correo <strong>{{ email }}</strong> e ingresa el código que te enviamos.</p>
+      <form class="formulario" (ngSubmit)="validarCodigo()">
+        <label>
+          Código de verificación
+          <input type="text" name="codigo" inputmode="numeric" maxlength="6"
+                 placeholder="Ingresa el código" required [(ngModel)]="codigo" />
+        </label>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <button type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Validando...' : 'Validar código' }}
+        </button>
+      </form>
+    } @else {
+      <p class="intro">Código válido. Ingresa tu nueva contraseña.</p>
+      <form class="formulario" (ngSubmit)="restablecer()">
+        <label>
+          Nueva contraseña
+          <input type="password" name="nuevaPassword" placeholder="••••••••" required [(ngModel)]="nuevaPassword" />
+        </label>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <button type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Guardando...' : 'Restablecer contraseña' }}
+        </button>
+      </form>
+    }
+
+    <p class="pie"><a routerLink="/login">Volver a iniciar sesión</a></p>
+  </div>
+</div>
