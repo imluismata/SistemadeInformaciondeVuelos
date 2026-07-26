@@ -1,20 +1,58 @@
+// --- Barra superior móvil (oculta en escritorio) ---
+.topbar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-border);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.75rem;
+  z-index: 150;
+
+  .menu-btn, .tema-btn {
+    border: none;
+    background: transparent;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.35rem;
+    color: var(--text);
+  }
+
+  .topbar-logo {
+    height: 30px;
+    width: auto;
+    margin-right: auto;
+  }
+}
+
+.backdrop {
+  display: none;
+}
+
+// --- Sidebar ---
 .sidebar {
   width: 220px;
   min-height: 100vh;
-  background: #fff;
-  border-right: 1px solid #e4e7ec;
+  background: var(--white);
+  border-right: 1px solid var(--gray-border);
   display: flex;
   flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 160;
+  transition: transform 0.25s ease;
 }
 
 .sidebar-brand {
   padding: 1.25rem 1rem;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--gray-border);
 
   .brand-logo {
     display: flex;
@@ -44,14 +82,14 @@
   padding: 0.6rem 0.85rem;
   border-radius: 6px;
   text-decoration: none;
-  color: #5a6478;
+  color: var(--text-muted);
   font-size: 0.9rem;
   font-weight: 500;
   transition: background 0.15s, color 0.15s;
 
   .nav-icon { font-size: 1rem; }
 
-  &:hover { background: #f4f6f9; color: var(--navy); }
+  &:hover { background: var(--hover-bg); color: var(--heading); }
 
   &.active {
     background: var(--red);
@@ -68,10 +106,27 @@
 
 .sidebar-footer {
   padding: 1rem 0.75rem;
-  border-top: 1px solid #f0f2f5;
+  border-top: 1px solid var(--gray-border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.tema-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--gray-border);
+  background: transparent;
+  font-size: 1.15rem;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--hover-bg); }
 }
 
 .user-info {
@@ -132,5 +187,33 @@
   width: 100%;
   transition: background 0.15s, color 0.15s;
 
-  &:hover { background: #fde8ea; color: var(--red); }
+  &:hover { background: rgba(192, 21, 42, 0.12); color: var(--red); }
+}
+
+// En tema oscuro el logo (texto azul marino) necesita fondo claro para verse.
+:host-context([data-theme="dark"]) .brand-img,
+:host-context([data-theme="dark"]) .topbar-logo {
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+// --- Responsive: móvil y tablet (menú deslizante) ---
+@media (max-width: 900px) {
+  .topbar { display: flex; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+    z-index: 200;
+  }
+  .sidebar.abierta { transform: translateX(0); }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 180;
+  }
 }

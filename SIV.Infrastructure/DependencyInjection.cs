@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SIV.Infrastructure.Configuracion;
 using SIV.Infrastructure.Correo;
 using SIV.Infrastructure.Repositories;
 using SIV.Modules.Usuarios.Application.Interfaces;
@@ -44,6 +45,13 @@ public static class DependencyInjection
         };
         services.AddSingleton(opcionesCorreo);
         services.AddScoped<IServicioCorreo, ServicioCorreoSmtp>();
+
+        // Aeropuerto base para los tableros de salidas y llegadas (AILA = SDQ).
+        var opcionesAeropuerto = new OpcionesAeropuerto
+        {
+            Codigo = configuration.GetSection(OpcionesAeropuerto.Seccion)["Codigo"] ?? "SDQ",
+        };
+        services.AddSingleton(opcionesAeropuerto);
 
         return services;
     }

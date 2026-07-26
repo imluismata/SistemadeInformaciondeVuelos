@@ -111,4 +111,10 @@
     flex-direction: column;
     text-align: center;
   }
+
+  .hero {
+    min-height: 380px;
+    .hero-overlay { padding: 0 1.5rem; }
+    .hero-content h1 { font-size: 1.9rem; }
+  }
 }

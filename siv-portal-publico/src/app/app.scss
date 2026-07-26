@@ -9,3 +9,10 @@
   min-height: 100vh;
   background: var(--gray-bg);
 }
+
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 0;
+    padding-top: 52px; // deja espacio para la barra superior fija
+  }
+}

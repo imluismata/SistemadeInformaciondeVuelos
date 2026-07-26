@@ -3,7 +3,7 @@
   h1 {
     font-size: 1.6rem;
     font-weight: 700;
-    color: var(--navy);
+    color: var(--heading);
     margin: 0 0 0.3rem;
   }
   p { color: var(--text-muted); margin: 0; font-size: 0.9rem; }
@@ -27,8 +27,8 @@
     border-bottom: 2px solid transparent;
     transition: all 0.15s;
 
-    &:hover { color: var(--navy); }
-    &.active { color: var(--navy); border-bottom-color: var(--red); font-weight: 600; }
+    &:hover { color: var(--heading); }
+    &.active { color: var(--heading); border-bottom-color: var(--red); font-weight: 600; }
   }
 }
 
@@ -49,10 +49,10 @@
     cursor: pointer;
     transition: all 0.15s;
 
-    &:hover { border-color: var(--navy); color: var(--navy); }
+    &:hover { border-color: var(--heading); color: var(--heading); }
     &.active {
       background: var(--navy);
-      border-color: var(--navy);
+      border-color: var(--heading);
       color: #fff;
     }
   }
@@ -91,7 +91,7 @@
 
     &.btn-secondary {
       background: transparent;
-      color: var(--navy);
+      color: var(--heading);
       border: 1px solid var(--gray-border);
       font-weight: 400;
       &:hover { background: var(--gray-bg); }
@@ -136,9 +136,9 @@
   }
 
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f7f9fc; }
+  tr:hover td { background: var(--row-hover); }
 
-  .num-vuelo { font-weight: 600; color: var(--navy); }
+  .num-vuelo { font-weight: 600; color: var(--heading); }
 
   .link-detalle {
     color: var(--red);
@@ -147,4 +147,14 @@
     font-size: 0.85rem;
     &:hover { text-decoration: underline; }
   }
+}
+
+@media (max-width: 640px) {
+  .page-header { padding: 1.25rem 1rem 0.75rem; }
+  .tabs { padding: 0 1rem; overflow-x: auto; }
+  .estado-chips { padding: 1rem 1rem 0; }
+  .busqueda-bar { padding: 1rem; }
+  .tabla-wrap { padding: 1rem; }
+
+  .filtros input { min-width: 0; flex: 1 1 45%; }
 }

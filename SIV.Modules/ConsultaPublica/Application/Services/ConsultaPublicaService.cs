@@ -46,19 +46,17 @@ internal class ConsultaPublicaService : IConsultaPublicaService
 
     public async Task<IEnumerable<VueloPublicoDto>> ObtenerSalidasAsync(DateTime? fecha = null)
     {
-        var vuelos = await _repo.ObtenerVuelosActivosAsync();
-        vuelos = vuelos.Where(v => v.HorarioSalida >= DateTime.Now);
+        var vuelos = await _repo.ObtenerSalidasAsync();
         if (fecha.HasValue)
             vuelos = vuelos.Where(v => v.HorarioSalida.Date == fecha.Value.Date);
-        return vuelos.OrderBy(v => v.HorarioSalida);
+        return vuelos;
     }
 
     public async Task<IEnumerable<VueloPublicoDto>> ObtenerLlegadasAsync(DateTime? fecha = null)
     {
-        var vuelos = await _repo.ObtenerVuelosActivosAsync();
-        vuelos = vuelos.Where(v => v.HorarioLlegada >= DateTime.Now);
+        var vuelos = await _repo.ObtenerLlegadasAsync();
         if (fecha.HasValue)
             vuelos = vuelos.Where(v => v.HorarioLlegada.Date == fecha.Value.Date);
-        return vuelos.OrderBy(v => v.HorarioLlegada);
+        return vuelos;
     }
 }

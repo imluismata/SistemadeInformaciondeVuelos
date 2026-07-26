@@ -8,6 +8,22 @@
   --gray-border: #dde2ea;
   --text: #1a1a2e;
   --text-muted: #5a6478;
+  --heading: #0d1f4c;
+  --hover-bg: #f4f6f9;
+  --row-hover: #f7f9fc;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --white: #1b2333;
+  --gray-bg: #0f141e;
+  --gray-border: #2b3648;
+  --text: #e7ebf3;
+  --text-muted: #9aa5ba;
+  --heading: #cbd8f2;
+  --hover-bg: #232e42;
+  --row-hover: #222c40;
+  color-scheme: dark;
 }
 
 * {
