@@ -1,41 +1,54 @@
-@if (cargando()) {
-  <p>Cargando...</p>
-}
+<div class="detalle-wrap">
 
-@if (!cargando() && !vuelo()) {
-  <p>No se encontró el vuelo.</p>
-}
-
-@if (vuelo(); as v) {
-  <h1>{{ v.aerolinea }}</h1>
-
-  <dl class="detalle">
-    <dt>Origen</dt>
-    <dd>{{ v.origen }}</dd>
-
-    <dt>Destino</dt>
-    <dd>{{ v.destino }}</dd>
-
-    <dt>Salida</dt>
-    <dd>{{ v.horarioSalida | date: 'medium' }}</dd>
-
-    <dt>Llegada</dt>
-    <dd>{{ v.horarioLlegada | date: 'medium' }}</dd>
-
-    <dt>Puerta</dt>
-    <dd>{{ v.puerta || '—' }}</dd>
-
-    <dt>Estado</dt>
-    <dd>{{ v.estado }}</dd>
-  </dl>
-
-  @if (auth.estaAutenticado()) {
-    <button type="button" (click)="seguirVuelo()">Seguir este vuelo</button>
-  } @else {
-    <p>Inicia sesión para seguir este vuelo.</p>
+  @if (cargando()) {
+    <div class="estado-msg">Cargando vuelo...</div>
   }
 
-  @if (mensaje()) {
-    <p class="mensaje">{{ mensaje() }}</p>
+  @if (!cargando() && !vuelo()) {
+    <div class="estado-msg error">No se encontró el vuelo.</div>
   }
-}
+
+  @if (vuelo(); as v) {
+    <div class="detalle-card">
+      <div class="detalle-header">
+        <div>
+          <p class="num-vuelo-tag">Vuelo {{ v.numero }}</p>
+          <p class="ruta">{{ v.origen }} → {{ v.destino }}</p>
+          <h1>{{ v.aerolinea }}</h1>
+        </div>
+        <span [class]="'badge ' + getBadge(v.estado)">{{ v.estado }}</span>
+      </div>
+
+      <dl class="info-grid">
+        <dt>Salida</dt>
+        <dd>{{ v.horarioSalida | date: 'dd/MM/yyyy HH:mm' }}</dd>
+
+        <dt>Llegada</dt>
+        <dd>{{ v.horarioLlegada | date: 'dd/MM/yyyy HH:mm' }}</dd>
+
+        <dt>Puerta</dt>
+        <dd>{{ v.puerta || '—' }}</dd>
+
+        <dt>Estado</dt>
+        <dd>{{ v.estado }}</dd>
+      </dl>
+
+      <div class="detalle-acciones">
+        @if (auth.estaAutenticado()) {
+          <button type="button" class="btn-seguir" (click)="seguirVuelo()">
+            Seguir este vuelo
+          </button>
+        } @else {
+          <p class="aviso">
+            <a routerLink="/login">Inicia sesión</a> para seguir este vuelo y recibir notificaciones.
+          </p>
+        }
+
+        @if (mensaje()) {
+          <p class="mensaje-ok">{{ mensaje() }}</p>
+        }
+      </div>
+    </div>
+  }
+
+</div>

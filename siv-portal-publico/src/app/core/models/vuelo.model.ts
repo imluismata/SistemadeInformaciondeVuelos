@@ -1,5 +1,6 @@
 export interface VueloPublico {
   id: string;
+  numero: string;
   aerolinea: string;
   origen: string;
   destino: string;

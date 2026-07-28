@@ -28,6 +28,58 @@ public class UsuariosController : ControllerBase
         return Created(string.Empty, null);
     }
 
+    [HttpPost("verificar")]
+    public async Task<IActionResult> Verificar([FromBody] VerificarCodigoRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Codigo))
+            return BadRequest("Email y código son obligatorios.");
+
+        await _servicio.VerificarCodigoAsync(request.Email, request.Codigo);
+        return NoContent();
+    }
+
+    [HttpPost("reenviar-codigo")]
+    public async Task<IActionResult> ReenviarCodigo([FromBody] ReenviarCodigoRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest("El email es obligatorio.");
+
+        await _servicio.ReenviarCodigoAsync(request.Email);
+        return NoContent();
+    }
+
+    [HttpPost("recuperar")]
+    public async Task<IActionResult> RecuperarPassword([FromBody] RecuperarPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest("El email es obligatorio.");
+
+        await _servicio.SolicitarRecuperacionAsync(request.Email);
+        return NoContent();
+    }
+
+    [HttpPost("validar-codigo")]
+    public async Task<IActionResult> ValidarCodigo([FromBody] VerificarCodigoRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Codigo))
+            return BadRequest("Email y código son obligatorios.");
+
+        await _servicio.ValidarCodigoRecuperacionAsync(request.Email, request.Codigo);
+        return NoContent();
+    }
+
+    [HttpPost("restablecer")]
+    public async Task<IActionResult> RestablecerPassword([FromBody] RestablecerPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Codigo) ||
+            string.IsNullOrWhiteSpace(request.NuevaPassword))
+            return BadRequest("Email, código y nueva contraseña son obligatorios.");
+
+        await _servicio.RestablecerPasswordAsync(request.Email, request.Codigo, request.NuevaPassword);
+        return NoContent();
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -79,3 +131,7 @@ public class UsuariosController : ControllerBase
 public record RegistroUsuarioRequest(string Nombre, string Email, string Password);
 public record LoginRequest(string Email, string Password);
 public record CambiarRolRequest(string Rol);
+public record VerificarCodigoRequest(string Email, string Codigo);
+public record ReenviarCodigoRequest(string Email);
+public record RecuperarPasswordRequest(string Email);
+public record RestablecerPasswordRequest(string Email, string Codigo, string NuevaPassword);

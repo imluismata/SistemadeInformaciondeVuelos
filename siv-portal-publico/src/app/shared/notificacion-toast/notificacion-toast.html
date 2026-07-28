@@ -1,0 +1,13 @@
+<div class="toast-stack">
+  @for (t of polling.toasts(); track t.id) {
+    <div class="toast" role="alert">
+      <div class="toast-icon">🔔</div>
+      <div class="toast-cuerpo">
+        <p class="toast-titulo">Cambio en tu vuelo</p>
+        <p class="toast-msg">{{ t.mensaje }}</p>
+        <a routerLink="/mis-seguimientos" class="toast-link" (click)="polling.descartar(t.id)">Ver mis seguimientos →</a>
+      </div>
+      <button type="button" class="toast-cerrar" (click)="polling.descartar(t.id)" aria-label="Cerrar">✕</button>
+    </div>
+  }
+</div>

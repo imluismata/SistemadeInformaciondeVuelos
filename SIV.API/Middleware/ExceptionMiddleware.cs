@@ -20,6 +20,10 @@ public sealed class ExceptionMiddleware(RequestDelegate next)
         {
             await EscribirRespuesta(context, HttpStatusCode.UnprocessableEntity, ex.Message);
         }
+        catch (EmailNoConfirmadoException ex)
+        {
+            await EscribirRespuesta(context, HttpStatusCode.Forbidden, ex.Message);
+        }
         catch (InvalidOperationException ex)
         {
             await EscribirRespuesta(context, HttpStatusCode.Conflict, ex.Message);

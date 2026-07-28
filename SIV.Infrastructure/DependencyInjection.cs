@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SIV.Infrastructure.Configuracion;
+using SIV.Infrastructure.Correo;
 using SIV.Infrastructure.Repositories;
+using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Auditoria.Application;
 using SIV.Modules.Catalogo.Application;
 using SIV.Modules.ConsultaPublica.Application;
@@ -27,6 +30,28 @@ public static class DependencyInjection
         services.AddScoped<ISeguimientoRepository, SeguimientoRepository>();
         services.AddScoped<INotificacionRepository, NotificacionRepository>();
         services.AddScoped<IConsultaPublicaRepository, ConsultaPublicaRepository>();
+
+        // Envío de correos (verificación de cuenta). Se leen los valores a mano
+        // para no depender de paquetes extra de binding de configuración.
+        var seccionCorreo = configuration.GetSection(OpcionesCorreo.Seccion);
+        var opcionesCorreo = new OpcionesCorreo
+        {
+            Habilitado = bool.TryParse(seccionCorreo["Habilitado"], out var habilitado) && habilitado,
+            Host = seccionCorreo["Host"] ?? "smtp.gmail.com",
+            Puerto = int.TryParse(seccionCorreo["Puerto"], out var puerto) ? puerto : 587,
+            Usuario = seccionCorreo["Usuario"] ?? string.Empty,
+            Clave = seccionCorreo["Clave"] ?? string.Empty,
+            RemitenteNombre = seccionCorreo["RemitenteNombre"] ?? "Quisqueya Flight Hub",
+        };
+        services.AddSingleton(opcionesCorreo);
+        services.AddScoped<IServicioCorreo, ServicioCorreoSmtp>();
+
+        // Aeropuerto base para los tableros de salidas y llegadas (AILA = SDQ).
+        var opcionesAeropuerto = new OpcionesAeropuerto
+        {
+            Codigo = configuration.GetSection(OpcionesAeropuerto.Seccion)["Codigo"] ?? "SDQ",
+        };
+        services.AddSingleton(opcionesAeropuerto);
 
         return services;
     }

@@ -34,5 +34,14 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.CreadoEn)
             .IsRequired();
+
+        builder.Property(u => u.EmailConfirmado)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.CodigoVerificacion)
+            .HasMaxLength(6);
+
+        builder.Property(u => u.CodigoExpiraEn);
     }
 }

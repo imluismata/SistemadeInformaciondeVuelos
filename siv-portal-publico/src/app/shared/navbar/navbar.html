@@ -1,16 +1,63 @@
-<nav class="navbar">
-  <a routerLink="/" class="brand">SIV &middot; Portal Público</a>
+<!-- Barra superior (solo móvil/tablet) -->
+<div class="topbar">
+  <button class="menu-btn" type="button" (click)="abrir()" aria-label="Abrir menú">☰</button>
+  <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="topbar-logo">
+  <button class="tema-btn" type="button" (click)="tema.alternar()" aria-label="Cambiar tema">
+    {{ tema.tema() === 'oscuro' ? '☀️' : '🌙' }}
+  </button>
+</div>
 
-  <div class="links">
-    <a routerLink="/vuelos">Vuelos</a>
+<!-- Fondo oscuro al abrir el menú en móvil -->
+@if (abierto()) {
+  <div class="backdrop" (click)="cerrar()"></div>
+}
+
+<aside class="sidebar" [class.abierta]="abierto()">
+  <div class="sidebar-brand">
+    <a routerLink="/" class="brand-logo" (click)="cerrar()">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item" (click)="cerrar()">
+      <span class="nav-icon">⊞</span> Inicio
+    </a>
+    <a routerLink="/vuelos" routerLinkActive="active" class="nav-item" (click)="cerrar()">
+      <span class="nav-icon">✈</span> Vuelos
+    </a>
+    @if (auth.estaAutenticado()) {
+      <a routerLink="/mis-seguimientos" routerLinkActive="active" class="nav-item" (click)="cerrar()">
+        <span class="nav-icon">🔔</span> Mis seguimientos
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="tema-toggle" type="button" (click)="tema.alternar()"
+            [attr.aria-label]="tema.tema() === 'oscuro' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+            title="Cambiar tema">
+      {{ tema.tema() === 'oscuro' ? '☀️' : '🌙' }}
+    </button>
 
     @if (auth.estaAutenticado()) {
-      <a routerLink="/mis-seguimientos">Mis seguimientos</a>
-      <span class="usuario">{{ auth.usuarioActual()?.nombre }}</span>
-      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+      <div class="user-info">
+        <div class="user-avatar">{{ auth.usuarioActual()?.nombre?.charAt(0) }}</div>
+        <div class="user-data">
+          <span class="user-name">{{ auth.usuarioActual()?.nombre }}</span>
+          <span class="user-role">Pasajero</span>
+        </div>
+      </div>
+      <button class="btn-salir" type="button" (click)="cerrarSesion()">
+        <span>⏻</span> Cerrar sesión
+      </button>
     } @else {
-      <a routerLink="/login">Iniciar sesión</a>
-      <a routerLink="/registro">Registrarse</a>
+      <a routerLink="/login" class="nav-item" (click)="cerrar()">
+        <span class="nav-icon">→</span> Iniciar sesión
+      </a>
+      <a routerLink="/registro" class="nav-item nav-item-registro" (click)="cerrar()">
+        <span class="nav-icon">+</span> Registrarse
+      </a>
     }
   </div>
-</nav>
+</aside>

@@ -1,21 +1,37 @@
-<h1>Iniciar sesión</h1>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="brand-img">
+    </div>
 
-<form class="formulario" (ngSubmit)="iniciarSesion()">
-  <label>
-    Email
-    <input type="email" name="email" required [(ngModel)]="email" />
-  </label>
+    @if (verificado()) {
+      <p class="aviso-ok">✓ Tu correo fue verificado. Ya puedes iniciar sesión.</p>
+    }
+    @if (restablecida()) {
+      <p class="aviso-ok">✓ Tu contraseña fue restablecida. Inicia sesión con la nueva.</p>
+    }
 
-  <label>
-    Contraseña
-    <input type="password" name="password" required [(ngModel)]="password" />
-  </label>
+    <form class="formulario" (ngSubmit)="iniciarSesion()">
+      <label>
+        Usuario
+        <input type="email" name="email" placeholder="correo@ejemplo.com" required [(ngModel)]="email" />
+      </label>
 
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
+      <label>
+        Contraseña
+        <input type="password" name="password" placeholder="••••••••" required [(ngModel)]="password" />
+      </label>
 
-  <button type="submit" [disabled]="enviando()">Entrar</button>
-</form>
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
 
-<p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+      <button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Ingresando...' : 'Iniciar sesión' }}
+      </button>
+    </form>
+
+    <p class="pie"><a routerLink="/recuperar">¿Olvidaste tu contraseña?</a></p>
+    <p class="pie">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+  </div>
+</div>

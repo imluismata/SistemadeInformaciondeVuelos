@@ -1,5 +1,30 @@
 <section class="hero">
-  <h1>Sistema de Información de Vuelos</h1>
-  <p>Consulta en tiempo real los vuelos del aeropuerto, da seguimiento a tus vuelos favoritos y recibe notificaciones de cambios.</p>
-  <a routerLink="/vuelos" class="cta">Ver vuelos</a>
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <p class="hero-tag">Información de vuelos en tiempo real</p>
+      <h1>Quisqueya<br>Flight Hub</h1>
+      <p class="hero-sub">Consulta llegadas y salidas, sigue tus vuelos y recibe actualizaciones al instante.</p>
+      <a routerLink="/vuelos" class="cta">Ver vuelos</a>
+    </div>
+  </div>
 </section>
+
+@if (auth.estaAutenticado()) {
+  <a routerLink="/mis-seguimientos" class="slogan-banner">
+    <div class="slogan-content">
+      <p class="slogan-text">
+        Hola, {{ auth.usuarioActual()?.nombre }} 👋 Mantente al día con tus vuelos — revisa el estado de los que sigues.
+      </p>
+      <span class="slogan-cta">Ver mis seguimientos →</span>
+    </div>
+  </a>
+} @else {
+  <a routerLink="/registro" class="slogan-banner">
+    <div class="slogan-content">
+      <p class="slogan-text">
+        No pierdas tu vuelo de vista — seguimiento personalizado y alertas al instante.
+      </p>
+      <span class="slogan-cta">Crear cuenta gratis →</span>
+    </div>
+  </a>
+}

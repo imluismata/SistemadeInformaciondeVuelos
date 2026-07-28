@@ -47,6 +47,20 @@ public class ConsultaPublicaController : ControllerBase
         return Ok(vuelos);
     }
 
+    [HttpGet("salidas")]
+    public async Task<IActionResult> ObtenerSalidas([FromQuery] DateTime? fecha)
+    {
+        var vuelos = await _servicio.ObtenerSalidasAsync(fecha);
+        return Ok(vuelos);
+    }
+
+    [HttpGet("llegadas")]
+    public async Task<IActionResult> ObtenerLlegadas([FromQuery] DateTime? fecha)
+    {
+        var vuelos = await _servicio.ObtenerLlegadasAsync(fecha);
+        return Ok(vuelos);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ObtenerDetalle(Guid id)
     {

@@ -28,6 +28,14 @@ export class VuelosService {
     return this.http.get<VueloPublico[]>(`${this.baseUrl}/filtro`, { params });
   }
 
+  obtenerSalidas(): Observable<VueloPublico[]> {
+    return this.http.get<VueloPublico[]>(`${this.baseUrl}/salidas`);
+  }
+
+  obtenerLlegadas(): Observable<VueloPublico[]> {
+    return this.http.get<VueloPublico[]>(`${this.baseUrl}/llegadas`);
+  }
+
   obtenerDetalle(id: string): Observable<VueloPublico> {
     return this.http.get<VueloPublico>(`${this.baseUrl}/${id}`);
   }
