@@ -5,16 +5,32 @@
     var rol = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
     var inicial = string.IsNullOrEmpty(User.Identity?.Name) ? "?" : User.Identity!.Name!.Substring(0, 1).ToUpper();
 }
-<header class="w-full h-20 px-8 flex justify-between items-center bg-surface sticky top-0 z-40 border-b border-outline-variant">
-    <div>
-        <h2 class="text-xl font-bold text-primary">@titulo</h2>
-        <p class="text-sm text-on-surface-variant">@subtitulo</p>
+<header class="w-full h-20 px-4 sm:px-8 flex justify-between items-center bg-surface sticky top-0 z-40 border-b border-outline-variant">
+    <div class="flex items-center gap-3">
+        @* Botón de menú: solo visible en móvil (oculto desde lg). *@
+        <button type="button" onclick="abrirSidebar()" aria-label="Abrir menú"
+                class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div>
+            <h2 class="text-lg sm:text-xl font-bold text-primary">@titulo</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant">@subtitulo</p>
+        </div>
     </div>
-    <div class="flex items-center gap-3 bg-surface-container-low px-3 py-2 rounded-full">
-        <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">@inicial</div>
-        <div class="flex flex-col pr-2">
-            <span class="text-sm font-bold text-on-surface leading-none">@User.Identity?.Name</span>
-            <span class="text-[10px] text-on-surface-variant uppercase tracking-wider">@rol</span>
+    <div class="flex items-center gap-3">
+        @* Alternar tema claro/oscuro. El ícono lo actualiza el script del layout. *@
+        <button type="button" onclick="alternarTema()" aria-label="Cambiar tema"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined" data-icono-tema>dark_mode</span>
+        </button>
+
+        <div class="flex items-center gap-3 bg-surface-container-low px-3 py-2 rounded-full">
+            <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shrink-0">@inicial</div>
+            @* Los datos del usuario se ocultan en pantallas muy pequeñas para dar espacio. *@
+            <div class="hidden sm:flex flex-col pr-2">
+                <span class="text-sm font-bold text-on-surface leading-none">@User.Identity?.Name</span>
+                <span class="text-[10px] text-on-surface-variant uppercase tracking-wider">@rol</span>
+            </div>
         </div>
     </div>
 </header>

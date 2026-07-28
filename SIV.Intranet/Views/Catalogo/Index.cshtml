@@ -26,32 +26,32 @@
     }
     else
     {
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-center border-collapse">
             <thead>
                 <tr class="bg-surface-container-low border-b border-outline-variant">
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Código</th>
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Nombre</th>
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Nombre</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
                     @if (esAdmin)
                     {
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acciones</th>
                     }
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant">
                 @foreach (var a in Model.Aerolineas)
                 {
-                    <tr class="hover:bg-surface-container-low transition-colors">
-                        <td class="px-6 py-4 font-mono font-semibold">@a.Codigo</td>
-                        <td class="px-6 py-4">@a.Nombre</td>
-                        <td class="px-6 py-4">
+                    <tr class="data-row">
+                        <td class="px-6 py-3.5 font-mono font-semibold">@a.Codigo</td>
+                        <td class="px-6 py-3.5">@a.Nombre</td>
+                        <td class="px-6 py-3.5">
                             <span class="status-pill @(a.Activa ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
                                 @(a.Activa ? "Activa" : "Inactiva")
                             </span>
                         </td>
                         @if (esAdmin)
                         {
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-3.5">
                                 <a asp-action="Aerolinea" asp-route-id="@a.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
                                 @if (a.Activa)
                                 {
@@ -91,34 +91,34 @@
     }
     else
     {
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-center border-collapse">
             <thead>
                 <tr class="bg-surface-container-low border-b border-outline-variant">
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Código</th>
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Nombre</th>
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">País</th>
-                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Nombre</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">País</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
                     @if (esAdmin)
                     {
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acciones</th>
                     }
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant">
                 @foreach (var a in Model.Aeropuertos)
                 {
-                    <tr class="hover:bg-surface-container-low transition-colors">
-                        <td class="px-6 py-4 font-mono font-semibold">@a.Codigo</td>
-                        <td class="px-6 py-4">@a.Nombre</td>
-                        <td class="px-6 py-4 text-on-surface-variant">@a.Pais</td>
-                        <td class="px-6 py-4">
+                    <tr class="data-row">
+                        <td class="px-6 py-3.5 font-mono font-semibold">@a.Codigo</td>
+                        <td class="px-6 py-3.5">@a.Nombre</td>
+                        <td class="px-6 py-3.5 text-on-surface-variant">@a.Pais</td>
+                        <td class="px-6 py-3.5">
                             <span class="status-pill @(a.Activo ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
                                 @(a.Activo ? "Activo" : "Inactivo")
                             </span>
                         </td>
                         @if (esAdmin)
                         {
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-3.5">
                                 <a asp-action="Aeropuerto" asp-route-id="@a.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
                                 @if (a.Activo)
                                 {

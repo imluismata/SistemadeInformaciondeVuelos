@@ -6,6 +6,8 @@
     <title>@ViewData["Title"] · Quisqueya Flight Hub</title>
     <partial name="_Favicons" />
     <partial name="_DesignHead" />
+    @* La pantalla de acceso es una vista de marca: siempre en claro. *@
+    <script>document.documentElement.classList.remove('dark');</script>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-primary">
     <div class="w-full max-w-md px-4">

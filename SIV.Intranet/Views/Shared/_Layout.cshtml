@@ -10,13 +10,43 @@
 <body class="text-on-surface overflow-hidden">
     <partial name="_Sidebar" />
 
-    <main class="ml-64 h-screen overflow-y-auto custom-scrollbar bg-background">
+    @* Fondo oscuro tras el menú en móvil; al tocarlo se cierra. Oculto en escritorio. *@
+    <div id="sidebar-backdrop"
+         class="hidden fixed inset-0 bg-black/40 z-40 lg:hidden"
+         onclick="cerrarSidebar()"></div>
+
+    <main class="lg:ml-64 h-screen overflow-y-auto custom-scrollbar bg-background">
         <partial name="_Header" />
-        <div class="p-8 max-w-[1280px] mx-auto space-y-6">
+        <div class="p-4 sm:p-8 max-w-[1280px] mx-auto space-y-6">
             <partial name="_Alertas" />
             @RenderBody()
         </div>
     </main>
+
+    <script>
+        // Menú lateral en móvil: abrir/cerrar con el botón ☰ y el fondo oscuro.
+        function abrirSidebar() {
+            document.getElementById('sidebar').classList.add('sidebar-abierto');
+            document.getElementById('sidebar-backdrop').classList.remove('hidden');
+        }
+        function cerrarSidebar() {
+            document.getElementById('sidebar').classList.remove('sidebar-abierto');
+            document.getElementById('sidebar-backdrop').classList.add('hidden');
+        }
+
+        // Tema claro/oscuro: alterna la clase .dark y guarda la preferencia.
+        function alternarTema() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('tema', html.classList.contains('dark') ? 'oscuro' : 'claro');
+            actualizarIconoTema();
+        }
+        function actualizarIconoTema() {
+            const oscuro = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('[data-icono-tema]').forEach(el => el.textContent = oscuro ? 'light_mode' : 'dark_mode');
+        }
+        actualizarIconoTema();
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

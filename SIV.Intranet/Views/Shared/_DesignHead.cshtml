@@ -1,32 +1,36 @@
 @*
     Sistema de diseño compartido (Stitch / Material 3).
-    Centralizado aquí para no repetirlo en cada layout (DRY).
+    La paleta se define con variables CSS: al alternar la clase .dark en <html>
+    cambian todos los colores sin tocar ninguna vista (DRY).
 *@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 <script>
+    // Cada color apunta a una variable CSS (con soporte de opacidad).
+    function c(v) { return `rgb(var(${v}) / <alpha-value>)`; }
     tailwind.config = {
+        darkMode: 'class',
         theme: {
             extend: {
                 colors: {
-                    "primary": "#000d2f",
-                    "on-primary": "#ffffff",
-                    "primary-container": "#00205b",
-                    "on-primary-container": "#738aca",
-                    "secondary": "#bb0023",
-                    "secondary-container": "#e02737",
-                    "on-secondary-container": "#fffbff",
-                    "surface": "#f7f9fb",
-                    "surface-container-lowest": "#ffffff",
-                    "surface-container-low": "#f2f4f6",
-                    "surface-container": "#eceef0",
-                    "surface-container-high": "#e6e8ea",
-                    "on-surface": "#191c1e",
-                    "on-surface-variant": "#444650",
-                    "outline": "#757681",
-                    "outline-variant": "#c5c6d1",
-                    "background": "#f7f9fb"
+                    "primary": c('--primary'),
+                    "on-primary": c('--on-primary'),
+                    "primary-container": c('--primary-container'),
+                    "on-primary-container": c('--on-primary-container'),
+                    "secondary": c('--secondary'),
+                    "secondary-container": c('--secondary-container'),
+                    "on-secondary-container": c('--on-secondary-container'),
+                    "surface": c('--surface'),
+                    "surface-container-lowest": c('--surface-container-lowest'),
+                    "surface-container-low": c('--surface-container-low'),
+                    "surface-container": c('--surface-container'),
+                    "surface-container-high": c('--surface-container-high'),
+                    "on-surface": c('--on-surface'),
+                    "on-surface-variant": c('--on-surface-variant'),
+                    "outline": c('--outline'),
+                    "outline-variant": c('--outline-variant'),
+                    "background": c('--background')
                 },
                 borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
                 fontFamily: {
@@ -37,11 +41,96 @@
         }
     };
 </script>
+<script>
+    // Aplica el tema guardado antes de pintar, para evitar parpadeo.
+    (function () {
+        const t = localStorage.getItem('tema');
+        if (t === 'oscuro' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    })();
+</script>
 <style>
-    body { font-family: 'Hanken Grotesk', sans-serif; background-color: #f7f9fb; }
+    /* Paleta clara (valores en canales RGB para permitir opacidad). */
+    :root {
+        color-scheme: light;
+        --input-bg: 255 255 255;
+        --primary: 0 13 47;
+        --on-primary: 255 255 255;
+        --primary-container: 0 32 91;
+        --on-primary-container: 115 138 202;
+        --secondary: 187 0 35;
+        --secondary-container: 224 39 55;
+        --on-secondary-container: 255 251 255;
+        --surface: 247 249 251;
+        --surface-container-lowest: 255 255 255;
+        --surface-container-low: 242 244 246;
+        --surface-container: 236 238 240;
+        --surface-container-high: 230 232 234;
+        --on-surface: 25 28 30;
+        --on-surface-variant: 68 70 80;
+        --outline: 117 118 129;
+        --outline-variant: 197 198 209;
+        --background: 247 249 251;
+    }
+
+    /* Paleta oscura. */
+    .dark {
+        color-scheme: dark;
+        --input-bg: 40 43 45;
+        --primary: 178 197 255;
+        --on-primary: 0 42 120;
+        --primary-container: 45 68 127;
+        --on-primary-container: 218 226 255;
+        --secondary: 224 39 55;
+        --secondary-container: 224 39 55;
+        --on-secondary-container: 255 251 255;
+        --surface: 15 17 19;
+        --surface-container-lowest: 26 29 31;
+        --surface-container-low: 33 36 38;
+        --surface-container: 40 43 45;
+        --surface-container-high: 48 51 53;
+        --on-surface: 226 226 229;
+        --on-surface-variant: 196 198 207;
+        --outline: 142 144 153;
+        --outline-variant: 67 71 78;
+        --background: 15 17 19;
+    }
+
+    body {
+        font-family: 'Hanken Grotesk', sans-serif;
+        background-color: rgb(var(--background));
+        color: rgb(var(--on-surface));
+    }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Campos de formulario: siguen el tema (el plugin de Tailwind los deja
+       blancos fijos, por eso se fuerza el color según la paleta activa). */
+    input:not([type='checkbox']):not([type='radio']),
+    select,
+    textarea {
+        background-color: rgb(var(--input-bg)) !important;
+        color: rgb(var(--on-surface)) !important;
+        border-color: rgb(var(--outline-variant)) !important;
+    }
+    input::placeholder,
+    textarea::placeholder {
+        color: rgb(var(--on-surface-variant)) !important;
+        opacity: 1;
+    }
+    select option {
+        background-color: rgb(var(--input-bg));
+        color: rgb(var(--on-surface));
+    }
     .status-pill { border-radius: 100px; padding: 4px 12px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Fila de datos: barra lateral de color al pasar el cursor (detalle del diseño Stitch). */
+    .data-row { transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+    .data-row:hover { background-color: rgb(var(--surface-container-low)); box-shadow: inset 4px 0 0 0 rgb(var(--primary)); }
+
+    /* Menú lateral desplegado en móvil (lo activa el botón ☰). */
+    #sidebar.sidebar-abierto { transform: translateX(0); }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #c5c6d1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgb(var(--outline-variant)); border-radius: 10px; }
 </style>

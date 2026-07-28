@@ -5,7 +5,11 @@
         ? "bg-secondary-container text-on-secondary-container font-bold"
         : "text-on-surface-variant hover:bg-surface-container-high";
 }
-<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low shadow-md flex flex-col p-6 gap-4 z-50">
+@* Oculto por defecto en móvil (-translate-x-full); el botón ☰ del header lo
+   muestra añadiendo la clase 'sidebar-abierto'. En escritorio (lg) siempre visible. *@
+<aside id="sidebar"
+       class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low shadow-md flex flex-col p-6 gap-4 z-50
+              -translate-x-full lg:translate-x-0 transition-transform duration-200">
     <div class="mb-8 flex items-center gap-3">
         <img src="~/images/logo.png" alt="Quisqueya Flight Hub" class="w-11 h-11 object-contain" />
         <div>

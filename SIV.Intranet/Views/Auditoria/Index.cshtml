@@ -66,27 +66,27 @@
     else
     {
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-center border-collapse">
                 <thead>
                     <tr class="bg-surface-container-low border-b border-outline-variant">
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Fecha y hora</th>
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Módulo</th>
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Acción</th>
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Detalle</th>
-                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Resultado</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Fecha y hora</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Módulo</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acción</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Detalle</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Resultado</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant">
                     @foreach (var r in Model.Registros)
                     {
-                        <tr class="hover:bg-surface-container-low transition-colors">
-                            <td class="px-6 py-4 font-mono text-sm whitespace-nowrap">@r.FechaHora.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                            <td class="px-6 py-4">
+                        <tr class="data-row">
+                            <td class="px-6 py-3.5 font-mono text-sm whitespace-nowrap">@r.FechaHora.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                            <td class="px-6 py-3.5">
                                 <span class="status-pill bg-surface-container text-on-surface-variant">@r.Modulo</span>
                             </td>
-                            <td class="px-6 py-4 font-medium">@r.Accion</td>
-                            <td class="px-6 py-4 text-on-surface-variant">@r.Detalle</td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-3.5 font-medium">@r.Accion</td>
+                            <td class="px-6 py-3.5 text-on-surface-variant">@r.Detalle</td>
+                            <td class="px-6 py-3.5">
                                 <span class="status-pill @ClaseResultado(r.Resultado)">@r.Resultado</span>
                             </td>
                         </tr>
