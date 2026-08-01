@@ -1,4 +1,4 @@
-using SIV.Modules.Usuarios.Application.Base;
+using SIV.Modules.Common;
 using SIV.Modules.Usuarios.Application.Dtos;
 
 namespace SIV.Modules.Usuarios.Application.Interfaces;

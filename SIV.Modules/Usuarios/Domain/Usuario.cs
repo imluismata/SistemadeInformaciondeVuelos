@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace SIV.Modules.Usuarios.Domain;
 
 // clase principal del modulo de usuarios
@@ -48,10 +50,12 @@ public class Usuario
     }
 
     // Genera un código numérico de 6 dígitos con vigencia de 30 minutos y lo
-    // devuelve para que el servicio lo envíe por correo.
+    // devuelve para que el servicio lo envíe por correo. Usa un generador
+    // criptográficamente seguro (no Random) porque el mismo código también sirve
+    // para recuperar la contraseña, así que no debe ser predecible.
     public string GenerarCodigoVerificacion()
     {
-        var codigo = Random.Shared.Next(0, 1_000_000).ToString("D6");
+        var codigo = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
         CodigoVerificacion = codigo;
         CodigoExpiraEn = DateTime.UtcNow.AddMinutes(30);
         return codigo;
