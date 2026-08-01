@@ -3,15 +3,16 @@ using System.Net.Mail;
 using System.Net.Mime;
 using Microsoft.Extensions.Logging;
 using SIV.Modules.Usuarios.Application.Interfaces;
+using SIV.Shared.Contracts;
 
 namespace SIV.Infrastructure.Correo;
 
 /// <summary>
 /// Envía correos por SMTP (por ejemplo, Gmail). Si el envío está deshabilitado
-/// en la configuración, registra el código en el log en lugar de enviarlo, para
+/// en la configuración, registra el mensaje en el log en lugar de enviarlo, para
 /// poder desarrollar sin credenciales.
 /// </summary>
-internal sealed class ServicioCorreoSmtp : IServicioCorreo
+internal sealed class ServicioCorreoSmtp : IServicioCorreo, INotificadorPorCorreo
 {
     // Identificador de la imagen embebida (logo) referenciada en el HTML como cid.
     private const string ContentIdLogo = "logoSiv";
@@ -43,6 +44,22 @@ internal sealed class ServicioCorreoSmtp : IServicioCorreo
                 "Recibimos una solicitud para restablecer tu contraseña. Usa este código:",
                 "Si no solicitaste este cambio, ignora este mensaje y tu contraseña seguirá igual."));
 
+    // Notifica por correo a un usuario que sigue un vuelo cuando este cambia.
+    public async Task EnviarNotificacionVueloAsync(string destino, string nombre, string numeroVuelo, string mensaje)
+    {
+        if (!_opciones.Habilitado)
+        {
+            _logger.LogWarning("Correo deshabilitado. Notificación del vuelo {Vuelo} para {Destino}: {Mensaje}",
+                numeroVuelo, destino, mensaje);
+            return;
+        }
+
+        await EnviarSmtpAsync(
+            destino,
+            $"Actualización de tu vuelo {numeroVuelo} — Quisqueya Flight Hub",
+            ConstruirCuerpoNotificacion(nombre, numeroVuelo, mensaje));
+    }
+
     private async Task EnviarAsync(string destino, string codigo, string asunto, string cuerpoHtml)
     {
         if (!_opciones.Habilitado)
@@ -52,6 +69,11 @@ internal sealed class ServicioCorreoSmtp : IServicioCorreo
             return;
         }
 
+        await EnviarSmtpAsync(destino, asunto, cuerpoHtml);
+    }
+
+    private async Task EnviarSmtpAsync(string destino, string asunto, string cuerpoHtml)
+    {
         using var mensaje = new MailMessage
         {
             From = new MailAddress(_opciones.Usuario, _opciones.RemitenteNombre),
@@ -92,6 +114,21 @@ internal sealed class ServicioCorreoSmtp : IServicioCorreo
   <p>{intro}</p>
   <p style='font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0d1f4c; text-align: center; margin: 24px 0;'>{codigo}</p>
   <p style='color: #6b7280; font-size: 13px;'>El código vence en 30 minutos. {nota}</p>
+
+  <div style='margin-top: 36px; text-align: center;'>
+    <img src='cid:{ContentIdLogo}' alt='Quisqueya Flight Hub' style='width: 150px; height: auto;' />
+    <p style='color: #9aa1ad; font-size: 12px; margin: 10px 0 0;'>
+      Este es un correo automático de Quisqueya Flight Hub. Por favor no respondas a este mensaje.
+    </p>
+  </div>
+</div>";
+
+    private static string ConstruirCuerpoNotificacion(string nombre, string numeroVuelo, string mensaje) => $@"
+<div style='font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1a2b4a;'>
+  <p>Hola {nombre},</p>
+  <p>Tienes una actualización en el vuelo <strong>{numeroVuelo}</strong> que sigues:</p>
+  <p style='font-size: 16px; color: #0d1f4c; background: #eef2fb; border-radius: 8px; padding: 16px; margin: 20px 0;'>{mensaje}</p>
+  <p style='color: #6b7280; font-size: 13px;'>Recibes este correo porque sigues este vuelo en Quisqueya Flight Hub.</p>
 
   <div style='margin-top: 36px; text-align: center;'>
     <img src='cid:{ContentIdLogo}' alt='Quisqueya Flight Hub' style='width: 150px; height: auto;' />

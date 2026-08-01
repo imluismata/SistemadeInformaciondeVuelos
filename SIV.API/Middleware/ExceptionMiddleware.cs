@@ -1,10 +1,11 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using SIV.Shared.Exceptions;
 
 namespace SIV.API.Middleware;
 
-public sealed class ExceptionMiddleware(RequestDelegate next)
+public sealed class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -31,6 +32,16 @@ public sealed class ExceptionMiddleware(RequestDelegate next)
         catch (ArgumentException ex)
         {
             await EscribirRespuesta(context, HttpStatusCode.BadRequest, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Cualquier excepción no prevista se registra con todo el detalle para
+            // diagnóstico, pero al cliente solo se le devuelve un mensaje genérico
+            // (no se filtran datos internos ni el stack trace).
+            logger.LogError(ex, "Error no controlado procesando {Metodo} {Ruta}.",
+                context.Request.Method, context.Request.Path);
+            await EscribirRespuesta(context, HttpStatusCode.InternalServerError,
+                "Ocurrió un error inesperado. Intenta de nuevo más tarde.");
         }
     }
 

@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SIV.API.Auth;
 using SIV.Modules.Notificaciones.Application.Interfaces;
 
 namespace SIV.API.Controllers;
 
+// RNF-SEG-01: consultar notificaciones propias requiere autenticación (CU-NOT-03).
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class NotificacionesController : ControllerBase
@@ -18,6 +22,10 @@ public class NotificacionesController : ControllerBase
     [HttpGet("{usuarioId:guid}")]
     public async Task<IActionResult> ObtenerNotificaciones(Guid usuarioId)
     {
+        // RNF-SEG-03: solo el propio usuario (o un administrador) ve sus notificaciones.
+        if (!User.EsAdministrador() && User.ObtenerUsuarioId() != usuarioId)
+            return Forbid();
+
         var notificaciones = await _servicio.ObtenerNotificacionesAsync(usuarioId);
         return Ok(notificaciones);
     }

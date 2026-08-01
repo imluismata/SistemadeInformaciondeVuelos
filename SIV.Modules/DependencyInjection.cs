@@ -16,8 +16,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddModules(this IServiceCollection services)
     {
-        // Usuarios
-        services.AddScoped<IUsuarioService, UsuarioService>();
+        // Usuarios — implementa IUsuarioService e IUsuarioConsulta (misma instancia por scope).
+        services.AddScoped<UsuarioService>();
+        services.AddScoped<IUsuarioService>(sp => sp.GetRequiredService<UsuarioService>());
+        services.AddScoped<IUsuarioConsulta>(sp => sp.GetRequiredService<UsuarioService>());
 
         // Seguimiento — implementa ISeguimientoService e ISeguimientoConsulta
         services.AddScoped<SeguimientoService>();
@@ -26,8 +28,10 @@ public static class DependencyInjection
 
         // Notificaciones
         services.AddScoped<INotificacionService, NotificacionService>();
-        // Conecta el evento de cambio de vuelo con la generación de notificaciones.
-        services.AddScoped<IManejadorVueloCambiado, ManejadorVueloCambiado>();
+        // Consumidores del evento de cambio de vuelo. Se pueden agregar canales sin
+        // modificar el publicador ni los manejadores existentes (Open/Closed):
+        services.AddScoped<IManejadorVueloCambiado, ManejadorVueloCambiado>();       // in-app
+        services.AddScoped<IManejadorVueloCambiado, ManejadorVueloCambiadoCorreo>(); // correo
 
         // Consulta Pública
         services.AddScoped<IConsultaPublicaService, ConsultaPublicaService>();
