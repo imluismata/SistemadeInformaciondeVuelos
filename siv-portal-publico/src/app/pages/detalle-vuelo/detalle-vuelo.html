@@ -45,7 +45,7 @@
         }
 
         @if (mensaje()) {
-          <p class="mensaje-ok">{{ mensaje() }}</p>
+          <p [class]="mensajeEsError() ? 'mensaje-error' : 'mensaje-ok'">{{ mensaje() }}</p>
         }
       </div>
     </div>
