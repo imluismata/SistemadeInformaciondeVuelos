@@ -46,6 +46,18 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
             .Include(v => v.CambiosOperativos)
             .FirstOrDefaultAsync(v => v.Numero == numero);
 
+    // Un vuelo cuenta como "activo" mientras no haya llegado a un estado final.
+    private static readonly EstadoVuelo[] EstadosFinales = [EstadoVuelo.Completado, EstadoVuelo.Cancelado];
+
+    public async Task<bool> ExistenVuelosActivosPorAerolineaAsync(Guid aerolineaId)
+        => await db.Vuelos.AnyAsync(v =>
+            v.AerolineaId == aerolineaId && !EstadosFinales.Contains(v.EstadoActual));
+
+    public async Task<bool> ExistenVuelosActivosPorAeropuertoAsync(Guid aeropuertoId)
+        => await db.Vuelos.AnyAsync(v =>
+            (v.AeropuertoOrigenId == aeropuertoId || v.AeropuertoDestinoId == aeropuertoId)
+            && !EstadosFinales.Contains(v.EstadoActual));
+
     public async Task GuardarAsync(Vuelo vuelo)
     {
         var existe = await db.Vuelos.AnyAsync(v => v.Id == vuelo.Id);

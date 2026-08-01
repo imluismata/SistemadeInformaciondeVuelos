@@ -9,4 +9,9 @@ internal interface IVueloRepository
     Task<Vuelo?> ObtenerPorIdAsync(Guid id);
     Task<Vuelo?> ObtenerPorNumeroAsync(string numero);
     Task GuardarAsync(Vuelo vuelo);
+
+    // Soporte para la regla de Catálogo (CU-CAT-04): saber si una aerolínea o
+    // aeropuerto todavía tiene vuelos no finalizados asociados.
+    Task<bool> ExistenVuelosActivosPorAerolineaAsync(Guid aerolineaId);
+    Task<bool> ExistenVuelosActivosPorAeropuertoAsync(Guid aeropuertoId);
 }

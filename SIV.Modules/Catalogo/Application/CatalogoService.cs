@@ -8,11 +8,19 @@ internal sealed class CatalogoService : ICatalogoService
 {
     private readonly ICatalogoRepository _repository;
     private readonly IAuditoriaService _auditoria;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IVueloConsulta _vuelos;
 
-    public CatalogoService(ICatalogoRepository repository, IAuditoriaService auditoria)
+    public CatalogoService(
+        ICatalogoRepository repository,
+        IAuditoriaService auditoria,
+        IUnitOfWork unitOfWork,
+        IVueloConsulta vuelos)
     {
         _repository = repository;
         _auditoria = auditoria;
+        _unitOfWork = unitOfWork;
+        _vuelos = vuelos;
     }
 
     public async Task<IReadOnlyList<AerolineaDto>> ObtenerAerolineasAsync()
@@ -27,67 +35,88 @@ internal sealed class CatalogoService : ICatalogoService
         return aeropuertos.Select(Mapear).ToList();
     }
 
-    public async Task<AerolineaDto> RegistrarAerolineaAsync(RegistrarAerolineaCommand command)
-    {
-        var existente = await _repository.ObtenerAerolineaPorCodigoAsync(command.Codigo.Trim());
-        if (existente is not null)
+    public Task<AerolineaDto> RegistrarAerolineaAsync(RegistrarAerolineaCommand command)
+        // Alta de la aerolínea + su registro de auditoría en una sola transacción.
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
-            throw new InvalidOperationException($"Ya existe una aerolínea con el código {command.Codigo.Trim()}.");
-        }
+            var existente = await _repository.ObtenerAerolineaPorCodigoAsync(command.Codigo.Trim());
+            if (existente is not null)
+            {
+                throw new InvalidOperationException($"Ya existe una aerolínea con el código {command.Codigo.Trim()}.");
+            }
 
-        var aerolinea = Aerolinea.Crear(command.Codigo, command.Nombre);
-        await _repository.GuardarAerolineaAsync(aerolinea);
-        await _auditoria.RegistrarAsync("Catalogo", "RegistrarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} registrada.");
-        return Mapear(aerolinea);
-    }
+            var aerolinea = Aerolinea.Crear(command.Codigo, command.Nombre);
+            await _repository.GuardarAerolineaAsync(aerolinea);
+            await _auditoria.RegistrarAsync("Catalogo", "RegistrarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} registrada.");
+            return Mapear(aerolinea);
+        });
 
-    public async Task<AerolineaDto> ActualizarAerolineaAsync(Guid id, ActualizarAerolineaCommand command)
-    {
-        var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
-        aerolinea.Actualizar(command.Codigo, command.Nombre);
-        await _repository.GuardarAerolineaAsync(aerolinea);
-        await _auditoria.RegistrarAsync("Catalogo", "ActualizarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} actualizada.");
-        return Mapear(aerolinea);
-    }
-
-    public async Task DesactivarAerolineaAsync(Guid id)
-    {
-        var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
-        aerolinea.Desactivar();
-        await _repository.GuardarAerolineaAsync(aerolinea);
-        await _auditoria.RegistrarAsync("Catalogo", "DesactivarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} desactivada.");
-    }
-
-    public async Task<AeropuertoDto> RegistrarAeropuertoAsync(RegistrarAeropuertoCommand command)
-    {
-        var existente = await _repository.ObtenerAeropuertoPorCodigoAsync(command.Codigo.Trim());
-        if (existente is not null)
+    public Task<AerolineaDto> ActualizarAerolineaAsync(Guid id, ActualizarAerolineaCommand command)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
-            throw new InvalidOperationException($"Ya existe un aeropuerto con el código {command.Codigo.Trim()}.");
-        }
+            var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
+            aerolinea.Actualizar(command.Codigo, command.Nombre);
+            await _repository.GuardarAerolineaAsync(aerolinea);
+            await _auditoria.RegistrarAsync("Catalogo", "ActualizarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} actualizada.");
+            return Mapear(aerolinea);
+        });
 
-        var aeropuerto = Aeropuerto.Registrar(command.Codigo, command.Nombre, command.Pais);
-        await _repository.GuardarAeropuertoAsync(aeropuerto);
-        await _auditoria.RegistrarAsync("Catalogo", "RegistrarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} registrado.");
-        return Mapear(aeropuerto);
-    }
+    public Task DesactivarAerolineaAsync(Guid id)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
 
-    public async Task<AeropuertoDto> ActualizarAeropuertoAsync(Guid id, ActualizarAeropuertoCommand command)
-    {
-        var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
-        aeropuerto.Actualizar(command.Codigo, command.Nombre, command.Pais);
-        await _repository.GuardarAeropuertoAsync(aeropuerto);
-        await _auditoria.RegistrarAsync("Catalogo", "ActualizarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} actualizado.");
-        return Mapear(aeropuerto);
-    }
+            // Regla del SAD (CU-CAT-04): no se puede desactivar una aerolínea con
+            // vuelos activos asociados. Se consulta al módulo de Vuelos vía contrato.
+            if (await _vuelos.ExistenVuelosActivosParaAerolineaAsync(id))
+                throw new InvalidOperationException(
+                    $"No se puede desactivar la aerolínea {aerolinea.Codigo}: tiene vuelos activos asociados.");
 
-    public async Task DesactivarAeropuertoAsync(Guid id)
-    {
-        var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
-        aeropuerto.Desactivar();
-        await _repository.GuardarAeropuertoAsync(aeropuerto);
-        await _auditoria.RegistrarAsync("Catalogo", "DesactivarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} desactivado.");
-    }
+            aerolinea.Desactivar();
+            await _repository.GuardarAerolineaAsync(aerolinea);
+            await _auditoria.RegistrarAsync("Catalogo", "DesactivarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} desactivada.");
+        });
+
+    public Task<AeropuertoDto> RegistrarAeropuertoAsync(RegistrarAeropuertoCommand command)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var existente = await _repository.ObtenerAeropuertoPorCodigoAsync(command.Codigo.Trim());
+            if (existente is not null)
+            {
+                throw new InvalidOperationException($"Ya existe un aeropuerto con el código {command.Codigo.Trim()}.");
+            }
+
+            var aeropuerto = Aeropuerto.Registrar(command.Codigo, command.Nombre, command.Pais);
+            await _repository.GuardarAeropuertoAsync(aeropuerto);
+            await _auditoria.RegistrarAsync("Catalogo", "RegistrarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} registrado.");
+            return Mapear(aeropuerto);
+        });
+
+    public Task<AeropuertoDto> ActualizarAeropuertoAsync(Guid id, ActualizarAeropuertoCommand command)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
+            aeropuerto.Actualizar(command.Codigo, command.Nombre, command.Pais);
+            await _repository.GuardarAeropuertoAsync(aeropuerto);
+            await _auditoria.RegistrarAsync("Catalogo", "ActualizarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} actualizado.");
+            return Mapear(aeropuerto);
+        });
+
+    public Task DesactivarAeropuertoAsync(Guid id)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
+
+            // Regla del SAD (CU-CAT-04): no se puede desactivar un aeropuerto usado
+            // como origen o destino por algún vuelo activo.
+            if (await _vuelos.ExistenVuelosActivosParaAeropuertoAsync(id))
+                throw new InvalidOperationException(
+                    $"No se puede desactivar el aeropuerto {aeropuerto.Codigo}: tiene vuelos activos asociados.");
+
+            aeropuerto.Desactivar();
+            await _repository.GuardarAeropuertoAsync(aeropuerto);
+            await _auditoria.RegistrarAsync("Catalogo", "DesactivarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} desactivado.");
+        });
 
     private async Task<Aerolinea> ObtenerAerolineaRequeridaAsync(Guid id)
         => await _repository.ObtenerAerolineaPorIdAsync(id)

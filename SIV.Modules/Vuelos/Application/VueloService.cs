@@ -33,17 +33,20 @@ internal sealed class VueloService : IVueloService
     private readonly IVueloDomainService _domainService;
     private readonly IAuditoriaService _auditoria;
     private readonly IPublicadorEventos _publicador;
+    private readonly IUnitOfWork _unitOfWork;
 
     public VueloService(
         IVueloRepository repository,
         IVueloDomainService domainService,
         IAuditoriaService auditoria,
-        IPublicadorEventos publicador)
+        IPublicadorEventos publicador,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _domainService = domainService;
         _auditoria = auditoria;
         _publicador = publicador;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IReadOnlyList<VueloDto>> ObtenerTodosAsync()
@@ -64,105 +67,116 @@ internal sealed class VueloService : IVueloService
         return vuelo is null ? null : Mapear(vuelo);
     }
 
-    public async Task<VueloDto> RegistrarAsync(RegistrarVueloCommand command)
-    {
-        var existente = await _repository.ObtenerPorNumeroAsync(command.Numero.Trim());
-        if (existente is not null)
-            throw new InvalidOperationException($"Ya existe un vuelo con el número {command.Numero.Trim()}.");
-
-        var vuelo = _domainService.Registrar(
-            command.Numero,
-            command.AerolineaId,
-            command.AeropuertoOrigenId,
-            command.AeropuertoDestinoId,
-            command.HorarioSalida,
-            command.HorarioLlegada,
-            command.Puerta);
-
-        await _repository.GuardarAsync(vuelo);
-        await _auditoria.RegistrarAsync("Vuelos", "RegistrarVuelo", "Exitoso", $"Vuelo {vuelo.Numero} registrado.");
-        return Mapear(vuelo);
-    }
-
-    public async Task<VueloDto> ActualizarDatosAsync(Guid vueloId, ActualizarDatosVueloCommand command)
-    {
-        var vuelo = await ObtenerVueloRequerido(vueloId);
-        _domainService.ActualizarDatos(
-            vuelo,
-            command.AerolineaId,
-            command.AeropuertoOrigenId,
-            command.AeropuertoDestinoId,
-            command.HorarioSalida,
-            command.HorarioLlegada,
-            command.Puerta,
-            command.Motivo);
-
-        await _repository.GuardarAsync(vuelo);
-        await _auditoria.RegistrarAsync("Vuelos", "ActualizarDatos", "Exitoso", $"Vuelo {vuelo.Numero} actualizado.");
-        return Mapear(vuelo);
-    }
-
-    public async Task<VueloDto> CambiarEstadoAsync(Guid vueloId, ActualizarEstadoVueloCommand command)
-    {
-        var vuelo = await ObtenerVueloRequerido(vueloId);
-
-        // El estado anterior debe capturarse antes de que el dominio mute la entidad.
-        var estadoAnterior = vuelo.EstadoActual;
-
-        _domainService.CambiarEstado(vuelo, command.EstadoNuevo);
-        await _repository.GuardarAsync(vuelo);
-        await _auditoria.RegistrarAsync("Estados", "CambiarEstado", "Exitoso", $"Vuelo {vuelo.Numero} → {vuelo.EstadoActual}.");
-
-        // El dominio ignora la transición hacia el mismo estado; en ese caso no hay nada que notificar.
-        if (estadoAnterior != vuelo.EstadoActual)
+    public Task<VueloDto> RegistrarAsync(RegistrarVueloCommand command)
+        // Registro del vuelo + auditoría en una sola transacción: si la auditoría
+        // falla, el vuelo no queda guardado a medias.
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
+            var existente = await _repository.ObtenerPorNumeroAsync(command.Numero.Trim());
+            if (existente is not null)
+                throw new InvalidOperationException($"Ya existe un vuelo con el número {command.Numero.Trim()}.");
+
+            var vuelo = _domainService.Registrar(
+                command.Numero,
+                command.AerolineaId,
+                command.AeropuertoOrigenId,
+                command.AeropuertoDestinoId,
+                command.HorarioSalida,
+                command.HorarioLlegada,
+                command.Puerta);
+
+            await _repository.GuardarAsync(vuelo);
+            await _auditoria.RegistrarAsync("Vuelos", "RegistrarVuelo", "Exitoso", $"Vuelo {vuelo.Numero} registrado.");
+            return Mapear(vuelo);
+        });
+
+    public Task<VueloDto> ActualizarDatosAsync(Guid vueloId, ActualizarDatosVueloCommand command)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var vuelo = await ObtenerVueloRequerido(vueloId);
+            _domainService.ActualizarDatos(
+                vuelo,
+                command.AerolineaId,
+                command.AeropuertoOrigenId,
+                command.AeropuertoDestinoId,
+                command.HorarioSalida,
+                command.HorarioLlegada,
+                command.Puerta,
+                command.Motivo);
+
+            await _repository.GuardarAsync(vuelo);
+            await _auditoria.RegistrarAsync("Vuelos", "ActualizarDatos", "Exitoso", $"Vuelo {vuelo.Numero} actualizado.");
+            return Mapear(vuelo);
+        });
+
+    public Task<VueloDto> CambiarEstadoAsync(Guid vueloId, ActualizarEstadoVueloCommand command)
+        // Cambio de estado + auditoría + notificaciones en una sola transacción
+        // atómica (DA-04 / RNF-TRZ-04): o se confirman los tres, o no se confirma nada.
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var vuelo = await ObtenerVueloRequerido(vueloId);
+
+            // El estado anterior debe capturarse antes de que el dominio mute la entidad.
+            var estadoAnterior = vuelo.EstadoActual;
+
+            _domainService.CambiarEstado(vuelo, command.EstadoNuevo);
+            await _repository.GuardarAsync(vuelo);
+            await _auditoria.RegistrarAsync("Estados", "CambiarEstado", "Exitoso", $"Vuelo {vuelo.Numero} → {vuelo.EstadoActual}.");
+
+            // El dominio ignora la transición hacia el mismo estado; en ese caso no hay nada que notificar.
+            if (estadoAnterior != vuelo.EstadoActual)
+            {
+                await PublicarCambioAsync(
+                    vuelo,
+                    estadoAnterior,
+                    TiposPorEstado.TryGetValue(vuelo.EstadoActual, out var tipo) ? tipo : TipoCambio.CambioDeEstado,
+                    $"El vuelo cambió de {estadoAnterior} a {vuelo.EstadoActual}.");
+            }
+
+            return Mapear(vuelo);
+        });
+
+    public Task<VueloDto> RegistrarCambioOperativoAsync(Guid vueloId, RegistrarCambioOperativoCommand command)
+        // Cambio operativo + posible transición de estado + auditoría + notificaciones
+        // en una sola transacción atómica (DA-04 / RNF-TRZ-04). Este es exactamente el
+        // flujo que la vista de procesos del SAD describe como atómico.
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var vuelo = await ObtenerVueloRequerido(vueloId);
+
+            // Un cambio operativo puede arrastrar consigo una transición de estado
+            // (p. ej. un retraso mueve el vuelo a Retrasado), así que se captura antes.
+            var estadoAnterior = vuelo.EstadoActual;
+
+            switch (command.Tipo)
+            {
+                case TipoCambioOperativo.Retraso:
+                    _domainService.RegistrarRetraso(vuelo, command.Duracion ?? TimeSpan.Zero, command.Motivo);
+                    break;
+                case TipoCambioOperativo.Adelanto:
+                    _domainService.RegistrarAdelanto(vuelo, command.Duracion ?? TimeSpan.Zero, command.Motivo);
+                    break;
+                case TipoCambioOperativo.CambioDePuerta:
+                    _domainService.RegistrarCambioDePuerta(vuelo, command.NuevaPuerta ?? string.Empty, command.Motivo);
+                    break;
+                case TipoCambioOperativo.Cancelacion:
+                    _domainService.Cancelar(vuelo, command.Motivo);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(command.Tipo), command.Tipo, "Tipo de cambio no soportado.");
+            }
+
+            await _repository.GuardarAsync(vuelo);
+            await _auditoria.RegistrarAsync("CambiosOperativos", command.Tipo.ToString(), "Exitoso", $"Vuelo {vuelo.Numero}: {command.Motivo}.");
+
             await PublicarCambioAsync(
                 vuelo,
                 estadoAnterior,
-                TiposPorEstado.TryGetValue(vuelo.EstadoActual, out var tipo) ? tipo : TipoCambio.CambioDeEstado,
-                $"El vuelo cambió de {estadoAnterior} a {vuelo.EstadoActual}.");
-        }
+                TiposPorCambioOperativo.TryGetValue(command.Tipo, out var tipo) ? tipo : TipoCambio.CambioDeEstado,
+                command.Motivo);
 
-        return Mapear(vuelo);
-    }
-
-    public async Task<VueloDto> RegistrarCambioOperativoAsync(Guid vueloId, RegistrarCambioOperativoCommand command)
-    {
-        var vuelo = await ObtenerVueloRequerido(vueloId);
-
-        // Un cambio operativo puede arrastrar consigo una transición de estado
-        // (p. ej. un retraso mueve el vuelo a Retrasado), así que se captura antes.
-        var estadoAnterior = vuelo.EstadoActual;
-
-        switch (command.Tipo)
-        {
-            case TipoCambioOperativo.Retraso:
-                _domainService.RegistrarRetraso(vuelo, command.Duracion ?? TimeSpan.Zero, command.Motivo);
-                break;
-            case TipoCambioOperativo.Adelanto:
-                _domainService.RegistrarAdelanto(vuelo, command.Duracion ?? TimeSpan.Zero, command.Motivo);
-                break;
-            case TipoCambioOperativo.CambioDePuerta:
-                _domainService.RegistrarCambioDePuerta(vuelo, command.NuevaPuerta ?? string.Empty, command.Motivo);
-                break;
-            case TipoCambioOperativo.Cancelacion:
-                _domainService.Cancelar(vuelo, command.Motivo);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(command.Tipo), command.Tipo, "Tipo de cambio no soportado.");
-        }
-
-        await _repository.GuardarAsync(vuelo);
-        await _auditoria.RegistrarAsync("CambiosOperativos", command.Tipo.ToString(), "Exitoso", $"Vuelo {vuelo.Numero}: {command.Motivo}.");
-
-        await PublicarCambioAsync(
-            vuelo,
-            estadoAnterior,
-            TiposPorCambioOperativo.TryGetValue(command.Tipo, out var tipo) ? tipo : TipoCambio.CambioDeEstado,
-            command.Motivo);
-
-        return Mapear(vuelo);
-    }
+            return Mapear(vuelo);
+        });
 
     /// <summary>
     /// Arma el evento de dominio y lo entrega al publicador. VueloService no sabe

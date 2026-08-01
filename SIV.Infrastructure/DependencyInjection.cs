@@ -12,6 +12,7 @@ using SIV.Modules.Notificaciones.Application;
 using SIV.Modules.Seguimiento.Application;
 using SIV.Modules.Usuarios.Application;
 using SIV.Modules.Vuelos.Application;
+using SIV.Shared.Contracts;
 
 namespace SIV.Infrastructure;
 
@@ -21,6 +22,10 @@ public static class DependencyInjection
     {
         services.AddDbContext<SivDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        // Unidad de trabajo: transacción atómica compartida por los módulos (DA-04).
+        // Scoped para vivir en el mismo scope que el SivDbContext.
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IVueloRepository, VueloRepository>();
         services.AddScoped<ICatalogoRepository, CatalogoRepository>();
