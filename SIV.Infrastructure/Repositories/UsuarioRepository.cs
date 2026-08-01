@@ -24,6 +24,13 @@ internal class UsuarioRepository : IUsuarioRepository
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    public async Task<IReadOnlyList<Usuario>> ObtenerPorIdsAsync(IReadOnlyCollection<Guid> ids)
+    {
+        return await _context.Usuarios
+            .Where(u => ids.Contains(u.Id))
+            .ToListAsync();
+    }
+
     public async Task<Usuario?> ObtenerPorEmailAsync(string email)
     {
         return await _context.Usuarios

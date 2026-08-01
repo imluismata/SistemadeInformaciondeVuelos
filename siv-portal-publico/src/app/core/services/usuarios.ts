@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, RegistroUsuarioRequest, Usuario } from '../models/usuario.model';
+import { LoginRequest, LoginResponse, RegistroUsuarioRequest, Usuario } from '../models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
@@ -33,8 +33,8 @@ export class UsuariosService {
     return this.http.post<void>(`${this.baseUrl}/restablecer`, { email, codigo, nuevaPassword });
   }
 
-  login(request: LoginRequest): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.baseUrl}/login`, request);
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request);
   }
 
   obtenerPorId(id: string): Observable<Usuario> {

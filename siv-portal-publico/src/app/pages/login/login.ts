@@ -28,8 +28,8 @@ export class Login {
     this.enviando.set(true);
 
     this.usuariosService.login({ email: this.email, password: this.password }).subscribe({
-      next: (usuario) => {
-        this.auth.iniciarSesion(usuario);
+      next: (respuesta) => {
+        this.auth.iniciarSesion(respuesta.usuario, respuesta.token);
         this.enviando.set(false);
         this.router.navigateByUrl('/');
       },

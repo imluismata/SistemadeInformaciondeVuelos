@@ -49,7 +49,11 @@ public static class DependencyInjection
             RemitenteNombre = seccionCorreo["RemitenteNombre"] ?? "Quisqueya Flight Hub",
         };
         services.AddSingleton(opcionesCorreo);
-        services.AddScoped<IServicioCorreo, ServicioCorreoSmtp>();
+        // ServicioCorreoSmtp implementa dos contratos: IServicioCorreo (Usuarios) e
+        // INotificadorPorCorreo (notificaciones de vuelo). Se comparte por scope.
+        services.AddScoped<ServicioCorreoSmtp>();
+        services.AddScoped<IServicioCorreo>(sp => sp.GetRequiredService<ServicioCorreoSmtp>());
+        services.AddScoped<INotificadorPorCorreo>(sp => sp.GetRequiredService<ServicioCorreoSmtp>());
 
         // Aeropuerto base para los tableros de salidas y llegadas (AILA = SDQ).
         var opcionesAeropuerto = new OpcionesAeropuerto

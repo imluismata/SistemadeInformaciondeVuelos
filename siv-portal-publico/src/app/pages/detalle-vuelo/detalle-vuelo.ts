@@ -21,6 +21,7 @@ export class DetalleVuelo implements OnInit {
   readonly vuelo = signal<VueloPublico | null>(null);
   readonly cargando = signal(true);
   readonly mensaje = signal<string | null>(null);
+  readonly mensajeEsError = signal(false);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -40,8 +41,20 @@ export class DetalleVuelo implements OnInit {
     this.seguimientoService
       .registrar({ usuarioId: usuario.id, vueloId: vuelo.id })
       .subscribe({
-        next: () => this.mensaje.set('Ahora sigues este vuelo. Recibirás notificaciones de cambios.'),
-        error: () => this.mensaje.set('No se pudo registrar el seguimiento.'),
+        next: () => {
+          this.mensajeEsError.set(false);
+          this.mensaje.set('Ahora sigues este vuelo. Recibirás notificaciones de cambios.');
+        },
+        error: (e) => {
+          // 409 = el backend indica que ya existe un seguimiento activo para este vuelo.
+          if (e?.status === 409) {
+            this.mensajeEsError.set(false);
+            this.mensaje.set('Ya estás siguiendo este vuelo.');
+          } else {
+            this.mensajeEsError.set(true);
+            this.mensaje.set('No se pudo registrar el seguimiento.');
+          }
+        },
       });
   }
 

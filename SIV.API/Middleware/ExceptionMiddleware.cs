@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using SIV.Shared.Exceptions;
 
 namespace SIV.API.Middleware;
@@ -35,13 +36,14 @@ public sealed class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionM
         catch (Exception ex)
         {
             // Red de seguridad: cualquier excepción no prevista (fallo de BD, null, etc.)
-            // se registra completa en el log del servidor, pero al cliente solo le llega
-            // un mensaje genérico — nunca el stack trace (evita fuga de información).
-            logger.LogError(ex, "Error no controlado al procesar {Metodo} {Ruta}",
+            // se registra completa en el log del servidor para diagnóstico, pero al
+            // cliente solo le llega un mensaje genérico — nunca el stack trace ni datos
+            // internos (evita fuga de información).
+            logger.LogError(ex, "Error no controlado procesando {Metodo} {Ruta}.",
                 context.Request.Method, context.Request.Path);
 
             await EscribirRespuesta(context, HttpStatusCode.InternalServerError,
-                "Ocurrió un error inesperado. Intente de nuevo más tarde.");
+                "Ocurrió un error inesperado. Intenta de nuevo más tarde.");
         }
     }
 
