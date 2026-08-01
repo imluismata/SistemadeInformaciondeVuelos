@@ -1,11 +1,13 @@
 using SIV.Modules.Usuarios.Application.Dtos;
 using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Usuarios.Domain;
+using SIV.Shared.Contracts;
 using SIV.Shared.Exceptions;
 
 namespace SIV.Modules.Usuarios.Application.Services;
 
-internal class UsuarioService : IUsuarioService
+// Implementa IUsuarioService (gestión) e IUsuarioConsulta (consulta para otros módulos).
+internal class UsuarioService : IUsuarioService, IUsuarioConsulta
 {
     private readonly IUsuarioRepository _repo;
     private readonly IServicioCorreo _correo;
@@ -154,6 +156,16 @@ internal class UsuarioService : IUsuarioService
             throw new EmailNoConfirmadoException(usuario.Email);
 
         return MapToDto(usuario);
+    }
+
+    // IUsuarioConsulta: datos de contacto de un conjunto de usuarios (para envío de correos).
+    public async Task<IReadOnlyList<UsuarioContacto>> ObtenerContactosAsync(IReadOnlyCollection<Guid> ids)
+    {
+        if (ids.Count == 0)
+            return Array.Empty<UsuarioContacto>();
+
+        var usuarios = await _repo.ObtenerPorIdsAsync(ids);
+        return usuarios.Select(u => new UsuarioContacto(u.Id, u.Nombre, u.Email)).ToList();
     }
 
     private static UsuarioDto MapToDto(Usuario u) =>
