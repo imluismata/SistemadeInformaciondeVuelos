@@ -7,7 +7,10 @@ namespace SIV.Intranet.Models;
 /// </summary>
 
 // Respuesta de POST /api/auth/login
-public sealed record ResultadoLogin(string Token, string Nombre, string Rol);
+// Respuesta de POST /api/auth/login: el token y los datos del usuario.
+public sealed record ResultadoLogin(string Token, UsuarioLogin Usuario);
+
+public sealed record UsuarioLogin(Guid Id, string Nombre, string Email, string Rol);
 
 // Elemento de GET /api/vuelos
 public sealed record VueloApi(

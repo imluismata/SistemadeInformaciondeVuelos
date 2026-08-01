@@ -1,0 +1,157 @@
+@model SIV.Intranet.Models.ReportesViewModel
+@{
+    ViewData["Title"] = "Reportes";
+    ViewData["Subtitulo"] = "Operación y cambios por período";
+
+    string ClaseEstado(string estado) => estado switch
+    {
+        "Completado" => "bg-green-100 text-green-700",
+        "Cancelado" => "bg-red-100 text-red-700",
+        "Retrasado" => "bg-amber-100 text-amber-700",
+        "EnVuelo" or "Embarcando" => "bg-sky-100 text-sky-700",
+        _ => "bg-surface-container text-on-surface-variant"
+    };
+    // Se propaga el período a los enlaces de exportación.
+    var rango = new { desde = Model.Desde?.ToString("yyyy-MM-dd"), hasta = Model.Hasta?.ToString("yyyy-MM-dd") };
+}
+
+<!-- Filtro de período -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
+    <form asp-action="Index" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+            <label asp-for="Desde" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Desde" type="date" class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container" />
+        </div>
+        <div>
+            <label asp-for="Hasta" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Hasta" type="date" class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container" />
+        </div>
+        <div class="flex gap-2 md:col-span-2">
+            <button type="submit" class="bg-primary text-on-primary rounded-lg px-4 py-2 font-semibold hover:opacity-90 transition-opacity">Filtrar</button>
+            <a asp-action="Index" class="border border-outline text-on-surface rounded-lg px-4 py-2 font-semibold hover:bg-surface-container transition-colors">Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<!-- CU-REP-01: Reporte de operación -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Reporte de operación</h3>
+            <p class="text-sm text-on-surface-variant">Vuelos por estado · total: <span class="font-semibold">@(Model.Operacion?.Total ?? 0)</span></p>
+        </div>
+        <a asp-action="OperacionCsv" asp-route-desde="@rango.desde" asp-route-hasta="@rango.hasta"
+           class="flex items-center gap-1 px-4 py-2 border border-outline-variant text-on-surface rounded-lg text-sm hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-sm">download</span> Exportar CSV
+        </a>
+    </div>
+    @if (Model.Operacion is null || Model.Operacion.Total == 0)
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay vuelos en el período seleccionado.</div>
+    }
+    else
+    {
+        <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            @foreach (var e in Model.Operacion.PorEstado)
+            {
+                <div class="border border-outline-variant rounded-xl p-4 flex flex-col gap-2">
+                    <span class="status-pill w-fit @ClaseEstado(e.Clave)">@e.Clave</span>
+                    <span class="text-2xl font-bold text-on-surface">@e.Cantidad</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- CU-REP-03: Vuelos más seguidos -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Vuelos más seguidos</h3>
+            <p class="text-sm text-on-surface-variant">Seguimientos activos · total: <span class="font-semibold">@(Model.Seguimiento?.TotalSeguimientosActivos ?? 0)</span></p>
+        </div>
+        <a asp-action="SeguimientoCsv"
+           class="flex items-center gap-1 px-4 py-2 border border-outline-variant text-on-surface rounded-lg text-sm hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-sm">download</span> Exportar CSV
+        </a>
+    </div>
+    @if (Model.Seguimiento is null || !Model.Seguimiento.VuelosMasSeguidos.Any())
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay seguimientos activos.</div>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low border-b border-outline-variant">
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Vuelo</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Seguidores</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    @foreach (var v in Model.Seguimiento.VuelosMasSeguidos)
+                    {
+                        <tr class="data-row">
+                            <td class="px-6 py-3 font-mono font-semibold text-primary">@v.Vuelo</td>
+                            <td class="px-6 py-3 font-bold text-on-surface">@v.Seguidores</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- CU-REP-02: Reporte de cambios -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Reporte de cambios operativos</h3>
+            <p class="text-sm text-on-surface-variant">Cambios por tipo · total: <span class="font-semibold">@(Model.Cambios?.Total ?? 0)</span></p>
+        </div>
+        <a asp-action="CambiosCsv" asp-route-desde="@rango.desde" asp-route-hasta="@rango.hasta"
+           class="flex items-center gap-1 px-4 py-2 border border-outline-variant text-on-surface rounded-lg text-sm hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-sm">download</span> Exportar CSV
+        </a>
+    </div>
+    @if (Model.Cambios is null || Model.Cambios.Total == 0)
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay cambios operativos en el período seleccionado.</div>
+    }
+    else
+    {
+        <div class="p-6 flex flex-wrap gap-3 border-b border-outline-variant">
+            @foreach (var t in Model.Cambios.PorTipo)
+            {
+                <div class="border border-outline-variant rounded-lg px-4 py-2 flex items-center gap-2">
+                    <span class="text-sm text-on-surface-variant">@t.Clave</span>
+                    <span class="text-lg font-bold text-on-surface">@t.Cantidad</span>
+                </div>
+            }
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low border-b border-outline-variant">
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Vuelo</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Tipo</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Motivo</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    @foreach (var c in Model.Cambios.Detalle)
+                    {
+                        <tr class="data-row">
+                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@c.RegistradoEn.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-6 py-3 font-mono font-semibold text-primary">@c.Vuelo</td>
+                            <td class="px-6 py-3">@c.Tipo</td>
+                            <td class="px-6 py-3 text-on-surface-variant">@c.Motivo</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

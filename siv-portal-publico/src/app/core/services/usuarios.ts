@@ -33,8 +33,10 @@ export class UsuariosService {
     return this.http.post<void>(`${this.baseUrl}/restablecer`, { email, codigo, nuevaPassword });
   }
 
+  // El login es el único endpoint que no cuelga de /usuarios: la autenticación
+  // vive en /auth (AuthController), compartida con la intranet para no duplicarla.
   login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request);
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, request);
   }
 
   obtenerPorId(id: string): Observable<Usuario> {

@@ -9,9 +9,12 @@ internal sealed class RegistroAuditoria
     public string Accion { get; private set; } = string.Empty;
     public string? Detalle { get; private set; }
     public string Resultado { get; private set; } = string.Empty;
+    // Quién ejecutó la acción (email del usuario autenticado, o "Sistema" para
+    // acciones automáticas como la siembra del admin en el arranque). RNF-TRZ.
+    public string Actor { get; private set; } = string.Empty;
     public DateTime FechaHora { get; private set; }
 
-    public static RegistroAuditoria Crear(string modulo, string accion, string resultado, string? detalle = null)
+    public static RegistroAuditoria Crear(string modulo, string accion, string resultado, string actor, string? detalle = null)
     {
         if (string.IsNullOrWhiteSpace(modulo))
             throw new ArgumentException("El módulo es obligatorio.", nameof(modulo));
@@ -29,6 +32,7 @@ internal sealed class RegistroAuditoria
             Accion = accion.Trim(),
             Detalle = detalle?.Trim(),
             Resultado = resultado.Trim(),
+            Actor = string.IsNullOrWhiteSpace(actor) ? "Desconocido" : actor.Trim(),
             FechaHora = DateTime.UtcNow
         };
     }

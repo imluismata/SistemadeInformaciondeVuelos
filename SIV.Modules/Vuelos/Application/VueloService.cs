@@ -34,19 +34,37 @@ internal sealed class VueloService : IVueloService
     private readonly IAuditoriaService _auditoria;
     private readonly IPublicadorEventos _publicador;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICatalogoConsulta _catalogo;
 
     public VueloService(
         IVueloRepository repository,
         IVueloDomainService domainService,
         IAuditoriaService auditoria,
         IPublicadorEventos publicador,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICatalogoConsulta catalogo)
     {
         _repository = repository;
         _domainService = domainService;
         _auditoria = auditoria;
         _publicador = publicador;
         _unitOfWork = unitOfWork;
+        _catalogo = catalogo;
+    }
+
+    // Regla del SAD: la aerolínea, el origen y el destino deben existir en el
+    // Catálogo antes de registrar o editar un vuelo. Se consulta al módulo de
+    // Catálogo por su contrato compartido (DA-02).
+    private async Task ValidarCatalogoAsync(Guid aerolineaId, Guid origenId, Guid destinoId)
+    {
+        if (!await _catalogo.ExisteAerolineaAsync(aerolineaId))
+            throw new ArgumentException("La aerolínea indicada no existe en el catálogo.");
+
+        if (!await _catalogo.ExisteAeropuertoAsync(origenId))
+            throw new ArgumentException("El aeropuerto de origen no existe en el catálogo.");
+
+        if (!await _catalogo.ExisteAeropuertoAsync(destinoId))
+            throw new ArgumentException("El aeropuerto de destino no existe en el catálogo.");
     }
 
     public async Task<IReadOnlyList<VueloDto>> ObtenerTodosAsync()
@@ -76,6 +94,8 @@ internal sealed class VueloService : IVueloService
             if (existente is not null)
                 throw new InvalidOperationException($"Ya existe un vuelo con el número {command.Numero.Trim()}.");
 
+            await ValidarCatalogoAsync(command.AerolineaId, command.AeropuertoOrigenId, command.AeropuertoDestinoId);
+
             var vuelo = _domainService.Registrar(
                 command.Numero,
                 command.AerolineaId,
@@ -94,6 +114,9 @@ internal sealed class VueloService : IVueloService
         => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
             var vuelo = await ObtenerVueloRequerido(vueloId);
+
+            await ValidarCatalogoAsync(command.AerolineaId, command.AeropuertoOrigenId, command.AeropuertoDestinoId);
+
             _domainService.ActualizarDatos(
                 vuelo,
                 command.AerolineaId,
@@ -201,22 +224,5 @@ internal sealed class VueloService : IVueloService
         return vuelo;
     }
 
-    private static VueloDto Mapear(Vuelo vuelo) =>
-        new(vuelo.Id,
-            vuelo.Numero,
-            vuelo.AerolineaId,
-            vuelo.AeropuertoOrigenId,
-            vuelo.AeropuertoDestinoId,
-            vuelo.HorarioSalida,
-            vuelo.HorarioLlegada,
-            vuelo.Puerta,
-            vuelo.EstadoActual.ToString(),
-            vuelo.HistorialEstados
-                .OrderBy(h => h.OcurridoEn)
-                .Select(h => new HistorialEstadoDto(
-                    h.Id, h.VueloId, h.EstadoAnterior.ToString(), h.EstadoNuevo.ToString(), h.OcurridoEn)).ToList(),
-            vuelo.CambiosOperativos
-                .OrderBy(c => c.RegistradoEn)
-                .Select(c => new CambioOperativoDto(
-                    c.Id, c.VueloId, c.Tipo.ToString(), c.Motivo, c.ValorAnterior, c.ValorNuevo, c.RegistradoEn)).ToList());
+    private static VueloDto Mapear(Vuelo vuelo) => VueloMapper.ADto(vuelo);
 }

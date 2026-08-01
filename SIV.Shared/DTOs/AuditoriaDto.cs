@@ -6,4 +6,5 @@ public sealed record AuditoriaDto(
     string Accion,
     string? Detalle,
     string Resultado,
+    string Actor,
     DateTime FechaHora);

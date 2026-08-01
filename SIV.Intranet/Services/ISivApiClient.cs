@@ -19,9 +19,11 @@ public interface ICatalogoApi
 
     Task<ResultadoOperacion> GuardarAerolineaAsync(AerolineaViewModel aerolinea);
     Task<ResultadoOperacion> DesactivarAerolineaAsync(Guid id);
+    Task<ResultadoOperacion> ReactivarAerolineaAsync(Guid id);
 
     Task<ResultadoOperacion> GuardarAeropuertoAsync(AeropuertoViewModel aeropuerto);
     Task<ResultadoOperacion> DesactivarAeropuertoAsync(Guid id);
+    Task<ResultadoOperacion> ReactivarAeropuertoAsync(Guid id);
 }
 
 public interface IAuditoriaApi
@@ -33,8 +35,32 @@ public interface IAuditoriaApi
 public interface IVuelosApi
 {
     Task<IReadOnlyList<VueloApi>> ObtenerTodosAsync();
+    Task<IReadOnlyList<VueloApi>> ConsultarAsync(VuelosFiltroViewModel filtro);
     Task<VueloDetalleApi?> ObtenerPorIdAsync(Guid id);
     Task<ResultadoOperacion> RegistrarAsync(RegistrarVueloViewModel vuelo);
+    Task<ResultadoOperacion> ActualizarAsync(EditarVueloViewModel vuelo);
     Task<ResultadoOperacion> CambiarEstadoAsync(Guid id, string estadoNuevo);
     Task<ResultadoOperacion> RegistrarCambioOperativoAsync(Guid id, CambioOperativoViewModel cambio);
+}
+
+public interface IUsuariosApi
+{
+    Task<IReadOnlyList<UsuarioApi>> ObtenerTodosAsync();
+    Task<ResultadoOperacion> CrearInternoAsync(CrearUsuarioViewModel usuario);
+}
+
+public interface IReportesApi
+{
+    Task<ReporteOperacionApi?> OperacionAsync(DateTime? desde, DateTime? hasta);
+    Task<ReporteCambiosApi?> CambiosAsync(DateTime? desde, DateTime? hasta);
+    Task<ReporteSeguimientoApi?> SeguimientoAsync();
+    Task<byte[]> OperacionCsvAsync(DateTime? desde, DateTime? hasta);
+    Task<byte[]> CambiosCsvAsync(DateTime? desde, DateTime? hasta);
+    Task<byte[]> SeguimientoCsvAsync();
+}
+
+public interface IActividadApi
+{
+    Task<IReadOnlyList<SeguimientoRegistroApi>> SeguimientosAsync();
+    Task<IReadOnlyList<NotificacionRegistroApi>> NotificacionesAsync();
 }

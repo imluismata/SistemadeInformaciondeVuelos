@@ -1,0 +1,90 @@
+@model SIV.Intranet.Models.EditarVueloViewModel
+@{
+    ViewData["Title"] = $"Editar vuelo {Model.Numero}";
+    ViewData["Subtitulo"] = "Actualizar los datos del vuelo";
+}
+
+<a asp-action="Detalle" asp-route-id="@Model.Id" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary">
+    <span class="material-symbols-outlined text-base">arrow_back</span> Volver al detalle
+</a>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden max-w-3xl">
+    <div class="p-6 border-b border-outline-variant">
+        <h3 class="text-lg font-bold text-primary">Vuelo <span class="font-mono">@Model.Numero</span></h3>
+        <p class="text-sm text-on-surface-variant">El número no se edita. El cambio queda registrado con su motivo.</p>
+    </div>
+
+    <form asp-action="Editar" method="post" class="p-6 space-y-5">
+        <div asp-validation-summary="ModelOnly" class="text-sm text-secondary bg-red-50 border border-red-200 rounded-lg px-4 py-3"></div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Numero" />
+
+        <div>
+            <label asp-for="AerolineaId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <select asp-for="AerolineaId" asp-items="Model.Aerolineas"
+                    class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                <option value="">— Selecciona una aerolínea —</option>
+            </select>
+            <span asp-validation-for="AerolineaId" class="text-xs text-secondary"></span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label asp-for="AeropuertoOrigenId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <select asp-for="AeropuertoOrigenId" asp-items="Model.Aeropuertos"
+                        class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                    <option value="">— Origen —</option>
+                </select>
+                <span asp-validation-for="AeropuertoOrigenId" class="text-xs text-secondary"></span>
+            </div>
+            <div>
+                <label asp-for="AeropuertoDestinoId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <select asp-for="AeropuertoDestinoId" asp-items="Model.Aeropuertos"
+                        class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                    <option value="">— Destino —</option>
+                </select>
+                <span asp-validation-for="AeropuertoDestinoId" class="text-xs text-secondary"></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label asp-for="HorarioSalida" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <input asp-for="HorarioSalida" type="datetime-local"
+                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                <span asp-validation-for="HorarioSalida" class="text-xs text-secondary"></span>
+            </div>
+            <div>
+                <label asp-for="HorarioLlegada" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <input asp-for="HorarioLlegada" type="datetime-local"
+                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                <span asp-validation-for="HorarioLlegada" class="text-xs text-secondary"></span>
+            </div>
+            <div>
+                <label asp-for="Puerta" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <input asp-for="Puerta" placeholder="Ej. B12"
+                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            </div>
+        </div>
+
+        <div>
+            <label asp-for="Motivo" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Motivo" placeholder="Motivo del cambio (obligatorio)"
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            <span asp-validation-for="Motivo" class="text-xs text-secondary"></span>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="bg-primary text-on-primary rounded-lg px-6 py-2.5 font-semibold hover:opacity-90 transition-opacity">
+                Guardar cambios
+            </button>
+            <a asp-action="Detalle" asp-route-id="@Model.Id" class="border border-outline text-on-surface rounded-lg px-6 py-2.5 font-semibold hover:bg-surface-container transition-colors">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -61,6 +61,14 @@
                                         <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
                                     </form>
                                 }
+                                else
+                                {
+                                    <form asp-action="ReactivarAerolinea" method="post" class="inline"
+                                          onsubmit="return confirm('¿Reactivar la aerolínea @a.Codigo?');">
+                                        <input type="hidden" name="id" value="@a.Id" />
+                                        <button type="submit" class="text-green-700 hover:underline text-sm">Activar</button>
+                                    </form>
+                                }
                             </td>
                         }
                     </tr>
@@ -126,6 +134,14 @@
                                           onsubmit="return confirm('¿Desactivar el aeropuerto @a.Codigo?');">
                                         <input type="hidden" name="id" value="@a.Id" />
                                         <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="ReactivarAeropuerto" method="post" class="inline"
+                                          onsubmit="return confirm('¿Reactivar el aeropuerto @a.Codigo?');">
+                                        <input type="hidden" name="id" value="@a.Id" />
+                                        <button type="submit" class="text-green-700 hover:underline text-sm">Activar</button>
                                     </form>
                                 }
                             </td>

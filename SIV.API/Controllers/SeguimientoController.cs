@@ -61,6 +61,13 @@ public class SeguimientoController : ControllerBase
         return Ok(usuarios);
     }
 
+    // CU-SEG-04: historial completo de seguimientos (usuario, vuelo, estado) para
+    // análisis y auditoría. Reservado a admin/auditor.
+    [Authorize(Roles = "Administrador,Auditor")]
+    [HttpGet("todos")]
+    public async Task<IActionResult> ObtenerTodos()
+        => Ok(await _servicio.ObtenerTodosAsync());
+
     // El usuario solo puede operar sobre su propia cuenta; el administrador puede sobre cualquiera.
     private bool EsPropioUsuario(Guid usuarioId)
         => User.EsAdministrador() || User.ObtenerUsuarioId() == usuarioId;

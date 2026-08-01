@@ -11,6 +11,7 @@ public sealed record AuditoriaApi(
     string Accion,
     string? Detalle,
     string Resultado,
+    string Actor,
     DateTime FechaHora);
 
 /// <summary>
@@ -37,5 +38,5 @@ public sealed class AuditoriaFiltroViewModel
 
     /// <summary>Módulos del sistema, para el desplegable de filtro.</summary>
     public static IReadOnlyList<string> Modulos { get; } =
-        ["Vuelos", "Estados", "CambiosOperativos", "Catalogo"];
+        ["Vuelos", "Estados", "CambiosOperativos", "Catalogo", "Usuarios"];
 }

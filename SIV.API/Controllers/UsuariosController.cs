@@ -13,12 +13,10 @@ namespace SIV.API.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _servicio;
-    private readonly IProveedorTokenJwt _tokens;
 
-    public UsuariosController(IUsuarioService servicio, IProveedorTokenJwt tokens)
+    public UsuariosController(IUsuarioService servicio)
     {
         _servicio = servicio;
-        _tokens = tokens;
     }
 
     [HttpPost("registro")]
@@ -65,19 +63,9 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
-    {
-        var usuario = await _servicio.ValidarCredencialesAsync(request.Email, request.Password);
-
-        if (usuario is null)
-            return Unauthorized("Email o contraseña incorrectos.");
-
-        // Se emite el token JWT para que el portal pueda autenticar sus llamadas
-        // a seguimiento y notificaciones (RNF-SEG-01).
-        var token = _tokens.GenerarToken(usuario);
-        return Ok(new LoginResponse(token, usuario));
-    }
+    // El login vive únicamente en AuthController (POST api/auth/login) para no
+    // duplicar la lógica de autenticación (DRY). Este controlador se limita a la
+    // gestión de usuarios: registro, verificación, roles y consulta (SRP).
 
     // RNF-SEG-03: los datos personales solo los consulta el propio usuario o un administrador.
     [Authorize]
@@ -99,6 +87,24 @@ public class UsuariosController : ControllerBase
     {
         var usuarios = await _servicio.ObtenerTodosAsync();
         return Ok(usuarios);
+    }
+
+    // CU-USU-03: solo un administrador da de alta personal interno (Operador,
+    // Auditor u otro Administrador). El registro público (POST /registro) queda
+    // reservado a los usuarios normales; este endpoint asigna el rol de entrada.
+    [Authorize(Roles = "Administrador")]
+    [HttpPost]
+    public async Task<IActionResult> CrearInterno([FromBody] CrearUsuarioInternoRequest request)
+    {
+        if (!Enum.TryParse<RolUsuario>(request.Rol, ignoreCase: true, out var rol)
+            || rol is not (RolUsuario.OperadorVuelos or RolUsuario.Administrador or RolUsuario.Auditor))
+        {
+            return BadRequest("Rol inválido. Valores permitidos: OperadorVuelos, Administrador, Auditor.");
+        }
+
+        var creado = await _servicio.CrearInternoAsync(
+            new CrearUsuarioInternoDto(request.Nombre, request.Email, request.Password, rol));
+        return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
     }
 
     // RNF-SEG-02: cambiar el rol es una operación de administrador; impide la escalada de privilegios.
@@ -124,60 +130,66 @@ public class UsuariosController : ControllerBase
 }
 
 public record RegistroUsuarioRequest(
-    [property: Required(ErrorMessage = "El nombre es obligatorio.")]
-    [property: StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres.")]
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres.")]
     string Nombre,
 
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
     string Email,
 
-    [property: Required(ErrorMessage = "La contraseña es obligatoria.")]
-    [property: StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+    [Required(ErrorMessage = "La contraseña es obligatoria.")]
+    [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
     string Password);
-
-public record LoginRequest(
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
-    string Email,
-
-    [property: Required(ErrorMessage = "La contraseña es obligatoria.")]
-    string Password);
-
-public record LoginResponse(string Token, UsuarioDto Usuario);
 
 public record CambiarRolRequest(
-    [property: Required(ErrorMessage = "El rol es obligatorio.")]
+    [Required(ErrorMessage = "El rol es obligatorio.")]
+    string Rol);
+
+public record CrearUsuarioInternoRequest(
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres.")]
+    string Nombre,
+
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    string Email,
+
+    [Required(ErrorMessage = "La contraseña es obligatoria.")]
+    [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+    string Password,
+
+    [Required(ErrorMessage = "El rol es obligatorio.")]
     string Rol);
 
 public record VerificarCodigoRequest(
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
     string Email,
 
-    [property: Required(ErrorMessage = "El código es obligatorio.")]
-    [property: RegularExpression(@"^\d{6}$", ErrorMessage = "El código debe tener 6 dígitos.")]
+    [Required(ErrorMessage = "El código es obligatorio.")]
+    [RegularExpression(@"^\d{6}$", ErrorMessage = "El código debe tener 6 dígitos.")]
     string Codigo);
 
 public record ReenviarCodigoRequest(
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
     string Email);
 
 public record RecuperarPasswordRequest(
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
     string Email);
 
 public record RestablecerPasswordRequest(
-    [property: Required(ErrorMessage = "El email es obligatorio.")]
-    [property: EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
     string Email,
 
-    [property: Required(ErrorMessage = "El código es obligatorio.")]
-    [property: RegularExpression(@"^\d{6}$", ErrorMessage = "El código debe tener 6 dígitos.")]
+    [Required(ErrorMessage = "El código es obligatorio.")]
+    [RegularExpression(@"^\d{6}$", ErrorMessage = "El código debe tener 6 dígitos.")]
     string Codigo,
 
-    [property: Required(ErrorMessage = "La nueva contraseña es obligatoria.")]
-    [property: StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+    [Required(ErrorMessage = "La nueva contraseña es obligatoria.")]
+    [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
     string NuevaPassword);

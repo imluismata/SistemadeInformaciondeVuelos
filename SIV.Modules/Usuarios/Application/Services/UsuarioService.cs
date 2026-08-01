@@ -11,11 +11,19 @@ internal class UsuarioService : IUsuarioService, IUsuarioConsulta
 {
     private readonly IUsuarioRepository _repo;
     private readonly IServicioCorreo _correo;
+    private readonly IAuditoriaService _auditoria;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UsuarioService(IUsuarioRepository repo, IServicioCorreo correo)
+    public UsuarioService(
+        IUsuarioRepository repo,
+        IServicioCorreo correo,
+        IAuditoriaService auditoria,
+        IUnitOfWork unitOfWork)
     {
         _repo = repo;
         _correo = correo;
+        _auditoria = auditoria;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task CrearAsync(RegistrarUsuarioDto dto)
@@ -71,14 +79,17 @@ internal class UsuarioService : IUsuarioService, IUsuarioConsulta
         await _repo.GuardarCambiosAsync();
     }
 
-    public async Task EliminarAsync(Guid id)
-    {
-        var usuario = await _repo.ObtenerPorIdAsync(id)
-            ?? throw new InvalidOperationException("El usuario no existe.");
+    public Task EliminarAsync(Guid id)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var usuario = await _repo.ObtenerPorIdAsync(id)
+                ?? throw new InvalidOperationException("El usuario no existe.");
 
-        await _repo.EliminarAsync(usuario);
-        await _repo.GuardarCambiosAsync();
-    }
+            await _repo.EliminarAsync(usuario);
+            await _repo.GuardarCambiosAsync();
+            await _auditoria.RegistrarAsync("Usuarios", "EliminarUsuario", "Exitoso",
+                $"Cuenta {usuario.Email} ({usuario.Rol}) eliminada.");
+        });
 
     public async Task<UsuarioDto?> ObtenerPorEmailAsync(string email)
     {
@@ -98,14 +109,59 @@ internal class UsuarioService : IUsuarioService, IUsuarioConsulta
         return usuarios.Select(MapToDto);
     }
 
-    public async Task CambiarRolAsync(CambiarRolUsuarioDto dto)
-    {
-        var usuario = await _repo.ObtenerPorIdAsync(dto.UsuarioId)
-            ?? throw new InvalidOperationException("El usuario no existe.");
+    public Task CambiarRolAsync(CambiarRolUsuarioDto dto)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var usuario = await _repo.ObtenerPorIdAsync(dto.UsuarioId)
+                ?? throw new InvalidOperationException("El usuario no existe.");
 
-        usuario.CambiarRol(dto.NuevoRol);
-        await _repo.ActualizarAsync(usuario);
-        await _repo.GuardarCambiosAsync();
+            var rolAnterior = usuario.Rol;
+            usuario.CambiarRol(dto.NuevoRol);
+            await _repo.ActualizarAsync(usuario);
+            await _repo.GuardarCambiosAsync();
+            await _auditoria.RegistrarAsync("Usuarios", "CambiarRol", "Exitoso",
+                $"{usuario.Email}: {rolAnterior} → {dto.NuevoRol}.");
+        });
+
+    public Task<UsuarioDto> CrearInternoAsync(CrearUsuarioInternoDto dto)
+        // Alta de personal interno + su registro de auditoría en una sola transacción.
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var existente = await _repo.ObtenerPorEmailAsync(dto.Email);
+            if (existente != null)
+                throw new InvalidOperationException("Ya existe un usuario con ese email.");
+
+            var hash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            // El admin da fe de la cuenta, así que el correo queda confirmado: el
+            // personal interno no pasa por el flujo de verificación por email.
+            var usuario = Usuario.Crear(dto.Nombre, dto.Email, hash, dto.Rol, emailConfirmado: true);
+
+            await _repo.AgregarAsync(usuario);
+            await _repo.GuardarCambiosAsync();
+            await _auditoria.RegistrarAsync("Usuarios", "CrearUsuarioInterno", "Exitoso",
+                $"Cuenta {usuario.Email} creada con rol {usuario.Rol}.");
+            return MapToDto(usuario);
+        });
+
+    public async Task AsegurarAdminInicialAsync(CrearUsuarioInternoDto dto)
+    {
+        // Idempotente: si ya existe una cuenta con ese email, no se hace nada.
+        // Así el arranque puede ejecutarse siempre sin duplicar el administrador.
+        var existente = await _repo.ObtenerPorEmailAsync(dto.Email);
+        if (existente != null)
+            return;
+
+        await _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var hash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            var admin = Usuario.Crear(dto.Nombre, dto.Email, hash, RolUsuario.Administrador, emailConfirmado: true);
+
+            await _repo.AgregarAsync(admin);
+            await _repo.GuardarCambiosAsync();
+            // Actor "Sistema": lo genera el arranque, no un usuario autenticado.
+            await _auditoria.RegistrarAsync("Usuarios", "SembrarAdminInicial", "Exitoso",
+                $"Administrador inicial {admin.Email} creado por el sistema en el arranque.");
+        });
     }
 
     public async Task SolicitarRecuperacionAsync(string email)

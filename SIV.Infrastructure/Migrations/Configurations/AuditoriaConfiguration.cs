@@ -14,6 +14,7 @@ internal class AuditoriaConfiguration : IEntityTypeConfiguration<RegistroAuditor
         builder.Property(a => a.Accion).IsRequired().HasMaxLength(100);
         builder.Property(a => a.Detalle).HasMaxLength(500);
         builder.Property(a => a.Resultado).IsRequired().HasMaxLength(20);
+        builder.Property(a => a.Actor).IsRequired().HasMaxLength(200);
         builder.Property(a => a.FechaHora).IsRequired();
 
         builder.HasIndex(a => a.Modulo);

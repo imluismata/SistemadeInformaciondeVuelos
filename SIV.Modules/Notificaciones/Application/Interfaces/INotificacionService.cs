@@ -7,5 +7,7 @@ public interface INotificacionService
 {
     Task GenerarNotificacionesAsync(IVueloCambiadoEvento evento);
     Task<IEnumerable<NotificacionDto>> ObtenerNotificacionesAsync(Guid usuarioId);
+    // Registro global para admin/auditor (CU-NOT-04), con el correo del destinatario.
+    Task<IEnumerable<RegistroNotificacionDto>> ObtenerRegistroAsync();
     Task MarcarComoLeidaAsync(Guid notificacionId);
 }

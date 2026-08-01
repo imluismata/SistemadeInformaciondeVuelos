@@ -34,6 +34,12 @@ builder.Services.AddHttpClient<IVuelosApi, VuelosApi>(ConfigurarCliente)
     .AddHttpMessageHandler<TokenHandler>();
 builder.Services.AddHttpClient<IAuditoriaApi, AuditoriaApiClient>(ConfigurarCliente)
     .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IUsuariosApi, UsuariosApiClient>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IReportesApi, ReportesApiClient>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IActividadApi, ActividadApiClient>(ConfigurarCliente)
+    .AddHttpMessageHandler<TokenHandler>();
 
 var app = builder.Build();
 

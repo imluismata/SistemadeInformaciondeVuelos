@@ -18,6 +18,13 @@ public class NotificacionesController : ControllerBase
         _servicio = servicio;
     }
 
+    // CU-NOT-04 / RNF-TRZ-03: registro global de notificaciones (qué, a quién, cuándo).
+    // Reservado a admin/auditor. La ruta "registro" no choca con {usuarioId:guid}.
+    [Authorize(Roles = "Administrador,Auditor")]
+    [HttpGet("registro")]
+    public async Task<IActionResult> ObtenerRegistro()
+        => Ok(await _servicio.ObtenerRegistroAsync());
+
     // devuelve todas las notificaciones de un usuario
     [HttpGet("{usuarioId:guid}")]
     public async Task<IActionResult> ObtenerNotificaciones(Guid usuarioId)

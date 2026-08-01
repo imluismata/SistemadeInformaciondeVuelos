@@ -1,6 +1,6 @@
 @using SIV.Intranet.Models
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
-@model IReadOnlyList<SIV.Intranet.Models.VueloApi>
+@model SIV.Intranet.Models.VuelosFiltroViewModel
 @{
     ViewData["Title"] = "Gestión de Vuelos";
     ViewData["Subtitulo"] = "Estado en tiempo real de SDQ";
@@ -10,13 +10,55 @@
     // Los vuelos finalizados (Completado o Cancelado) se separan de los
     // activos para no mezclar la operación en curso con lo ya terminado.
     var estadosFinales = new[] { "Completado", "Cancelado" };
-    var activos = Model.Where(v => !estadosFinales.Contains(v.EstadoActual)).ToList();
-    var finalizados = Model.Where(v => estadosFinales.Contains(v.EstadoActual)).ToList();
+    var activos = Model.Vuelos.Where(v => !estadosFinales.Contains(v.EstadoActual)).ToList();
+    var finalizados = Model.Vuelos.Where(v => estadosFinales.Contains(v.EstadoActual)).ToList();
 
     var vdActivos = new ViewDataDictionary(ViewData) { ["MensajeVacio"] = "No hay vuelos activos." };
 
-    var resumen = ResumenVuelos.DesdeVuelos(Model);
+    var resumen = ResumenVuelos.DesdeVuelos(Model.Vuelos);
 }
+
+<!-- Filtro de consulta (CU-VUE-03) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
+    <form asp-action="Index" method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div>
+            <label asp-for="AerolineaId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <select asp-for="AerolineaId" asp-items="Model.Aerolineas"
+                    class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container">
+                <option value="">Todas</option>
+            </select>
+        </div>
+        <div>
+            <label asp-for="Estado" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <select asp-for="Estado"
+                    class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container">
+                <option value="">Todos</option>
+                @foreach (var estado in EstadosVuelo.Todos)
+                {
+                    <option value="@estado">@estado</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label asp-for="FechaDesde" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="FechaDesde" type="date"
+                   class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container" />
+        </div>
+        <div>
+            <label asp-for="FechaHasta" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="FechaHasta" type="date"
+                   class="w-full rounded-lg border border-outline-variant px-3 py-2 outline-none focus:ring-2 focus:ring-primary-container" />
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="flex-grow bg-primary text-on-primary rounded-lg px-4 py-2 font-semibold hover:opacity-90 transition-opacity">
+                Filtrar
+            </button>
+            <a asp-action="Index" class="border border-outline text-on-surface rounded-lg px-4 py-2 font-semibold hover:bg-surface-container transition-colors">
+                Limpiar
+            </a>
+        </div>
+    </form>
+</div>
 
 <!-- Fila de KPIs (calculados de los datos reales) -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">

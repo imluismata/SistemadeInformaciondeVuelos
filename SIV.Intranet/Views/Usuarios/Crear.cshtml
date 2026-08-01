@@ -1,0 +1,68 @@
+@model SIV.Intranet.Models.CrearUsuarioViewModel
+@{
+    ViewData["Title"] = "Nuevo usuario";
+    ViewData["Subtitulo"] = "Alta de personal interno";
+}
+
+<a asp-action="Index" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary">
+    <span class="material-symbols-outlined text-base">arrow_back</span> Volver a usuarios
+</a>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden max-w-xl">
+    <div class="p-6 border-b border-outline-variant">
+        <h3 class="text-lg font-bold text-primary">Nuevo usuario</h3>
+        <p class="text-sm text-on-surface-variant">
+            El usuario podrá iniciar sesión de inmediato con la contraseña inicial que definas.
+        </p>
+    </div>
+
+    <form asp-action="Crear" method="post" class="p-6 space-y-5">
+        <div asp-validation-summary="ModelOnly" class="text-sm text-secondary bg-red-50 border border-red-200 rounded-lg px-4 py-3"></div>
+
+        <div>
+            <label asp-for="Nombre" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Nombre" placeholder="Ej. Carlos Pérez"
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            <span asp-validation-for="Nombre" class="text-xs text-secondary"></span>
+        </div>
+
+        <div>
+            <label asp-for="Email" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Email" placeholder="correo@aeropuerto.do"
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            <span asp-validation-for="Email" class="text-xs text-secondary"></span>
+        </div>
+
+        <div>
+            <label asp-for="Rol" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <select asp-for="Rol"
+                    class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                @foreach (var rol in SIV.Intranet.Models.CrearUsuarioViewModel.RolesDisponibles)
+                {
+                    <option value="@rol">@rol</option>
+                }
+            </select>
+            <span asp-validation-for="Rol" class="text-xs text-secondary"></span>
+        </div>
+
+        <div>
+            <label asp-for="Password" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+            <input asp-for="Password" placeholder="Mínimo 8 caracteres"
+                   class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            <span asp-validation-for="Password" class="text-xs text-secondary"></span>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="bg-primary text-on-primary rounded-lg px-6 py-2.5 font-semibold hover:opacity-90 transition-opacity">
+                Crear usuario
+            </button>
+            <a asp-action="Index" class="border border-outline text-on-surface rounded-lg px-6 py-2.5 font-semibold hover:bg-surface-container transition-colors">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

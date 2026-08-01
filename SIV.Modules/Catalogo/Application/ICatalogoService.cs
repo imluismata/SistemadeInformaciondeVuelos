@@ -9,7 +9,9 @@ public interface ICatalogoService
     Task<AerolineaDto> RegistrarAerolineaAsync(RegistrarAerolineaCommand command);
     Task<AerolineaDto> ActualizarAerolineaAsync(Guid id, ActualizarAerolineaCommand command);
     Task DesactivarAerolineaAsync(Guid id);
+    Task ReactivarAerolineaAsync(Guid id);
     Task<AeropuertoDto> RegistrarAeropuertoAsync(RegistrarAeropuertoCommand command);
     Task<AeropuertoDto> ActualizarAeropuertoAsync(Guid id, ActualizarAeropuertoCommand command);
     Task DesactivarAeropuertoAsync(Guid id);
+    Task ReactivarAeropuertoAsync(Guid id);
 }

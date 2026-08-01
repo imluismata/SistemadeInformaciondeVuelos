@@ -70,6 +70,7 @@
                 <thead>
                     <tr class="bg-surface-container-low border-b border-outline-variant">
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Fecha y hora</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Actor</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Módulo</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acción</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Detalle</th>
@@ -81,6 +82,7 @@
                     {
                         <tr class="data-row">
                             <td class="px-6 py-3.5 font-mono text-sm whitespace-nowrap">@r.FechaHora.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                            <td class="px-6 py-3.5 font-mono text-sm text-on-surface-variant">@r.Actor</td>
                             <td class="px-6 py-3.5">
                                 <span class="status-pill bg-surface-container text-on-surface-variant">@r.Modulo</span>
                             </td>

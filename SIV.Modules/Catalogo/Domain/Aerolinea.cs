@@ -29,6 +29,8 @@ internal sealed class Aerolinea
 
     public void Desactivar() => Activa = false;
 
+    public void Reactivar() => Activa = true;
+
     public static Aerolinea Crear(string codigo, string nombre)
     {
         if (string.IsNullOrWhiteSpace(codigo))

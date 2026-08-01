@@ -26,8 +26,19 @@ public sealed class VuelosController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
-        => View(await _vuelos.ObtenerTodosAsync());
+    public async Task<IActionResult> Index(VuelosFiltroViewModel filtro)
+    {
+        // Si el usuario aplicó filtros, se consulta con ellos (CU-VUE-03); si no,
+        // se traen todos los vuelos.
+        filtro.Vuelos = filtro.HayFiltro
+            ? await _vuelos.ConsultarAsync(filtro)
+            : await _vuelos.ObtenerTodosAsync();
+
+        var aerolineas = await _catalogo.ObtenerAerolineasAsync();
+        filtro.Aerolineas = aerolineas.Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString()));
+
+        return View(filtro);
+    }
 
     [HttpGet]
     public async Task<IActionResult> Detalle(Guid id)
@@ -58,6 +69,55 @@ public sealed class VuelosController : Controller
 
         TempData["Exito"] = $"Vuelo {modelo.Numero} registrado correctamente.";
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    [Authorize(Roles = RolesOperacion)]
+    public async Task<IActionResult> Editar(Guid id)
+    {
+        var vuelo = await _vuelos.ObtenerPorIdAsync(id);
+        if (vuelo is null)
+            return NotFound();
+
+        var (aerolineas, aeropuertos) = await CatalogoActivoAsync();
+        var modelo = new EditarVueloViewModel
+        {
+            Id = vuelo.Id,
+            Numero = vuelo.Numero,
+            AerolineaId = vuelo.AerolineaId,
+            AeropuertoOrigenId = vuelo.AeropuertoOrigenId,
+            AeropuertoDestinoId = vuelo.AeropuertoDestinoId,
+            HorarioSalida = vuelo.HorarioSalida,
+            HorarioLlegada = vuelo.HorarioLlegada,
+            Puerta = vuelo.Puerta,
+            Aerolineas = aerolineas,
+            Aeropuertos = aeropuertos
+        };
+
+        return View(modelo);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolesOperacion)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(EditarVueloViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            (modelo.Aerolineas, modelo.Aeropuertos) = await CatalogoActivoAsync();
+            return View(modelo);
+        }
+
+        var resultado = await _vuelos.ActualizarAsync(modelo);
+        if (!resultado.Exito)
+        {
+            ModelState.AddModelError(string.Empty, resultado.Error!);
+            (modelo.Aerolineas, modelo.Aeropuertos) = await CatalogoActivoAsync();
+            return View(modelo);
+        }
+
+        TempData["Exito"] = $"Vuelo {modelo.Numero} actualizado.";
+        return RedirectToAction(nameof(Detalle), new { id = modelo.Id });
     }
 
     [HttpPost]
@@ -97,21 +157,26 @@ public sealed class VuelosController : Controller
     }
 
     /// <summary>
-    /// Rellena las listas desplegables del formulario con el catálogo vigente.
+    /// Rellena las listas desplegables del formulario de registro con el catálogo vigente.
     /// </summary>
     private async Task<RegistrarVueloViewModel> ConCatalogoAsync(RegistrarVueloViewModel modelo)
+    {
+        (modelo.Aerolineas, modelo.Aeropuertos) = await CatalogoActivoAsync();
+        return modelo;
+    }
+
+    /// <summary>
+    /// Opciones de aerolíneas y aeropuertos activos para los desplegables de los
+    /// formularios de vuelo (registrar y editar), evitando duplicar el mapeo.
+    /// </summary>
+    private async Task<(IEnumerable<SelectListItem> aerolineas, IEnumerable<SelectListItem> aeropuertos)> CatalogoActivoAsync()
     {
         var aerolineas = await _catalogo.ObtenerAerolineasAsync();
         var aeropuertos = await _catalogo.ObtenerAeropuertosAsync();
 
-        modelo.Aerolineas = aerolineas
-            .Where(a => a.Activa)
-            .Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString()));
-
-        modelo.Aeropuertos = aeropuertos
-            .Where(a => a.Activo)
-            .Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString()));
-
-        return modelo;
+        return (
+            aerolineas.Where(a => a.Activa).Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString())),
+            aeropuertos.Where(a => a.Activo).Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString()))
+        );
     }
 }

@@ -102,6 +102,15 @@ internal sealed class CatalogoService : ICatalogoService
             return Mapear(aeropuerto);
         });
 
+    public Task ReactivarAerolineaAsync(Guid id)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var aerolinea = await ObtenerAerolineaRequeridaAsync(id);
+            aerolinea.Reactivar();
+            await _repository.GuardarAerolineaAsync(aerolinea);
+            await _auditoria.RegistrarAsync("Catalogo", "ReactivarAerolinea", "Exitoso", $"Aerolínea {aerolinea.Codigo} reactivada.");
+        });
+
     public Task DesactivarAeropuertoAsync(Guid id)
         => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
@@ -116,6 +125,15 @@ internal sealed class CatalogoService : ICatalogoService
             aeropuerto.Desactivar();
             await _repository.GuardarAeropuertoAsync(aeropuerto);
             await _auditoria.RegistrarAsync("Catalogo", "DesactivarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} desactivado.");
+        });
+
+    public Task ReactivarAeropuertoAsync(Guid id)
+        => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
+        {
+            var aeropuerto = await ObtenerAeropuertoRequeridoAsync(id);
+            aeropuerto.Reactivar();
+            await _repository.GuardarAeropuertoAsync(aeropuerto);
+            await _auditoria.RegistrarAsync("Catalogo", "ReactivarAeropuerto", "Exitoso", $"Aeropuerto {aeropuerto.Codigo} reactivado.");
         });
 
     private async Task<Aerolinea> ObtenerAerolineaRequeridaAsync(Guid id)

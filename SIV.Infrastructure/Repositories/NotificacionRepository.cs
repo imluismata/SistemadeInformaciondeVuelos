@@ -26,6 +26,13 @@ internal class NotificacionRepository : INotificacionRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Notificacion>> ObtenerTodasAsync()
+    {
+        return await _context.Notificaciones
+            .OrderByDescending(n => n.GeneradaEn)
+            .ToListAsync();
+    }
+
     public async Task<Notificacion?> ObtenerPorIdAsync(Guid id)
     {
         return await _context.Notificaciones

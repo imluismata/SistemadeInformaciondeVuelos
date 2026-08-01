@@ -36,6 +36,8 @@ internal sealed class Aeropuerto
 
     public void Desactivar() => Activo = false;
 
+    public void Reactivar() => Activo = true;
+
     public static Aeropuerto Registrar(string codigo, string nombre, string pais)
     {
         if (string.IsNullOrWhiteSpace(codigo))

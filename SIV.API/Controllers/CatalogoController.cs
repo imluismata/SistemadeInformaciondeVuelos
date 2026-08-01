@@ -38,6 +38,14 @@ public sealed class CatalogoController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("aerolineas/{id:guid}/activar")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ReactivarAerolinea(Guid id)
+    {
+        await _service.ReactivarAerolineaAsync(id);
+        return NoContent();
+    }
+
     [HttpGet("aeropuertos")]
     public async Task<IActionResult> ObtenerAeropuertos()
         => Ok(await _service.ObtenerAeropuertosAsync());
@@ -57,6 +65,14 @@ public sealed class CatalogoController : ControllerBase
     public async Task<IActionResult> DesactivarAeropuerto(Guid id)
     {
         await _service.DesactivarAeropuertoAsync(id);
+        return NoContent();
+    }
+
+    [HttpPatch("aeropuertos/{id:guid}/activar")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ReactivarAeropuerto(Guid id)
+    {
+        await _service.ReactivarAeropuertoAsync(id);
         return NoContent();
     }
 }

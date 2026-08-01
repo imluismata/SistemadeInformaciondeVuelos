@@ -84,6 +84,9 @@ public sealed class CatalogoApi : ICatalogoApi
     public async Task<ResultadoOperacion> DesactivarAerolineaAsync(Guid id)
         => await RespuestaApi.InterpretarAsync(await _http.DeleteAsync($"api/catalogo/aerolineas/{id}"));
 
+    public async Task<ResultadoOperacion> ReactivarAerolineaAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.PatchAsync($"api/catalogo/aerolineas/{id}/activar", null));
+
     public async Task<ResultadoOperacion> GuardarAeropuertoAsync(AeropuertoViewModel aeropuerto)
     {
         var cuerpo = new { codigo = aeropuerto.Codigo, nombre = aeropuerto.Nombre, pais = aeropuerto.Pais };
@@ -97,6 +100,9 @@ public sealed class CatalogoApi : ICatalogoApi
 
     public async Task<ResultadoOperacion> DesactivarAeropuertoAsync(Guid id)
         => await RespuestaApi.InterpretarAsync(await _http.DeleteAsync($"api/catalogo/aeropuertos/{id}"));
+
+    public async Task<ResultadoOperacion> ReactivarAeropuertoAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.PatchAsync($"api/catalogo/aeropuertos/{id}/activar", null));
 }
 
 public sealed class AuditoriaApiClient : IAuditoriaApi
@@ -138,6 +144,23 @@ public sealed class VuelosApi : IVuelosApi
     public async Task<IReadOnlyList<VueloApi>> ObtenerTodosAsync()
         => await _http.GetFromJsonAsync<List<VueloApi>>("api/vuelos") ?? [];
 
+    public async Task<IReadOnlyList<VueloApi>> ConsultarAsync(VuelosFiltroViewModel filtro)
+    {
+        var parametros = new List<string>();
+        if (filtro.AerolineaId.HasValue)
+            parametros.Add($"aerolineaId={filtro.AerolineaId.Value}");
+        if (!string.IsNullOrWhiteSpace(filtro.Estado))
+            parametros.Add($"estado={Uri.EscapeDataString(filtro.Estado)}");
+        if (filtro.FechaDesde.HasValue)
+            parametros.Add($"fechaDesde={filtro.FechaDesde.Value.Date:o}");
+        // El "hasta" cubre el día completo.
+        if (filtro.FechaHasta.HasValue)
+            parametros.Add($"fechaHasta={filtro.FechaHasta.Value.Date.AddDays(1).AddTicks(-1):o}");
+
+        var query = parametros.Count > 0 ? "?" + string.Join("&", parametros) : string.Empty;
+        return await _http.GetFromJsonAsync<List<VueloApi>>($"api/vuelos/consultar{query}") ?? [];
+    }
+
     public async Task<VueloDetalleApi?> ObtenerPorIdAsync(Guid id)
     {
         var respuesta = await _http.GetAsync($"api/vuelos/{id}");
@@ -164,6 +187,22 @@ public sealed class VuelosApi : IVuelosApi
         return await RespuestaApi.InterpretarAsync(respuesta);
     }
 
+    public async Task<ResultadoOperacion> ActualizarAsync(EditarVueloViewModel v)
+    {
+        var respuesta = await _http.PutAsJsonAsync($"api/vuelos/{v.Id}", new
+        {
+            aerolineaId = v.AerolineaId,
+            aeropuertoOrigenId = v.AeropuertoOrigenId,
+            aeropuertoDestinoId = v.AeropuertoDestinoId,
+            horarioSalida = v.HorarioSalida,
+            horarioLlegada = v.HorarioLlegada,
+            puerta = v.Puerta,
+            motivo = v.Motivo
+        });
+
+        return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+
     public async Task<ResultadoOperacion> CambiarEstadoAsync(Guid id, string estadoNuevo)
     {
         var respuesta = await _http.PutAsJsonAsync($"api/vuelos/{id}/estado", new { estadoNuevo });
@@ -181,5 +220,78 @@ public sealed class VuelosApi : IVuelosApi
         });
 
         return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+}
+
+public sealed class UsuariosApiClient : IUsuariosApi
+{
+    private readonly HttpClient _http;
+
+    public UsuariosApiClient(HttpClient http) => _http = http;
+
+    public async Task<IReadOnlyList<UsuarioApi>> ObtenerTodosAsync()
+        => await _http.GetFromJsonAsync<List<UsuarioApi>>("api/usuarios") ?? [];
+
+    public async Task<ResultadoOperacion> CrearInternoAsync(CrearUsuarioViewModel usuario)
+    {
+        var cuerpo = new
+        {
+            nombre = usuario.Nombre,
+            email = usuario.Email,
+            password = usuario.Password,
+            rol = usuario.Rol
+        };
+
+        var respuesta = await _http.PostAsJsonAsync("api/usuarios", cuerpo);
+        return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+}
+
+public sealed class ActividadApiClient : IActividadApi
+{
+    private readonly HttpClient _http;
+
+    public ActividadApiClient(HttpClient http) => _http = http;
+
+    public async Task<IReadOnlyList<SeguimientoRegistroApi>> SeguimientosAsync()
+        => await _http.GetFromJsonAsync<List<SeguimientoRegistroApi>>("api/seguimiento/todos") ?? [];
+
+    public async Task<IReadOnlyList<NotificacionRegistroApi>> NotificacionesAsync()
+        => await _http.GetFromJsonAsync<List<NotificacionRegistroApi>>("api/notificaciones/registro") ?? [];
+}
+
+public sealed class ReportesApiClient : IReportesApi
+{
+    private readonly HttpClient _http;
+
+    public ReportesApiClient(HttpClient http) => _http = http;
+
+    public async Task<ReporteOperacionApi?> OperacionAsync(DateTime? desde, DateTime? hasta)
+        => await _http.GetFromJsonAsync<ReporteOperacionApi>($"api/reportes/operacion{Rango(desde, hasta)}");
+
+    public async Task<ReporteCambiosApi?> CambiosAsync(DateTime? desde, DateTime? hasta)
+        => await _http.GetFromJsonAsync<ReporteCambiosApi>($"api/reportes/cambios{Rango(desde, hasta)}");
+
+    public async Task<ReporteSeguimientoApi?> SeguimientoAsync()
+        => await _http.GetFromJsonAsync<ReporteSeguimientoApi>("api/reportes/seguimiento");
+
+    public async Task<byte[]> SeguimientoCsvAsync()
+        => await _http.GetByteArrayAsync("api/reportes/seguimiento/csv");
+
+    public async Task<byte[]> OperacionCsvAsync(DateTime? desde, DateTime? hasta)
+        => await _http.GetByteArrayAsync($"api/reportes/operacion/csv{Rango(desde, hasta)}");
+
+    public async Task<byte[]> CambiosCsvAsync(DateTime? desde, DateTime? hasta)
+        => await _http.GetByteArrayAsync($"api/reportes/cambios/csv{Rango(desde, hasta)}");
+
+    // Arma el query string del período; "hasta" cubre el día completo.
+    private static string Rango(DateTime? desde, DateTime? hasta)
+    {
+        var partes = new List<string>();
+        if (desde.HasValue)
+            partes.Add($"desde={desde.Value.Date:o}");
+        if (hasta.HasValue)
+            partes.Add($"hasta={hasta.Value.Date.AddDays(1).AddTicks(-1):o}");
+        return partes.Count > 0 ? "?" + string.Join("&", partes) : string.Empty;
     }
 }

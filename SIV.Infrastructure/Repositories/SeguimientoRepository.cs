@@ -42,6 +42,13 @@ internal class SeguimientoRepository : ISeguimientoRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<SeguimientoEntidad>> ObtenerTodosAsync()
+    {
+        return await _context.Seguimientos
+            .OrderByDescending(s => s.CreadoEn)
+            .ToListAsync();
+    }
+
     public async Task ActualizarAsync(SeguimientoEntidad seguimiento)
     {
         _context.Seguimientos.Update(seguimiento);

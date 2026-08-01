@@ -30,10 +30,25 @@
                 <span class="material-symbols-outlined">menu_book</span>
                 <span>Catálogo</span>
             </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Usuarios")" asp-controller="Usuarios" asp-action="Index">
+                <span class="material-symbols-outlined">group</span>
+                <span>Usuarios</span>
+            </a>
         }
 
         @if (User.IsInRole("Auditor") || User.IsInRole("Administrador"))
         {
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Reportes")" asp-controller="Reportes" asp-action="Index">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span>Reportes</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Actividad")" asp-controller="Actividad" asp-action="Index">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Actividad</span>
+            </a>
+
             <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all @ClaseNav("Auditoria")" asp-controller="Auditoria" asp-action="Index">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span>Auditoría</span>

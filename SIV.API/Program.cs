@@ -9,6 +9,10 @@ using SIV.Modules;
 using SIV.Modules.Auditoria.Application;
 using SIV.Modules.Catalogo.Application;
 using SIV.Modules.Eventos;
+using SIV.Modules.Reportes.Application;
+using SIV.Modules.Usuarios.Application.Dtos;
+using SIV.Modules.Usuarios.Application.Interfaces;
+using SIV.Modules.Usuarios.Domain;
 using SIV.Modules.Vuelos.Application;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,12 +44,17 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddVuelosModule();
 builder.Services.AddCatalogoModule();
 builder.Services.AddAuditoriaModule();
+builder.Services.AddReportesModule();
 builder.Services.AddModules();
 builder.Services.AddEventos();
 
 // --- Autenticación y autorización con JWT ---
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.Seccion));
 builder.Services.AddScoped<IProveedorTokenJwt, ProveedorTokenJwt>();
+
+// Usuario actual: la auditoría lee el actor del JWT sin acoplarse al HttpContext.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<SIV.Shared.Contracts.IUsuarioActual, UsuarioActualHttp>();
 
 var jwt = builder.Configuration.GetSection(JwtSettings.Seccion).Get<JwtSettings>()!;
 
@@ -86,6 +95,20 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<SIV.Infrastructure.SivDbContext>();
     db.Database.Migrate();
+
+    // Bootstrap: siembra el administrador inicial desde configuración (no en código).
+    // Es idempotente, así que puede correr en cada arranque sin duplicar la cuenta.
+    // Los valores reales viven en appsettings.Development.json / variables de entorno,
+    // nunca en el repositorio. Si no hay Email/Password configurados, no se siembra.
+    var adminCfg = app.Configuration.GetSection("AdminInicial");
+    var adminEmail = adminCfg["Email"];
+    var adminPassword = adminCfg["Password"];
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+    {
+        var usuarios = scope.ServiceProvider.GetRequiredService<IUsuarioService>();
+        await usuarios.AsegurarAdminInicialAsync(new CrearUsuarioInternoDto(
+            adminCfg["Nombre"] ?? "Administrador SIV", adminEmail, adminPassword, RolUsuario.Administrador));
+    }
 }
 
 app.UseMiddleware<SIV.API.Middleware.ExceptionMiddleware>();

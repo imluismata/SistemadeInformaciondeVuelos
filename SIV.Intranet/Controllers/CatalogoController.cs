@@ -88,6 +88,16 @@ public sealed class CatalogoController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReactivarAerolinea(Guid id)
+    {
+        var resultado = await _catalogo.ReactivarAerolineaAsync(id);
+        MostrarResultado(resultado, "Aerolínea reactivada.");
+        return RedirectToAction(nameof(Index));
+    }
+
     // ---------- Aeropuertos ----------
 
     [HttpGet]
@@ -139,6 +149,16 @@ public sealed class CatalogoController : Controller
     {
         var resultado = await _catalogo.DesactivarAeropuertoAsync(id);
         MostrarResultado(resultado, "Aeropuerto desactivado.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReactivarAeropuerto(Guid id)
+    {
+        var resultado = await _catalogo.ReactivarAeropuertoAsync(id);
+        MostrarResultado(resultado, "Aeropuerto reactivado.");
         return RedirectToAction(nameof(Index));
     }
 

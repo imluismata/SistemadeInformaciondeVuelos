@@ -11,13 +11,16 @@ internal class NotificacionService : INotificacionService
 {
     private readonly INotificacionRepository _repo;
     private readonly ISeguimientoConsulta _seguimientoConsulta;
+    private readonly IUsuarioConsulta _usuarios;
 
     public NotificacionService(
         INotificacionRepository repo,
-        ISeguimientoConsulta seguimientoConsulta)
+        ISeguimientoConsulta seguimientoConsulta,
+        IUsuarioConsulta usuarios)
     {
         _repo = repo;
         _seguimientoConsulta = seguimientoConsulta;
+        _usuarios = usuarios;
     }
 
     public async Task GenerarNotificacionesAsync(IVueloCambiadoEvento evento)
@@ -38,6 +41,25 @@ internal class NotificacionService : INotificacionService
     {
         var notificaciones = await _repo.ObtenerPorUsuarioAsync(usuarioId);
         return notificaciones.Select(MapToDto);
+    }
+
+    public async Task<IEnumerable<RegistroNotificacionDto>> ObtenerRegistroAsync()
+    {
+        var todas = (await _repo.ObtenerTodasAsync()).ToList();
+
+        // Se resuelve el correo de cada destinatario en una sola consulta (evita N+1).
+        var ids = todas.Select(n => n.UsuarioId).Distinct().ToList();
+        var correos = (await _usuarios.ObtenerContactosAsync(ids)).ToDictionary(c => c.Id, c => c.Email);
+
+        return todas.Select(n => new RegistroNotificacionDto(
+            n.Id,
+            n.UsuarioId,
+            correos.GetValueOrDefault(n.UsuarioId, "—"),
+            n.VueloId,
+            n.Mensaje,
+            n.Estado.ToString(),
+            n.GeneradaEn,
+            n.LeidaEn));
     }
 
     public async Task MarcarComoLeidaAsync(Guid notificacionId)
