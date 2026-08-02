@@ -48,6 +48,11 @@ builder.Services.AddReportesModule();
 builder.Services.AddModules();
 builder.Services.AddEventos();
 
+// Prendo el chequeo de salud. Expone /health para saber si la app y su base de
+// datos estan respondiendo (util para monitoreo y disponibilidad).
+builder.Services.AddHealthChecks()
+    .AddCheck<SIV.API.Health.BaseDatosHealthCheck>("base-datos");
+
 // --- Autenticación y autorización con JWT ---
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.Seccion));
 builder.Services.AddScoped<IProveedorTokenJwt, ProveedorTokenJwt>();
@@ -117,5 +122,6 @@ app.UseCors("PortalPublico");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
