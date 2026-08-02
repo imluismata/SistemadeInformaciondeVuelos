@@ -4,7 +4,7 @@ using SIV.Modules.Notificaciones.Domain;
 
 namespace SIV.Infrastructure.Configurations;
 
-public class NotificacionConfiguration : IEntityTypeConfiguration<Notificacion>
+internal sealed class NotificacionConfiguration : IEntityTypeConfiguration<Notificacion>
 {
     public void Configure(EntityTypeBuilder<Notificacion> builder)
     {

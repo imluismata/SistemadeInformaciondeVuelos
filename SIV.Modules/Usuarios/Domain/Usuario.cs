@@ -4,7 +4,8 @@ namespace SIV.Modules.Usuarios.Domain;
 
 // clase principal del modulo de usuarios
 // la contraseña se guarda como hash, nunca en texto plano
-public class Usuario
+// la dejo internal para que solo se use dentro de este modulo; afuera va el UsuarioDto
+internal sealed class Usuario
 {
     public Guid Id { get; private set; }
     public string Nombre { get; private set; } = string.Empty;

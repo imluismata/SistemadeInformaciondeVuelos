@@ -4,7 +4,7 @@ using SIV.Modules.Usuarios.Domain;
 
 namespace SIV.Infrastructure.Configurations;
 
-public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
+internal sealed class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {

@@ -1,6 +1,7 @@
 namespace SIV.Modules.Notificaciones.Domain;
 
-public class Notificacion
+// la dejo internal para que solo se use dentro de este modulo; afuera va el NotificacionDto
+internal sealed class Notificacion
 {
     public Guid Id { get; private set; }
     public Guid UsuarioId { get; private set; }

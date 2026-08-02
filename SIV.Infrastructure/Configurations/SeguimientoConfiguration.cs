@@ -4,7 +4,7 @@ using SeguimientoEntidad = SIV.Modules.Seguimiento.Domain.Seguimiento;
 
 namespace SIV.Infrastructure.Configurations;
 
-public class SeguimientoConfiguration : IEntityTypeConfiguration<SeguimientoEntidad>
+internal sealed class SeguimientoConfiguration : IEntityTypeConfiguration<SeguimientoEntidad>
 {
     public void Configure(EntityTypeBuilder<SeguimientoEntidad> builder)
     {

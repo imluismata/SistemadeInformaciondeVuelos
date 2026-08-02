@@ -2,7 +2,7 @@
 
 namespace SIV.Modules.Notificaciones.Application;
 
-public interface INotificacionRepository
+internal interface INotificacionRepository
 {
     Task AgregarAsync(Notificacion notificacion);
     Task<IEnumerable<Notificacion>> ObtenerPorUsuarioAsync(Guid usuarioId);

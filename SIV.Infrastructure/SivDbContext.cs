@@ -15,9 +15,9 @@ public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(op
     internal DbSet<Aerolinea> Aerolineas => Set<Aerolinea>();
     internal DbSet<Aeropuerto> Aeropuertos => Set<Aeropuerto>();
     internal DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
-    public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
-    public DbSet<Usuario> Usuarios => Set<Usuario>();
-    public DbSet<SeguimientoEntidad> Seguimientos => Set<SeguimientoEntidad>();
+    internal DbSet<Notificacion> Notificaciones => Set<Notificacion>();
+    internal DbSet<Usuario> Usuarios => Set<Usuario>();
+    internal DbSet<SeguimientoEntidad> Seguimientos => Set<SeguimientoEntidad>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

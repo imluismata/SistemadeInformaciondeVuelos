@@ -2,7 +2,8 @@ namespace SIV.Modules.Seguimiento.Domain;
 
 // representa cuando un usuario quiere recibir notificaciones de un vuelo
 // use constructor privado y metodo Crear() para validar los datos antes de crear el objeto
-public class Seguimiento
+// la dejo internal para que solo se use dentro de este modulo; afuera va el SeguimientoDto
+internal sealed class Seguimiento
 {
     public Guid Id { get; private set; }
     public Guid UsuarioId { get; private set; }

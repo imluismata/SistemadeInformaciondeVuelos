@@ -2,7 +2,7 @@
 
 namespace SIV.Modules.Seguimiento.Application;
 
-public interface ISeguimientoRepository
+internal interface ISeguimientoRepository
 {
     Task AgregarAsync(Domain.Seguimiento seguimiento);
     Task<Domain.Seguimiento?> ObtenerPorUsuarioYVueloAsync(Guid usuarioId, Guid vueloId);
