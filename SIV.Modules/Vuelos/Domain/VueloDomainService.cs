@@ -1,3 +1,4 @@
+using SIV.Shared.Enums;
 using SIV.Shared.Exceptions;
 
 namespace SIV.Modules.Vuelos.Domain;

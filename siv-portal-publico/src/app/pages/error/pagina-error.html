@@ -1,0 +1,65 @@
+<div class="error-fondo" [class]="'error-fondo acento-' + codigo">
+  <div class="tarjeta">
+    <div class="ilustracion" [ngSwitch]="codigo" aria-hidden="true">
+
+      <!-- 404: radar sin blip -->
+      <svg *ngSwitchCase="404" width="150" height="150" viewBox="0 0 150 150" fill="none">
+        <circle cx="75" cy="75" r="70" stroke="#2b3566" stroke-width="1.5"/>
+        <circle cx="75" cy="75" r="48" stroke="#232c57" stroke-width="1.5"/>
+        <circle cx="75" cy="75" r="26" stroke="#232c57" stroke-width="1.5"/>
+        <line x1="5" y1="75" x2="145" y2="75" stroke="#232c57" stroke-width="1"/>
+        <line x1="75" y1="5" x2="75" y2="145" stroke="#232c57" stroke-width="1"/>
+        <g class="barrido"><path d="M75 75 L75 5 A70 70 0 0 1 135 40 Z" fill="url(#sweep)"/></g>
+        <text x="75" y="82" text-anchor="middle" font-size="26" fill="#3a4680" font-weight="700">?</text>
+        <defs><linearGradient id="sweep" x1="75" y1="75" x2="120" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#8fb0ff" stop-opacity=".28"/><stop offset="1" stop-color="#8fb0ff" stop-opacity="0"/>
+        </linearGradient></defs>
+      </svg>
+
+      <!-- 403: escudo con candado -->
+      <svg *ngSwitchCase="403" width="130" height="130" viewBox="0 0 130 130" fill="none">
+        <path d="M65 12 L108 28 V64 C108 92 88 110 65 118 C42 110 22 92 22 64 V28 Z" fill="#241d10" stroke="#f0b866" stroke-width="2.5"/>
+        <rect x="48" y="60" width="34" height="26" rx="5" fill="#f0b866"/>
+        <path d="M53 60 V52 a12 12 0 0 1 24 0 V60" stroke="#f0b866" stroke-width="4" fill="none"/>
+        <circle cx="65" cy="71" r="4" fill="#241d10"/><rect x="63.5" y="71" width="3" height="9" rx="1.5" fill="#241d10"/>
+      </svg>
+
+      <!-- 500: avión en pánico -->
+      <svg *ngSwitchCase="500" width="150" height="120" viewBox="0 0 150 120" fill="none">
+        <path d="M75 68 L26 88 L33 64 L75 58 Z" fill="#c98a92"/><path d="M75 68 L124 88 L117 64 L75 58 Z" fill="#c98a92"/>
+        <path d="M75 40 L62 20 L73 32 L75 36 Z" fill="#c98a92"/>
+        <ellipse cx="75" cy="66" rx="20" ry="30" fill="#ff9d9d"/>
+        <ellipse cx="75" cy="60" rx="13" ry="15" fill="#2a0d0d"/>
+        <circle cx="69.5" cy="58" r="3" fill="#ff9d9d"/><circle cx="80.5" cy="58" r="3" fill="#ff9d9d"/>
+        <ellipse cx="75" cy="68" rx="4" ry="5" fill="#ff9d9d"/>
+        <path d="M40 30 l6 8 M110 30 l-6 8 M30 55 l9 2 M120 55 l-9 2" stroke="#ffcf6b" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M100 14 L112 34 L88 34 Z" fill="#ffcf6b"/>
+        <rect x="99" y="21" width="2.4" height="7" rx="1.2" fill="#2a0d0d"/><circle cx="100.2" cy="31" r="1.4" fill="#2a0d0d"/>
+      </svg>
+
+      <!-- 503: avioncito triste -->
+      <svg *ngSwitchDefault width="120" height="96" viewBox="0 0 120 96" fill="none">
+        <path d="M60 52 L14 70 L20 50 L60 44 Z" fill="#7f93d6"/><path d="M60 52 L106 70 L100 50 L60 44 Z" fill="#7f93d6"/>
+        <path d="M60 30 L48 12 L58 22 L60 26 Z" fill="#7f93d6"/>
+        <ellipse cx="60" cy="52" rx="20" ry="30" fill="#b2c5ff"/>
+        <ellipse cx="60" cy="46" rx="13" ry="15" fill="#0b1024"/>
+        <circle cx="54.5" cy="44" r="2.4" fill="#b2c5ff"/><circle cx="65.5" cy="44" r="2.4" fill="#b2c5ff"/>
+        <path d="M51 39 L58 42 M69 39 L62 42" stroke="#b2c5ff" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M55 53 Q60 49 65 53" stroke="#b2c5ff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M52 47 q-2.5 4 0 6 q2.5 -2 0 -6 Z" fill="#8fd3ff"/>
+      </svg>
+    </div>
+
+    <div class="etiqueta">{{ info.etiqueta }}</div>
+    <h1>{{ info.titulo }}</h1>
+    <p>{{ info.mensaje }}</p>
+    <div class="lectura">{{ info.lectura }}</div>
+
+    <div class="acciones">
+      <button *ngIf="codigo >= 500" class="btn btn-primario" (click)="reintentar()">Reintentar</button>
+      <a class="btn" [class.btn-primario]="codigo < 500" [class.btn-secundario]="codigo >= 500" routerLink="/">Volver al inicio</a>
+    </div>
+
+    <div class="pie">Quisqueya Flight Hub · {{ codigo }}</div>
+  </div>
+</div>

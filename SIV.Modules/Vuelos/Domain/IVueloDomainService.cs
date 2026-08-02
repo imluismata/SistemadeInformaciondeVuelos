@@ -1,3 +1,5 @@
+using SIV.Shared.Enums;
+
 namespace SIV.Modules.Vuelos.Domain;
 
 internal interface IVueloDomainService

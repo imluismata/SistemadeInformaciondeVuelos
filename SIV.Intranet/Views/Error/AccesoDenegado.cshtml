@@ -1,0 +1,56 @@
+@{ Layout = null; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>403 · Zona restringida — Quisqueya Flight Hub</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(1200px 600px at 50% -10%, #16204a 0%, #0b1024 55%, #070a17 100%);
+            color: #e9edff; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 24px;
+        }
+        .tarjeta { background: rgba(255,255,255,.04); border: 1px solid rgba(255,196,120,.18); border-radius: 20px;
+            padding: 44px 40px; max-width: 470px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+        .escudo { width: 130px; height: 130px; margin: 0 auto 8px; animation: latir 2.6s ease-in-out infinite; }
+        @@keyframes latir { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+        .codigo { font-size: .8rem; letter-spacing: .18em; color: #f0b866; text-transform: uppercase; margin-bottom: 6px; }
+        h1 { font-size: 1.7rem; color: #fff; margin-bottom: 8px; }
+        p { color: #aeb6d6; line-height: 1.55; font-size: .98rem; }
+        .lectura { margin: 18px auto 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .72rem;
+            color: #9a8258; letter-spacing: .05em; border: 1px dashed rgba(255,196,120,.22); border-radius: 10px; padding: 8px 12px; display: inline-block; }
+        .acciones { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn { text-decoration: none; padding: 11px 22px; border-radius: 12px; font-weight: 600; font-size: .95rem; transition: opacity .15s, background .15s; }
+        .btn-primario { background: #f0b866; color: #1a1204; } .btn-primario:hover { opacity: .9; }
+        .btn-secundario { background: transparent; color: #cdd5f5; border: 1px solid rgba(178,197,255,.3); } .btn-secundario:hover { background: rgba(178,197,255,.08); }
+        .pie { margin-top: 20px; font-size: .78rem; color: #6b74a0; }
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <div class="escudo" aria-hidden="true">
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+                <!-- Escudo -->
+                <path d="M65 12 L108 28 V64 C108 92 88 110 65 118 C42 110 22 92 22 64 V28 Z"
+                      fill="#241d10" stroke="#f0b866" stroke-width="2.5"/>
+                <!-- Candado -->
+                <rect x="48" y="60" width="34" height="26" rx="5" fill="#f0b866"/>
+                <path d="M53 60 V52 a12 12 0 0 1 24 0 V60" stroke="#f0b866" stroke-width="4" fill="none"/>
+                <circle cx="65" cy="71" r="4" fill="#241d10"/>
+                <rect x="63.5" y="71" width="3" height="9" rx="1.5" fill="#241d10"/>
+            </svg>
+        </div>
+        <div class="codigo">Error 403 · Acceso denegado</div>
+        <h1>Zona restringida</h1>
+        <p>No tienes autorización para entrar a esta área. Si crees que es un error, contacta a un administrador del sistema.</p>
+        <div class="lectura">NIVEL: CRITICAL_AUTH · ESTADO: DENEGADO</div>
+        <div class="acciones">
+            <a class="btn btn-primario" href="/">Volver al inicio</a>
+            <a class="btn btn-secundario" href="javascript:history.back()">Regresar</a>
+        </div>
+        <div class="pie">Quisqueya Flight Hub · 403</div>
+    </div>
+</body>
+</html>

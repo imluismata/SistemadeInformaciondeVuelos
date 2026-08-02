@@ -3,7 +3,10 @@ using SIV.Intranet.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+// El filtro muestra una página amigable si la API no está disponible (caso de la
+// práctica "API no disponible") en vez de un 500 crudo.
+builder.Services.AddControllersWithViews(opciones =>
+    opciones.Filters.Add<SIV.Intranet.Filters.ApiNoDisponibleFilter>());
 
 // Acceso al HttpContext para leer el token del usuario en el TokenHandler.
 builder.Services.AddHttpContextAccessor();
@@ -13,7 +16,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Cuenta/Login";
-        options.AccessDeniedPath = "/Cuenta/Denegado";
+        options.AccessDeniedPath = "/Error/403";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
@@ -43,9 +46,13 @@ builder.Services.AddHttpClient<IActividadApi, ActividadApiClient>(ConfigurarClie
 
 var app = builder.Build();
 
+// Páginas de error con marca (500, 404, 403…) activas también en Development para
+// que la demo muestre siempre las páginas amigables en vez del stack trace crudo.
+app.UseExceptionHandler("/Error/500");
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 

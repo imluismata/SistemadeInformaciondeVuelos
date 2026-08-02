@@ -1,13 +1,6 @@
-namespace SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Enums;
 
-public enum TipoCambioOperativo
-{
-    Retraso,
-    Adelanto,
-    CambioDePuerta,
-    Cancelacion,
-    ActualizacionDatos
-}
+namespace SIV.Modules.Vuelos.Domain;
 
 internal sealed class CambioOperativo
 {

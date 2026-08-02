@@ -16,7 +16,10 @@ internal class VueloConfiguration : IEntityTypeConfiguration<Vuelo>
             .IsRequired()
             .HasMaxLength(20);
 
-        builder.HasIndex(v => v.Numero).IsUnique();
+        // El número NO es único global: la regla del SAD (único por aerolínea y
+        // fecha) la aplica VueloService. Se deja un índice compuesto no único para
+        // acelerar esa consulta de existencia.
+        builder.HasIndex(v => new { v.Numero, v.AerolineaId });
 
         builder.Property(v => v.AerolineaId).IsRequired();
         builder.Property(v => v.AeropuertoOrigenId).IsRequired();

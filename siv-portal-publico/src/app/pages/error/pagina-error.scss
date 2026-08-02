@@ -1,0 +1,91 @@
+.error-fondo {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #e9edff;
+
+  // Acentos por código (variables locales que usan tarjeta/botones).
+  --acento: #b2c5ff;
+  --acento-texto: #0b1024;
+  --fondo1: #16204a;
+  --fondo2: #0b1024;
+
+  &.acento-403 { --acento: #f0b866; --acento-texto: #1a1204; }
+  &.acento-500 { --acento: #ff9d9d; --acento-texto: #2a0d0d; --fondo1: #2a1620; --fondo2: #140b13; }
+  &.acento-503 { --acento: #b2c5ff; --acento-texto: #0b1024; }
+
+  background: radial-gradient(1200px 600px at 50% -10%, var(--fondo1) 0%, var(--fondo2) 55%, #070a17 100%);
+}
+
+.tarjeta {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(178, 197, 255, 0.15);
+  border-radius: 20px;
+  padding: 44px 40px;
+  max-width: 470px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.ilustracion {
+  margin-bottom: 8px;
+
+  svg { display: block; margin: 0 auto; }
+  .barrido { transform-origin: 75px 75px; animation: girar 3.5s linear infinite; }
+}
+
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.etiqueta {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--acento);
+  margin-bottom: 6px;
+}
+
+h1 { font-size: 1.7rem; color: #fff; margin-bottom: 8px; }
+p { color: #aeb6d6; line-height: 1.55; font-size: 0.98rem; }
+
+.lectura {
+  margin: 18px auto 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  color: #6f79a8;
+  letter-spacing: 0.05em;
+  border: 1px dashed rgba(178, 197, 255, 0.18);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: inline-block;
+}
+
+.acciones {
+  margin-top: 26px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.btn-primario { background: var(--acento); color: var(--acento-texto); }
+.btn-primario:hover { opacity: 0.9; }
+
+.btn-secundario { background: transparent; color: #cdd5f5; border: 1px solid rgba(178, 197, 255, 0.3); }
+.btn-secundario:hover { background: rgba(178, 197, 255, 0.08); }
+
+.pie { margin-top: 20px; font-size: 0.78rem; color: #6b74a0; }

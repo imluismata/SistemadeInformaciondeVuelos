@@ -1,4 +1,4 @@
-using SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Enums;
 
 namespace SIV.Modules.Vuelos.Application;
 

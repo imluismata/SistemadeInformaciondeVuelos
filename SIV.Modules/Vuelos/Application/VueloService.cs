@@ -103,9 +103,10 @@ internal sealed class VueloService : IVueloService
         // falla, el vuelo no queda guardado a medias.
         => _unitOfWork.EjecutarEnTransaccionAsync(async () =>
         {
-            var existente = await _repository.ObtenerPorNumeroAsync(command.Numero.Trim());
-            if (existente is not null)
-                throw new InvalidOperationException($"Ya existe un vuelo con el número {command.Numero.Trim()}.");
+            // El número de vuelo es único por aerolínea y fecha (regla del SAD), no global.
+            if (await _repository.ExisteNumeroParaAerolineaYFechaAsync(command.Numero.Trim(), command.AerolineaId, command.HorarioSalida))
+                throw new InvalidOperationException(
+                    $"Ya existe el vuelo {command.Numero.Trim()} para esa aerolínea en esa fecha.");
 
             await ValidarCatalogoAsync(command.AerolineaId, command.AeropuertoOrigenId, command.AeropuertoDestinoId);
 

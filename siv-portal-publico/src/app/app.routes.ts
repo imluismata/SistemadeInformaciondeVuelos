@@ -7,6 +7,7 @@ import { MisSeguimientos } from './pages/mis-seguimientos/mis-seguimientos';
 import { Registro } from './pages/registro/registro';
 import { Verificar } from './pages/verificar/verificar';
 import { Recuperar } from './pages/recuperar/recuperar';
+import { PaginaError } from './pages/error/pagina-error';
 
 export const routes: Routes = [
   { path: '', component: Inicio },
@@ -17,5 +18,8 @@ export const routes: Routes = [
   { path: 'verificar', component: Verificar },
   { path: 'recuperar', component: Recuperar },
   { path: 'mis-seguimientos', component: MisSeguimientos },
-  { path: '**', redirectTo: '' },
+  // Páginas de error con la marca; el interceptor navega aquí ante fallos de API.
+  { path: 'error/:codigo', component: PaginaError },
+  // Cualquier ruta desconocida muestra el 404 (antes redirigía a home en silencio).
+  { path: '**', component: PaginaError },
 ];

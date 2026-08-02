@@ -1,0 +1,67 @@
+@model int
+@{ Layout = null; var codigo = Model == 0 ? 500 : Model; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@codigo · Turbulencia técnica — Quisqueya Flight Hub</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(1200px 600px at 50% -10%, #2a1620 0%, #140b13 55%, #0a0709 100%);
+            color: #f7eaec; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 24px;
+        }
+        .tarjeta { background: rgba(255,255,255,.04); border: 1px solid rgba(255,140,140,.18); border-radius: 20px;
+            padding: 44px 40px; max-width: 470px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+        .avion { width: 150px; height: 120px; margin: 0 auto 4px; animation: temblar 0.35s ease-in-out infinite; }
+        @@keyframes temblar { 0%,100% { transform: translate(0,0) rotate(-8deg); } 25% { transform: translate(2px,-1px) rotate(-6deg); } 75% { transform: translate(-2px,1px) rotate(-10deg); } }
+        .codigo { font-size: .8rem; letter-spacing: .18em; color: #ff9d9d; text-transform: uppercase; margin-bottom: 6px; }
+        h1 { font-size: 1.7rem; color: #fff; margin-bottom: 8px; }
+        p { color: #d8c2c6; line-height: 1.55; font-size: .98rem; }
+        .lectura { margin: 18px auto 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .72rem;
+            color: #a8767c; letter-spacing: .05em; border: 1px dashed rgba(255,140,140,.22); border-radius: 10px; padding: 8px 12px; display: inline-block; }
+        .acciones { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn { border: 0; cursor: pointer; text-decoration: none; padding: 11px 22px; border-radius: 12px; font-weight: 600; font-size: .95rem; transition: opacity .15s, background .15s; }
+        .btn-primario { background: #ff9d9d; color: #2a0d0d; } .btn-primario:hover { opacity: .9; }
+        .btn-secundario { background: transparent; color: #e6cfd2; border: 1px solid rgba(255,140,140,.3); } .btn-secundario:hover { background: rgba(255,140,140,.08); }
+        .pie { margin-top: 20px; font-size: .78rem; color: #9a707a; }
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <div class="avion" aria-hidden="true">
+            <svg width="150" height="120" viewBox="0 0 150 120" fill="none">
+                <!-- Alas -->
+                <path d="M75 68 L26 88 L33 64 L75 58 Z" fill="#c98a92"/>
+                <path d="M75 68 L124 88 L117 64 L75 58 Z" fill="#c98a92"/>
+                <!-- Cola -->
+                <path d="M75 40 L62 20 L73 32 L75 36 Z" fill="#c98a92"/>
+                <!-- Fuselaje -->
+                <ellipse cx="75" cy="66" rx="20" ry="30" fill="#ff9d9d"/>
+                <!-- Cara asustada -->
+                <ellipse cx="75" cy="60" rx="13" ry="15" fill="#2a0d0d"/>
+                <circle cx="69.5" cy="58" r="3" fill="#ff9d9d"/>
+                <circle cx="80.5" cy="58" r="3" fill="#ff9d9d"/>
+                <ellipse cx="75" cy="68" rx="4" ry="5" fill="#ff9d9d"/>
+                <!-- Rayos de alerta -->
+                <path d="M40 30 l6 8 M110 30 l-6 8 M30 55 l9 2 M120 55 l-9 2" stroke="#ffcf6b" stroke-width="2.4" stroke-linecap="round"/>
+                <!-- Triángulo de advertencia -->
+                <path d="M100 14 L112 34 L88 34 Z" fill="#ffcf6b"/>
+                <rect x="99" y="21" width="2.4" height="7" rx="1.2" fill="#2a0d0d"/>
+                <circle cx="100.2" cy="31" r="1.4" fill="#2a0d0d"/>
+            </svg>
+        </div>
+        <div class="codigo">Error @codigo · Fallo interno</div>
+        <h1>Turbulencia técnica</h1>
+        <p>Algo salió mal de nuestro lado. Nuestro equipo ya está en ello — intenta de nuevo en un momento.</p>
+        <div class="lectura">SISTEMA: EN TIERRA · REINTENTO SUGERIDO</div>
+        <div class="acciones">
+            <button class="btn btn-primario" onclick="location.reload()">Reintentar</button>
+            <a class="btn btn-secundario" href="/">Ir al inicio</a>
+        </div>
+        <div class="pie">Quisqueya Flight Hub · @codigo</div>
+    </div>
+</body>
+</html>

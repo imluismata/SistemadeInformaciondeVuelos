@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SIV.Modules.Vuelos.Application;
 using SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Enums;
 
 namespace SIV.Infrastructure.Repositories;
 
@@ -52,11 +53,17 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
             .Include(v => v.CambiosOperativos)
             .FirstOrDefaultAsync(v => v.Id == id);
 
-    public async Task<Vuelo?> ObtenerPorNumeroAsync(string numero)
-        => await db.Vuelos
-            .Include(v => v.HistorialEstados)
-            .Include(v => v.CambiosOperativos)
-            .FirstOrDefaultAsync(v => v.Numero == numero);
+    public async Task<bool> ExisteNumeroParaAerolineaYFechaAsync(string numero, Guid aerolineaId, DateTime fecha)
+    {
+        // Mismo número + misma aerolínea + mismo día de salida (comparación por rango
+        // para que EF la traduzca a SQL sin depender de funciones de fecha).
+        var dia = fecha.Date;
+        var siguiente = dia.AddDays(1);
+        return await db.Vuelos.AnyAsync(v =>
+            v.Numero == numero
+            && v.AerolineaId == aerolineaId
+            && v.HorarioSalida >= dia && v.HorarioSalida < siguiente);
+    }
 
     // Un vuelo cuenta como "activo" mientras no haya llegado a un estado final.
     private static readonly EstadoVuelo[] EstadosFinales = [EstadoVuelo.Completado, EstadoVuelo.Cancelado];

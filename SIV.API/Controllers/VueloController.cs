@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIV.Modules.Vuelos.Application;
-using SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Enums;
 
 namespace SIV.API.Controllers;
 

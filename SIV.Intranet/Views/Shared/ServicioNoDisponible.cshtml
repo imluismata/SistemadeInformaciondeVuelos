@@ -1,0 +1,114 @@
+@{
+    // Página auto-contenida (sin layout) para que se muestre aunque la API esté caída.
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Servicio no disponible · Quisqueya Flight Hub</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(1200px 600px at 50% -10%, #16204a 0%, #0b1024 55%, #070a17 100%);
+            color: #e9edff;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            padding: 24px;
+        }
+        .tarjeta {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(178,197,255,0.15);
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 460px; width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        }
+        .escena { position: relative; height: 150px; margin-bottom: 8px; }
+        /* Nube de la que se "cayó" el avión */
+        .nube { position: absolute; top: 0; left: 50%; transform: translateX(-90px); opacity: .5; }
+        /* Estela punteada */
+        .estela {
+            position: absolute; top: 34px; left: 50%;
+            width: 2px; height: 62px;
+            transform: translateX(-46px) rotate(28deg);
+            background: repeating-linear-gradient(180deg, rgba(178,197,255,.5) 0 4px, transparent 4px 9px);
+        }
+        .avion { position: absolute; top: 46px; left: 50%; transform: translateX(-60px); animation: caer 3s ease-in-out infinite; }
+        @@keyframes caer {
+            0%, 100% { transform: translateX(-60px) translateY(0) rotate(20deg); }
+            50%      { transform: translateX(-60px) translateY(10px) rotate(24deg); }
+        }
+        h1 { font-size: 1.55rem; margin: 14px 0 6px; color: #fff; }
+        p { color: #aeb6d6; line-height: 1.55; font-size: .98rem; }
+        .acciones { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            border: 0; cursor: pointer; text-decoration: none;
+            padding: 11px 22px; border-radius: 12px; font-weight: 600; font-size: .95rem;
+            transition: opacity .15s, background .15s;
+        }
+        .btn-primario { background: #b2c5ff; color: #0b1024; }
+        .btn-primario:hover { opacity: .9; }
+        .btn-secundario { background: transparent; color: #cdd5f5; border: 1px solid rgba(178,197,255,.3); }
+        .btn-secundario:hover { background: rgba(178,197,255,.08); }
+        .pie { margin-top: 22px; font-size: .78rem; color: #6b74a0; }
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <div class="escena" aria-hidden="true">
+            <!-- Nube -->
+            <svg class="nube" width="90" height="40" viewBox="0 0 90 40" fill="none">
+                <ellipse cx="30" cy="26" rx="24" ry="14" fill="#8e93b0"/>
+                <ellipse cx="52" cy="20" rx="20" ry="16" fill="#a0a5c2"/>
+                <ellipse cx="68" cy="27" rx="18" ry="12" fill="#8e93b0"/>
+            </svg>
+
+            <div class="estela"></div>
+
+            <!-- Avioncito triste -->
+            <svg class="avion" width="120" height="96" viewBox="0 0 120 96" fill="none">
+                <!-- Alas -->
+                <path d="M60 52 L14 70 L20 50 L60 44 Z" fill="#7f93d6"/>
+                <path d="M60 52 L106 70 L100 50 L60 44 Z" fill="#7f93d6"/>
+                <!-- Cola -->
+                <path d="M60 30 L48 12 L58 22 L60 26 Z" fill="#7f93d6"/>
+                <!-- Fuselaje -->
+                <ellipse cx="60" cy="52" rx="20" ry="30" fill="#b2c5ff"/>
+                <ellipse cx="60" cy="52" rx="20" ry="30" fill="url(#brillo)" opacity=".25"/>
+                <!-- Ventana / cara -->
+                <ellipse cx="60" cy="46" rx="13" ry="15" fill="#0b1024"/>
+                <!-- Ojos tristes -->
+                <circle cx="54.5" cy="44" r="2.4" fill="#b2c5ff"/>
+                <circle cx="65.5" cy="44" r="2.4" fill="#b2c5ff"/>
+                <!-- Cejas caídas -->
+                <path d="M51 39 L58 42" stroke="#b2c5ff" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M69 39 L62 42" stroke="#b2c5ff" stroke-width="1.6" stroke-linecap="round"/>
+                <!-- Boca triste -->
+                <path d="M55 53 Q60 49 65 53" stroke="#b2c5ff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <!-- Lagrimita -->
+                <path d="M52 47 q-2.5 4 0 6 q2.5 -2 0 -6 Z" fill="#8fd3ff"/>
+                <defs>
+                    <linearGradient id="brillo" x1="40" y1="22" x2="80" y2="82" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#ffffff"/>
+                        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <h1>¡Ups! No podemos despegar</h1>
+        <p>No pudimos conectar con el servidor. El sistema está en tierra por un momento — vuelve a intentarlo en unos segundos.</p>
+
+        <div class="acciones">
+            <button class="btn btn-primario" onclick="location.reload()">Reintentar</button>
+            <a class="btn btn-secundario" href="/">Ir al inicio</a>
+        </div>
+
+        <div class="pie">Quisqueya Flight Hub · Servicio no disponible (503)</div>
+    </div>
+</body>
+</html>
