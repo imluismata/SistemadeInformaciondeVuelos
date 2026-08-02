@@ -9,6 +9,18 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
     public async Task<IReadOnlyList<Vuelo>> ObtenerTodosAsync()
         => await db.Vuelos.ToListAsync();
 
+    public async Task<(IReadOnlyList<Vuelo> Items, int Total)> ObtenerPaginadoAsync(int pagina, int tamano)
+    {
+        // Ordeno por horario para que las paginas salgan siempre igual.
+        var query = db.Vuelos.OrderBy(v => v.HorarioSalida);
+        var total = await query.CountAsync();      // cuantos vuelos hay en total
+        var items = await query
+            .Skip((pagina - 1) * tamano)   // me salto las paginas anteriores
+            .Take(tamano)                  // agarro solo los de esta pagina
+            .ToListAsync();
+        return (items, total);
+    }
+
     public async Task<IReadOnlyList<Vuelo>> ConsultarAsync(ConsultarVuelosQuery filtro)
     {
         var query = db.Vuelos.AsQueryable();

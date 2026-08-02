@@ -17,9 +17,16 @@ public sealed class VueloController : ControllerBase
         _service = service;
     }
 
+    // Si me mandan un 'tamano', devuelvo solo esa pagina; si no, la lista completa
+    // como antes (para no romper lo que ya la usaba).
     [HttpGet]
-    public async Task<IActionResult> ObtenerTodos()
-        => Ok(await _service.ObtenerTodosAsync());
+    public async Task<IActionResult> ObtenerTodos([FromQuery] int? pagina, [FromQuery] int? tamano)
+    {
+        if (tamano is > 0)
+            return Ok(await _service.ObtenerPaginadoAsync(pagina ?? 1, tamano.Value));
+
+        return Ok(await _service.ObtenerTodosAsync());
+    }
 
     [HttpGet("consultar")]
     public async Task<IActionResult> Consultar(

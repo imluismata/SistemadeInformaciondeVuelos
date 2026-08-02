@@ -42,6 +42,18 @@ internal class UsuarioRepository : IUsuarioRepository
         return await _context.Usuarios.ToListAsync();
     }
 
+    public async Task<(IReadOnlyList<Usuario> Items, int Total)> ObtenerPaginadoAsync(int pagina, int tamano)
+    {
+        // Ordeno por fecha para que las paginas salgan siempre en el mismo orden.
+        var query = _context.Usuarios.OrderBy(u => u.CreadoEn);
+        var total = await query.CountAsync();      // cuantos usuarios hay en total
+        var items = await query
+            .Skip((pagina - 1) * tamano)   // me salto los de las paginas anteriores
+            .Take(tamano)                  // y agarro solo los de esta pagina
+            .ToListAsync();
+        return (items, total);
+    }
+
     public async Task ActualizarAsync(Usuario usuario)
     {
         _context.Usuarios.Update(usuario);

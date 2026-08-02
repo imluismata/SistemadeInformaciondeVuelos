@@ -1,11 +1,13 @@
 using SIV.Modules.Common;
 using SIV.Modules.Usuarios.Application.Dtos;
+using SIV.Shared.DTOs;
 
 namespace SIV.Modules.Usuarios.Application.Interfaces;
 
 public interface IUsuarioService : IBaseService<UsuarioDto, RegistrarUsuarioDto, ActualizarUsuarioDto>
 {
     Task<UsuarioDto?> ObtenerPorEmailAsync(string email);
+    Task<ResultadoPaginado<UsuarioDto>> ObtenerPaginadoAsync(int pagina, int tamano);
     Task CambiarRolAsync(CambiarRolUsuarioDto dto);
 
     // Alta de personal interno hecha por un administrador (CU-USU-03): crea la

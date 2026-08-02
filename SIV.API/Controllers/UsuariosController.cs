@@ -80,11 +80,16 @@ public class UsuariosController : ControllerBase
         return Ok(usuario);
     }
 
-    // CU-USU-03: la gestión de usuarios internos es exclusiva del administrador.
+    // Solo el admin puede ver la lista de usuarios.
+    // Si me mandan un 'tamano', devuelvo solo esa pagina; si no, la lista completa
+    // como antes (asi no rompo a nadie que ya la usaba).
     [Authorize(Roles = "Administrador")]
     [HttpGet]
-    public async Task<IActionResult> ObtenerTodos()
+    public async Task<IActionResult> ObtenerTodos([FromQuery] int? pagina, [FromQuery] int? tamano)
     {
+        if (tamano is > 0)
+            return Ok(await _servicio.ObtenerPaginadoAsync(pagina ?? 1, tamano.Value));
+
         var usuarios = await _servicio.ObtenerTodosAsync();
         return Ok(usuarios);
     }

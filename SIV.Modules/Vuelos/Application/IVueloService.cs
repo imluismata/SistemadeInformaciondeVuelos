@@ -6,6 +6,7 @@ namespace SIV.Modules.Vuelos.Application;
 public interface IVueloService
 {
     Task<IReadOnlyList<VueloDto>> ObtenerTodosAsync();
+    Task<ResultadoPaginado<VueloDto>> ObtenerPaginadoAsync(int pagina, int tamano);
     Task<IReadOnlyList<VueloDto>> ConsultarAsync(ConsultarVuelosQuery filtro);
     Task<VueloDto?> ObtenerPorIdAsync(Guid id);
     Task<VueloDto> RegistrarAsync(RegistrarVueloCommand command);

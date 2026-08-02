@@ -2,6 +2,7 @@ using SIV.Modules.Usuarios.Application.Dtos;
 using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Usuarios.Domain;
 using SIV.Shared.Contracts;
+using SIV.Shared.DTOs;
 using SIV.Shared.Exceptions;
 
 namespace SIV.Modules.Usuarios.Application.Services;
@@ -107,6 +108,19 @@ internal class UsuarioService : IUsuarioService, IUsuarioConsulta
     {
         var usuarios = await _repo.ObtenerTodosAsync();
         return usuarios.Select(MapToDto);
+    }
+
+    public async Task<ResultadoPaginado<UsuarioDto>> ObtenerPaginadoAsync(int pagina, int tamano)
+    {
+        // Si me mandan valores raros, pongo unos por defecto. Y no dejo pedir mas
+        // de 100 por pagina, para que nadie se traiga toda la tabla de un jalon.
+        if (pagina < 1) pagina = 1;
+        if (tamano < 1) tamano = 20;
+        if (tamano > 100) tamano = 100;
+
+        // Le pido la pagina al repositorio y convierto las entidades a DTOs.
+        var (items, total) = await _repo.ObtenerPaginadoAsync(pagina, tamano);
+        return new ResultadoPaginado<UsuarioDto>(items.Select(MapToDto).ToList(), total, pagina, tamano);
     }
 
     public Task CambiarRolAsync(CambiarRolUsuarioDto dto)

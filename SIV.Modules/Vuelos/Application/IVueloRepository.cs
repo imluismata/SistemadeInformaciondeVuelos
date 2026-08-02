@@ -5,6 +5,7 @@ namespace SIV.Modules.Vuelos.Application;
 internal interface IVueloRepository
 {
     Task<IReadOnlyList<Vuelo>> ObtenerTodosAsync();
+    Task<(IReadOnlyList<Vuelo> Items, int Total)> ObtenerPaginadoAsync(int pagina, int tamano);
     Task<IReadOnlyList<Vuelo>> ConsultarAsync(ConsultarVuelosQuery filtro);
     Task<Vuelo?> ObtenerPorIdAsync(Guid id);
     Task<Vuelo?> ObtenerPorNumeroAsync(string numero);

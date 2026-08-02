@@ -73,6 +73,19 @@ internal sealed class VueloService : IVueloService
         return vuelos.Select(Mapear).ToList();
     }
 
+    public async Task<ResultadoPaginado<VueloDto>> ObtenerPaginadoAsync(int pagina, int tamano)
+    {
+        // Si mandan valores raros, pongo por defecto, y limito a 100 por pagina
+        // para no traer todos los vuelos de una.
+        if (pagina < 1) pagina = 1;
+        if (tamano < 1) tamano = 20;
+        if (tamano > 100) tamano = 100;
+
+        // Pido la pagina al repositorio y paso las entidades a DTOs.
+        var (items, total) = await _repository.ObtenerPaginadoAsync(pagina, tamano);
+        return new ResultadoPaginado<VueloDto>(items.Select(Mapear).ToList(), total, pagina, tamano);
+    }
+
     public async Task<IReadOnlyList<VueloDto>> ConsultarAsync(ConsultarVuelosQuery filtro)
     {
         var vuelos = await _repository.ConsultarAsync(filtro);
