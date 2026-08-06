@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SIV.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class EsquemaInicialCompleto : Migration
+    public partial class EsquemaInicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,6 +49,7 @@ namespace SIV.Infrastructure.Migrations
                     Accion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Detalle = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Resultado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Actor = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     FechaHora = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -98,7 +99,10 @@ namespace SIV.Infrastructure.Migrations
                     Email = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Rol = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CreadoEn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreadoEn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EmailConfirmado = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CodigoVerificacion = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
+                    CodigoExpiraEn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -218,10 +222,9 @@ namespace SIV.Infrastructure.Migrations
                 column: "VueloId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vuelos_Numero",
+                name: "IX_Vuelos_Numero_AerolineaId",
                 table: "Vuelos",
-                column: "Numero",
-                unique: true);
+                columns: new[] { "Numero", "AerolineaId" });
         }
 
         /// <inheritdoc />

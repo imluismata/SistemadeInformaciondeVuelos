@@ -12,8 +12,8 @@ using SIV.Infrastructure;
 namespace SIV.Infrastructure.Migrations
 {
     [DbContext(typeof(SivDbContext))]
-    [Migration("20260801222839_AgregarActorAuditoria")]
-    partial class AgregarActorAuditoria
+    [Migration("20260802190429_EsquemaInicial")]
+    partial class EsquemaInicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -283,8 +283,7 @@ namespace SIV.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Numero")
-                        .IsUnique();
+                    b.HasIndex("Numero", "AerolineaId");
 
                     b.ToTable("Vuelos", (string)null);
                 });
