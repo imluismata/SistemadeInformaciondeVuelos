@@ -55,6 +55,13 @@ public static class DependencyInjection
         services.AddScoped<IServicioCorreo>(sp => sp.GetRequiredService<ServicioCorreoSmtp>());
         services.AddScoped<INotificadorPorCorreo>(sp => sp.GetRequiredService<ServicioCorreoSmtp>());
 
+        // Notificaciones por correo asíncronas (RNF-REN-03): el manejador del evento
+        // encola el correo (instantáneo) y el worker lo envía por SMTP en segundo
+        // plano, fuera del request y de la transacción atómica del cambio de vuelo.
+        // La cola es singleton (una sola compartida); el worker, un hosted service.
+        services.AddSingleton<IColaCorreos, ColaCorreosEnMemoria>();
+        services.AddHostedService<EnviadorCorreosHostedService>();
+
         // Aeropuerto base para los tableros de salidas y llegadas (AILA = SDQ).
         var opcionesAeropuerto = new OpcionesAeropuerto
         {
