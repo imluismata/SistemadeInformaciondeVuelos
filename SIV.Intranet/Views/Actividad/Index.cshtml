@@ -44,7 +44,7 @@
                             <td class="px-6 py-3 font-mono text-sm text-on-surface-variant">@s.Usuario</td>
                             <td class="px-6 py-3 font-mono font-semibold text-primary">@s.Vuelo</td>
                             <td class="px-6 py-3"><span class="status-pill @ClaseEstadoSeg(s.Estado)">@s.Estado</span></td>
-                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@s.CreadoEn.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@s.CreadoEn.AHoraLocal().ToString("dd/MM/yyyy HH:mm")</td>
                         </tr>
                     }
                 </tbody>
@@ -84,7 +84,7 @@
                     @foreach (var n in Model.Notificaciones)
                     {
                         <tr class="data-row">
-                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@n.GeneradaEn.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@n.GeneradaEn.AHoraLocal().ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="px-6 py-3 font-mono text-sm text-on-surface-variant">@n.Usuario</td>
                             <td class="px-6 py-3">@n.Mensaje</td>
                             <td class="px-6 py-3"><span class="status-pill @ClaseEstadoNot(n.Estado)">@n.Estado</span></td>

@@ -144,7 +144,7 @@
                     @foreach (var c in Model.Cambios.Detalle)
                     {
                         <tr class="data-row">
-                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@c.RegistradoEn.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-6 py-3 font-mono text-sm whitespace-nowrap">@c.RegistradoEn.AHoraLocal().ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="px-6 py-3 font-mono font-semibold text-primary">@c.Vuelo</td>
                             <td class="px-6 py-3">@c.Tipo</td>
                             <td class="px-6 py-3 text-on-surface-variant">@c.Motivo</td>

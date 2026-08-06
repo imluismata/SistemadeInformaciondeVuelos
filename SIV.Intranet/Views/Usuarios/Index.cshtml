@@ -50,7 +50,7 @@
                             <td class="px-6 py-3.5">
                                 <span class="status-pill @ClaseRol(u.Rol)">@u.Rol</span>
                             </td>
-                            <td class="px-6 py-3.5 font-mono text-sm text-on-surface-variant">@u.CreadoEn.ToString("dd/MM/yyyy")</td>
+                            <td class="px-6 py-3.5 font-mono text-sm text-on-surface-variant">@u.CreadoEn.AHoraLocal().ToString("dd/MM/yyyy")</td>
                         </tr>
                     }
                 </tbody>
