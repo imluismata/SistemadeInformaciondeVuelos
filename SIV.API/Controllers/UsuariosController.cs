@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SIV.API.Auth;
+using SIV.API.Seguridad;
 using SIV.Modules.Usuarios.Application.Dtos;
 using SIV.Modules.Usuarios.Application.Interfaces;
 using SIV.Modules.Usuarios.Domain;
@@ -19,6 +21,10 @@ public class UsuariosController : ControllerBase
         _servicio = servicio;
     }
 
+    // Los endpoints públicos de cuentas van con límite de intentos por IP: los
+    // códigos son de 6 dígitos y sin freno se pueden adivinar probando, y además
+    // evita que alguien use el registro y el reenvío para spamear correos.
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("registro")]
     public async Task<IActionResult> Registrar([FromBody] RegistroUsuarioRequest request)
     {
@@ -28,6 +34,7 @@ public class UsuariosController : ControllerBase
         return Created(string.Empty, null);
     }
 
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("verificar")]
     public async Task<IActionResult> Verificar([FromBody] VerificarCodigoRequest request)
     {
@@ -35,6 +42,7 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("reenviar-codigo")]
     public async Task<IActionResult> ReenviarCodigo([FromBody] ReenviarCodigoRequest request)
     {
@@ -42,6 +50,7 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("recuperar")]
     public async Task<IActionResult> RecuperarPassword([FromBody] RecuperarPasswordRequest request)
     {
@@ -49,6 +58,7 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("validar-codigo")]
     public async Task<IActionResult> ValidarCodigo([FromBody] VerificarCodigoRequest request)
     {
@@ -56,6 +66,7 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
+    [EnableRateLimiting(LimitesPeticiones.Codigos)]
     [HttpPost("restablecer")]
     public async Task<IActionResult> RestablecerPassword([FromBody] RestablecerPasswordRequest request)
     {
