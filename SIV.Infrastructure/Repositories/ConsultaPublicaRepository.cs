@@ -1,9 +1,12 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using SIV.Infrastructure.Configuracion;
 using SIV.Modules.Catalogo.Domain;
 using SIV.Modules.ConsultaPublica.Application;
 using SIV.Modules.ConsultaPublica.Application.Dtos;
 using SIV.Modules.Vuelos.Domain;
+using SIV.Shared.Enums;
 
 namespace SIV.Infrastructure.Repositories;
 
@@ -99,24 +102,85 @@ internal class ConsultaPublicaRepository(SivDbContext context, OpcionesAeropuert
         var aerolineaIds = vuelos.Select(v => v.AerolineaId).Distinct().ToList();
         var aeropuertoIds = vuelos.SelectMany(v => new[] { v.AeropuertoOrigenId, v.AeropuertoDestinoId }).Distinct().ToList();
 
+        // Se traen nombre y código juntos: las pantallas usan el código (MIA, B6)
+        // y las páginas del portal el nombre completo.
         var aerolineas = await context.Aerolineas
             .Where(a => aerolineaIds.Contains(a.Id))
-            .ToDictionaryAsync(a => a.Id, a => a.Nombre);
+            .ToDictionaryAsync(a => a.Id, a => new { a.Nombre, a.Codigo });
 
         var aeropuertos = await context.Aeropuertos
             .Where(a => aeropuertoIds.Contains(a.Id))
-            .ToDictionaryAsync(a => a.Id, a => a.Nombre);
+            .ToDictionaryAsync(a => a.Id, a => new { a.Nombre, a.Codigo });
 
-        return vuelos.Select(v => new VueloPublicoDto(
-            v.Id,
-            v.Numero,
-            aerolineas.GetValueOrDefault(v.AerolineaId, "—"),
-            aeropuertos.GetValueOrDefault(v.AeropuertoOrigenId, "—"),
-            aeropuertos.GetValueOrDefault(v.AeropuertoDestinoId, "—"),
-            v.HorarioSalida,
-            v.HorarioLlegada,
-            v.Puerta,
-            v.EstadoActual.ToString()
-        )).ToList();
+        return vuelos.Select(v =>
+        {
+            var aerolinea = aerolineas.GetValueOrDefault(v.AerolineaId);
+            var origen = aeropuertos.GetValueOrDefault(v.AeropuertoOrigenId);
+            var destino = aeropuertos.GetValueOrDefault(v.AeropuertoDestinoId);
+            var (salidaOriginal, llegadaOriginal) = HorariosOriginales(v);
+
+            return new VueloPublicoDto(
+                v.Id,
+                v.Numero,
+                aerolinea?.Nombre ?? "—",
+                aerolinea?.Codigo ?? "",
+                origen?.Nombre ?? "—",
+                origen?.Codigo ?? "",
+                destino?.Nombre ?? "—",
+                destino?.Codigo ?? "",
+                v.HorarioSalida,
+                v.HorarioLlegada,
+                salidaOriginal,
+                llegadaOriginal,
+                v.Puerta,
+                v.EstadoActual.ToString());
+        }).ToList();
+    }
+
+    /// <summary>
+    /// Recupera las horas que tenía el vuelo antes de su primer retraso o
+    /// adelanto, para poder mostrar en pantalla la programada junto a la nueva.
+    ///
+    /// El dominio no guarda la hora original: al registrar un retraso, mueve
+    /// HorarioSalida y HorarioLlegada hacia adelante. Lo único que queda del
+    /// valor anterior es el historial de cambios operativos, así que se lee de
+    /// ahí. Solo cuentan Retraso y Adelanto: son las desviaciones sobre el
+    /// itinerario publicado, mientras que una edición de datos es una corrección
+    /// del itinerario en sí.
+    ///
+    /// Es una solución de lectura, sin migración ni cambios en el módulo de
+    /// Vuelos, pero depende del formato de texto con que ese módulo escribe el
+    /// valor anterior. Si nunca se pudo interpretar, se devuelve null y la
+    /// pantalla simplemente muestra una sola hora — nunca un dato inventado.
+    /// </summary>
+    private static (DateTime? Salida, DateTime? Llegada) HorariosOriginales(Vuelo vuelo)
+    {
+        var primeraDesviacion = vuelo.CambiosOperativos
+            .Where(c => c.Tipo is TipoCambioOperativo.Retraso or TipoCambioOperativo.Adelanto)
+            .OrderBy(c => c.RegistradoEn)
+            .FirstOrDefault();
+
+        if (primeraDesviacion?.ValorAnterior is null)
+            return (null, null);
+
+        return (
+            LeerHora(primeraDesviacion.ValorAnterior, "Salida"),
+            LeerHora(primeraDesviacion.ValorAnterior, "Llegada"));
+    }
+
+    /// <summary>Extrae "Campo=&lt;fecha ISO&gt;" de la cadena del historial.</summary>
+    private static DateTime? LeerHora(string texto, string campo)
+    {
+        var coincidencia = Regex.Match(texto, $@"{campo}=([^;]+)");
+        if (!coincidencia.Success)
+            return null;
+
+        return DateTime.TryParse(
+            coincidencia.Groups[1].Value.Trim(),
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.RoundtripKind,
+            out var hora)
+            ? hora
+            : null;
     }
 }
