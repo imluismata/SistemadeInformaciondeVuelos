@@ -1,0 +1,81 @@
+<app-pantalla-marco
+  [titulo]="esSalidas() ? 'Salidas' : 'Llegadas'"
+  [tituloEn]="esSalidas() ? 'Departures' : 'Arrivals'"
+>
+  <div class="tablero">
+
+    @if (sinConexion()) {
+      <p class="aviso-conexion">
+        Sin conexión con el sistema · Información no actualizada
+      </p>
+    }
+
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th class="col-hora">Hora<span>Time</span></th>
+          <th class="col-vuelo">Vuelo<span>Flight</span></th>
+          <th class="col-aerolinea">Aerolínea<span>Airline</span></th>
+          <th class="col-ciudad">
+            @if (esSalidas()) {
+              Destino<span>Destination</span>
+            } @else {
+              Origen<span>Origin</span>
+            }
+          </th>
+          @if (esSalidas()) {
+            <th class="col-embarque">Embarque<span>Boarding</span></th>
+          }
+          <th class="col-puerta">Puerta<span>Gate</span></th>
+          <th class="col-estado">Estado<span>Status</span></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (v of vuelos(); track v.id) {
+          <tr>
+            <td class="col-hora">
+              <!-- Si el vuelo se movió, la programada va tachada y la nueva en
+                   rojo, como en las pantallas reales. -->
+              @if (horaOriginal(v); as original) {
+                <span class="hora-vieja">{{ original | date: 'HH:mm' }}</span>
+                <span class="hora-nueva">{{ hora(v) | date: 'HH:mm' }}</span>
+              } @else {
+                <span class="hora-sola">{{ hora(v) | date: 'HH:mm' }}</span>
+              }
+            </td>
+            <td class="col-vuelo">{{ v.numero }}</td>
+            <td class="col-aerolinea">
+              <app-logo-aerolinea [codigo]="v.aerolineaCodigo" [nombre]="v.aerolinea" />
+            </td>
+            <td class="col-ciudad">
+              {{ ciudad(v) }}
+              <span class="ciudad-codigo">{{ esSalidas() ? v.destinoCodigo : v.origenCodigo }}</span>
+            </td>
+            @if (esSalidas()) {
+              <td class="col-embarque">{{ horaDeEmbarque(v) | date: 'HH:mm' }}</td>
+            }
+            <td class="col-puerta">
+              @if (v.puerta) {
+                <span class="puerta">{{ v.puerta }}</span>
+              } @else {
+                <span class="puerta-vacia">—</span>
+              }
+            </td>
+            <td class="col-estado">
+              <app-estado-vuelo [estado]="v.estado" variante="pantalla" />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (!cargando() && vuelos().length === 0) {
+      <p class="vacio">
+        No hay vuelos programados en este momento
+        <span>No scheduled flights at this time</span>
+      </p>
+    }
+
+  </div>
+</app-pantalla-marco>

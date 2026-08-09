@@ -1,0 +1,55 @@
+<div class="page-header">
+  <h1>Pantallas</h1>
+  <p>Las pantallas que se cuelgan en la terminal. Cada una se abre en una pestaña aparte.</p>
+</div>
+
+<div class="contenido">
+
+  <section class="grupo">
+    <h2 class="grupo-titulo">Tableros de vuelos</h2>
+    <div class="tarjetas">
+      @for (p of tableros; track p.ruta) {
+        <a [href]="p.ruta" target="_blank" rel="noopener" class="tarjeta">
+          <span class="tarjeta-titulo">{{ p.titulo }}</span>
+          <span class="tarjeta-desc">{{ p.descripcion }}</span>
+          <span class="tarjeta-ruta">{{ p.ruta }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <section class="grupo">
+    <h2 class="grupo-titulo">Puertas de embarque</h2>
+    <p class="grupo-nota">
+      Cada puerta tiene su propia pantalla. Estas son las puertas con vuelo asignado hoy.
+    </p>
+
+    @if (cargandoPuertas()) {
+      <p class="estado-msg">Buscando puertas en uso...</p>
+    } @else if (puertas().length === 0) {
+      <p class="estado-msg">No hay puertas asignadas en este momento.</p>
+    } @else {
+      <div class="puertas">
+        @for (puerta of puertas(); track puerta) {
+          <a [href]="'/tablero/embarque/' + puerta" target="_blank" rel="noopener" class="puerta">
+            {{ puerta }}
+          </a>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="grupo">
+    <h2 class="grupo-titulo">Pantallas informativas</h2>
+    <div class="tarjetas">
+      @for (p of informativas; track p.ruta) {
+        <a [href]="p.ruta" target="_blank" rel="noopener" class="tarjeta">
+          <span class="tarjeta-titulo">{{ p.titulo }}</span>
+          <span class="tarjeta-desc">{{ p.descripcion }}</span>
+          <span class="tarjeta-ruta">{{ p.ruta }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+</div>

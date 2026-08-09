@@ -1,0 +1,228 @@
+.directorio {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+  gap: 1.6vw;
+}
+
+// ── Paneles (mismo encabezado para el plano, la leyenda y los servicios) ──
+.panel,
+.plano {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 2px solid var(--p-borde);
+  background: var(--p-fondo);
+}
+
+.panel-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1vw;
+  padding: 1vh 1.2vw;
+  background: var(--p-navy);
+  color: #fff;
+
+  .panel-titulo {
+    font-family: var(--p-mono);
+    font-size: 1vw;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .panel-nota {
+    font-family: var(--p-mono);
+    font-size: 0.72vw;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+}
+
+// ── Plano ────────────────────────────────────────────────────────────────
+.plano-lienzo {
+  flex: 1;
+  min-height: 0;
+  padding: 2vh 1.5vw;
+  background: var(--p-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plano-svg {
+  width: 100%;
+  height: 100%;
+
+  .edificio {
+    fill: #fff;
+    stroke: var(--p-navy);
+    stroke-width: 3;
+  }
+
+  .pasillo {
+    fill: var(--p-panel-alt);
+    stroke: var(--p-borde);
+    stroke-width: 1;
+  }
+
+  .etiqueta-pasillo {
+    font-family: var(--p-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    fill: var(--p-apagado);
+    text-anchor: middle;
+  }
+
+  .puerta {
+    fill: var(--p-navy);
+  }
+
+  .puerta-texto {
+    font-family: var(--p-mono);
+    font-size: 17px;
+    font-weight: 700;
+    fill: #fff;
+    text-anchor: middle;
+  }
+
+  .zona {
+    stroke: var(--p-borde);
+    stroke-width: 1;
+  }
+
+  .zona-comida   { fill: #fde8ea; }
+  .zona-servicio { fill: #e8f0fe; }
+  .zona-lounge   { fill: #e6f4ea; }
+
+  .zona-texto {
+    font-family: var(--p-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    fill: var(--p-navy-oscuro);
+    text-anchor: middle;
+  }
+
+  .aqui {
+    fill: var(--p-rojo);
+    stroke: #fff;
+    stroke-width: 3;
+  }
+
+  .aqui-texto {
+    font-family: var(--p-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    fill: var(--p-rojo);
+    text-anchor: middle;
+  }
+}
+
+// ── Lateral ──────────────────────────────────────────────────────────────
+.lateral {
+  display: grid;
+  grid-template-rows: 1.3fr 1fr;
+  gap: 1.6vh;
+  min-height: 0;
+}
+
+.leyenda {
+  list-style: none;
+  margin: 0;
+  padding: 1vh 1.2vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
+    padding: 0.9vh 0;
+    border-bottom: 1px solid var(--p-borde);
+
+    &:last-child { border-bottom: none; }
+  }
+
+  .marca {
+    width: 1.6vw;
+    height: 1.6vw;
+    flex-shrink: 0;
+    border: 1px solid var(--p-borde);
+  }
+
+  .marca-puerta   { background: var(--p-navy); border-color: var(--p-navy); }
+  .marca-servicio { background: #e8f0fe; }
+  .marca-comida   { background: #fde8ea; }
+  .marca-lounge   { background: #e6f4ea; }
+
+  .leyenda-texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  .leyenda-nombre {
+    font-size: 1vw;
+    font-weight: 600;
+    color: var(--p-texto);
+  }
+
+  .leyenda-en {
+    font-family: var(--p-mono);
+    font-size: 0.7vw;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-apagado);
+  }
+
+  .leyenda-ubicacion {
+    font-family: var(--p-mono);
+    font-size: 0.8vw;
+    font-weight: 700;
+    color: var(--p-navy);
+    white-space: nowrap;
+  }
+}
+
+.servicios {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  // Las líneas entre celdas se hacen con el hueco de la rejilla sobre el fondo.
+  gap: 1px;
+  background: var(--p-borde);
+
+  li {
+    background: var(--p-fondo);
+    padding: 1vh 1vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .servicio-nombre {
+    font-size: 1vw;
+    font-weight: 600;
+    color: var(--p-navy-oscuro);
+  }
+
+  .servicio-en {
+    font-family: var(--p-mono);
+    font-size: 0.7vw;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-apagado);
+  }
+}

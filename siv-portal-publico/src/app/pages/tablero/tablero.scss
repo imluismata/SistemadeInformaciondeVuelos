@@ -1,0 +1,145 @@
+.tablero {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.aviso-conexion {
+  margin: 0 0 1.2vh;
+  padding: 0.8vh 1vw;
+  text-align: center;
+  background: #fff4d6;
+  border: 1px solid #e0b84a;
+  font-family: var(--p-mono);
+  font-size: 0.9vw;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a5600;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  thead th {
+    text-align: left;
+    padding: 1.1vh 0.8vw;
+    background: var(--p-navy);
+    color: #fff;
+    font-family: var(--p-mono);
+    font-size: 0.85vw;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+
+    // La traducción va debajo del rótulo, más pequeña.
+    span {
+      display: block;
+      font-size: 0.68vw;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      opacity: 0.7;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--p-borde);
+
+    // Franjas alternas: ayudan a seguir la fila con la vista desde lejos.
+    &:nth-child(even) { background: var(--p-panel); }
+  }
+
+  tbody td {
+    padding: 1.15vh 0.8vw;
+    font-size: 1.5vw;
+    font-weight: 600;
+    color: var(--p-texto);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-hora      { width: 12%; font-family: var(--p-mono); font-variant-numeric: tabular-nums; }
+  .col-vuelo     { width: 12%; font-family: var(--p-mono); color: var(--p-navy); letter-spacing: 0.02em; }
+  .col-aerolinea { width: 18%; font-size: 1.2vw; font-weight: 500; color: var(--p-apagado); }
+  .col-ciudad    { width: 26%; }
+
+  // El logo entra completo en la celda: alto generoso y que se encoja a lo ancho
+  // si hace falta. Importante NO poner display:flex aquí: una celda que deja de
+  // ser table-cell se sale del reparto de columnas y el logo queda diminuto.
+  tbody td.col-aerolinea {
+    --logo-alto: 4.6vh;
+    vertical-align: middle;
+  }
+
+  // El código IATA acompaña a la ciudad, más pequeño y en rojo, como en las
+  // pantallas reales: "MIAMI MIA".
+  .ciudad-codigo {
+    margin-left: 0.5vw;
+    font-family: var(--p-mono);
+    font-size: 0.75em;
+    font-weight: 700;
+    color: var(--p-rojo);
+  }
+  .col-embarque  { width: 11%; font-family: var(--p-mono); font-variant-numeric: tabular-nums; color: var(--p-apagado); }
+  .col-puerta    { width: 9%; }
+  .col-estado    { width: 15%; }
+}
+
+// ── Horas ────────────────────────────────────────────────────────────────
+.hora-sola {
+  color: var(--p-navy-oscuro);
+}
+
+.hora-vieja {
+  display: block;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: var(--p-apagado);
+  text-decoration: line-through;
+  line-height: 1.1;
+}
+
+.hora-nueva {
+  display: block;
+  color: var(--p-rojo);
+  line-height: 1.15;
+}
+
+// ── Puerta ───────────────────────────────────────────────────────────────
+.puerta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2vw;
+  padding: 0.35vh 0.5vw;
+  border: 2px solid var(--p-navy);
+  font-family: var(--p-mono);
+  font-weight: 700;
+  color: var(--p-navy);
+}
+
+.puerta-vacia {
+  color: var(--p-borde);
+}
+
+.vacio {
+  margin: auto;
+  text-align: center;
+  font-size: 1.8vw;
+  font-weight: 600;
+  color: var(--p-apagado);
+
+  span {
+    display: block;
+    font-family: var(--p-mono);
+    font-size: 1vw;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 0.6vh;
+  }
+}

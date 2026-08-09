@@ -1,0 +1,60 @@
+<app-pantalla-marco titulo="E-Ticket" tituloEn="Migration form">
+  <div class="eticket">
+
+    <section class="instrucciones">
+      <p class="etiqueta">Aviso oficial · Official notice</p>
+
+      <h2 class="titular">
+        Llena tu <span class="resalte">E-Ticket</span> aquí
+        <span class="titular-en">Complete your E-Ticket here</span>
+      </h2>
+
+      <p class="gratis">
+        Es <strong>gratis</strong> <span class="gratis-en">— It's free of charge</span>
+      </p>
+
+      <ol class="pasos">
+        @for (paso of pasos; track paso.numero) {
+          <li class="paso">
+            <span class="paso-numero">{{ paso.numero }}</span>
+            <span class="paso-texto">
+              <span class="paso-titulo">{{ paso.titulo }}</span>
+              <span class="paso-titulo-en">{{ paso.tituloEn }}</span>
+              <span class="paso-detalle">{{ paso.detalle }}</span>
+            </span>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <section class="codigo">
+      <!-- Marco con esquinas, como el visor de un escáner. El QR se sirve desde
+           public/; si aún no está, se ve la dirección escrita, que es lo que la
+           persona necesita de todos modos. -->
+      <div class="codigo-marco">
+        <span class="esquina arriba-izq"></span>
+        <span class="esquina arriba-der"></span>
+        <span class="esquina abajo-izq"></span>
+        <span class="esquina abajo-der"></span>
+
+        @if (qrDisponible()) {
+          <img
+            src="eticket-qr.png"
+            alt="Código QR del E-Ticket"
+            class="codigo-qr"
+            (error)="qrDisponible.set(false)"
+          >
+        } @else {
+          <p class="codigo-ausente">
+            Entra desde tu teléfono a
+            <span class="codigo-ausente-url">{{ url }}</span>
+          </p>
+        }
+      </div>
+
+      <p class="codigo-url">{{ url }}</p>
+      <p class="codigo-nota">Escanea con la cámara · Scan with your camera</p>
+    </section>
+
+  </div>
+</app-pantalla-marco>

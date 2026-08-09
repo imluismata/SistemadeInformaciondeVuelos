@@ -1,0 +1,102 @@
+.page-header {
+  padding: 2rem 2rem 1rem;
+  h1 { font-size: 1.6rem; font-weight: 700; color: var(--heading); margin: 0 0 0.3rem; }
+  p  { color: var(--text-muted); margin: 0; font-size: 0.9rem; }
+}
+
+.contenido {
+  padding: 0 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.grupo-titulo {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--gray-border);
+  padding-bottom: 0.5rem;
+}
+
+.grupo-nota {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tarjetas {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--white);
+  border-radius: 8px;
+  border-left: 4px solid var(--navy);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  text-decoration: none;
+
+  &:hover {
+    border-left-color: var(--red);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .tarjeta-titulo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--heading);
+  }
+
+  .tarjeta-desc {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+  }
+
+  .tarjeta-ruta {
+    margin-top: 0.35rem;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--red);
+  }
+}
+
+.puertas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.puerta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  padding: 0.7rem 1rem;
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 4px;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-decoration: none;
+
+  &:hover { background: var(--navy); color: #fff; }
+}
+
+.estado-msg {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}

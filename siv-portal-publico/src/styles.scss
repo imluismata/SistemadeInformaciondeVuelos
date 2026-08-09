@@ -26,6 +26,25 @@
   color-scheme: dark;
 }
 
+// ── Pantallas de aeropuerto (tablero, embarque, señalización, directorio) ──
+// Tienen paleta propia, tomada del diseño: fondo blanco, azul marino y rojo de
+// marca, con monoespaciada para los datos (es lo que da el aire de pantalla de
+// terminal). Van aparte de las variables del portal a propósito: que alguien
+// ponga el sitio en modo oscuro no debe cambiar una pantalla colgada en el
+// aeropuerto.
+.pantalla {
+  --p-navy: #002d62;
+  --p-navy-oscuro: #00193c;
+  --p-rojo: #c40220;
+  --p-fondo: #ffffff;
+  --p-panel: #f4f6f9;
+  --p-panel-alt: #eef1f6;
+  --p-borde: #c4c6d1;
+  --p-texto: #1a1b1f;
+  --p-apagado: #5a6478;
+  --p-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
 * {
   box-sizing: border-box;
 }

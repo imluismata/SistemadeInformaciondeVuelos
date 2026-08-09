@@ -1,0 +1,148 @@
+// Ocupa la ventana entera: estas pantallas no se navegan ni se hace scroll en
+// ellas, así que todo tiene que caber. Las medidas van en vw/vh para que se vea
+// igual en un monitor de 24" que en uno de 55".
+.marco {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--p-fondo);
+  color: var(--p-texto);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.marco-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2vw;
+  padding: 1.4vh 2vw;
+  border-bottom: 3px solid var(--p-navy);
+  background: var(--p-fondo);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+
+  .marca-logo {
+    height: 7vh;
+    width: auto;
+    display: block;
+  }
+
+  .marca-texto {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .marca-aeropuerto {
+    font-family: var(--p-mono);
+    font-size: 1.25vw;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--p-navy);
+    text-transform: uppercase;
+  }
+
+  .marca-ciudad {
+    font-size: 0.8vw;
+    color: var(--p-apagado);
+    letter-spacing: 0.06em;
+  }
+}
+
+.marco-titulo {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7vw;
+
+  .titulo-es {
+    font-family: var(--p-mono);
+    font-size: 2.6vw;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--p-navy-oscuro);
+  }
+
+  .titulo-en {
+    font-family: var(--p-mono);
+    font-size: 1.1vw;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--p-apagado);
+  }
+}
+
+.marco-reloj {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .reloj-hora {
+    font-family: var(--p-mono);
+    // Tabular: los dígitos no bailan al pasar los segundos.
+    font-variant-numeric: tabular-nums;
+    font-size: 2.2vw;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--p-navy);
+  }
+
+  .reloj-fecha {
+    font-family: var(--p-mono);
+    font-size: 0.8vw;
+    color: var(--p-apagado);
+    letter-spacing: 0.08em;
+    margin-top: 0.4vh;
+  }
+}
+
+.marco-cuerpo {
+  flex: 1;
+  min-height: 0; // sin esto el contenido desborda el flex en vez de encogerse
+  padding: 2vh 2vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.marco-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2vw;
+  padding: 0.9vh 2vw;
+  background: var(--p-rojo);
+  color: #fff;
+
+  .aviso-seguridad {
+    margin: 0;
+    font-family: var(--p-mono);
+    font-size: 0.85vw;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .aviso-en {
+    display: block;
+    font-weight: 500;
+    font-size: 0.7vw;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+  }
+
+  .pie-marca {
+    margin: 0;
+    font-size: 0.75vw;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+    white-space: nowrap;
+  }
+}

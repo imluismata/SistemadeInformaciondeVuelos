@@ -1,0 +1,246 @@
+.embarque {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.6vw;
+}
+
+.etiqueta {
+  margin: 0 0 0.6vh;
+  font-family: var(--p-mono);
+  font-size: 0.85vw;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--p-apagado);
+}
+
+// ── Columna principal ────────────────────────────────────────────────────
+.principal {
+  display: grid;
+  grid-template-rows: 1.2fr 1fr 1fr;
+  gap: 1.6vh;
+  min-height: 0;
+}
+
+.bloque-puerta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--p-navy);
+  background: var(--p-panel);
+
+  .puerta-numero {
+    margin: 0;
+    font-family: var(--p-mono);
+    font-size: 13vh;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--p-navy);
+  }
+}
+
+.bloque-destino {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5vh 1.5vw;
+  border: 2px solid var(--p-borde);
+
+  .destino-nombre {
+    margin: 0;
+    font-size: 4vw;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--p-navy-oscuro);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .destino-codigo {
+    font-family: var(--p-mono);
+    font-size: 0.5em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--p-rojo);
+    vertical-align: super;
+  }
+}
+
+.bloque-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6vw;
+  min-height: 0;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5vh 1.5vw;
+  border: 2px solid var(--p-borde);
+
+  .dato-valor {
+    margin: 0;
+    font-family: var(--p-mono);
+    font-size: 3vw;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--p-navy-oscuro);
+
+    &.apagado { color: var(--p-borde); font-size: 2vw; }
+  }
+
+  .dato-nota {
+    margin: 0.6vh 0 0;
+    font-size: 1vw;
+    color: var(--p-apagado);
+  }
+
+  // El logo sustituye al nombre escrito de la aerolínea: ya lo lleva dentro.
+  .dato-logo {
+    margin-top: 1vh;
+    --logo-alto: 3.5vh;
+    max-width: 100%;
+  }
+}
+
+.sin-vuelo {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--p-borde);
+
+  .sin-vuelo-texto {
+    margin: 0;
+    font-size: 2.4vw;
+    font-weight: 700;
+    color: var(--p-apagado);
+  }
+
+  .sin-vuelo-en {
+    margin: 0.6vh 0 0;
+    font-family: var(--p-mono);
+    font-size: 1vw;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--p-borde);
+  }
+}
+
+// ── Columna lateral ──────────────────────────────────────────────────────
+.lateral {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 1.6vh;
+  min-height: 0;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5vh 1.4vw;
+  border: 2px solid var(--p-borde);
+  background: var(--p-fondo);
+
+  .dato-valor {
+    margin: 0;
+    font-family: var(--p-mono);
+    font-size: 2vw;
+    font-weight: 700;
+    color: var(--p-navy-oscuro);
+
+    &.apagado { color: var(--p-borde); font-size: 1.3vw; }
+  }
+}
+
+.tarjeta-estado {
+  background: var(--p-panel);
+  border-color: var(--p-navy);
+}
+
+// ── Cuenta atrás ─────────────────────────────────────────────────────────
+.cuenta {
+  display: flex;
+  align-items: center;
+  gap: 0.6vw;
+
+  .cuenta-caja {
+    flex: 1;
+    text-align: center;
+    padding: 1vh 0;
+    background: var(--p-navy);
+    color: #fff;
+    font-family: var(--p-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 3.4vw;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .cuenta-sep {
+    font-family: var(--p-mono);
+    font-size: 2.4vw;
+    font-weight: 700;
+    color: var(--p-navy);
+  }
+}
+
+.cuenta-unidades {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.6vh 0 0;
+  padding: 0 1.5vw;
+  font-family: var(--p-mono);
+  font-size: 0.72vw;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-apagado);
+}
+
+// ── Clima ────────────────────────────────────────────────────────────────
+.clima {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+
+.clima-icono {
+  width: 6vh;
+  height: 6vh;
+  flex-shrink: 0;
+
+  .sol   { fill: #f0b429; }
+  .rayos rect { fill: #f0b429; }
+  .nube  { fill: #cdd6e4; }
+  .gotas rect { fill: #6fa8e8; }
+}
+
+.clima-texto {
+  min-width: 0;
+
+  .clima-temp {
+    margin: 0;
+    font-family: var(--p-mono);
+    font-size: 2.2vw;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--p-navy-oscuro);
+  }
+
+  .clima-desc {
+    margin: 0.5vh 0 0;
+    font-size: 0.95vw;
+    color: var(--p-apagado);
+  }
+}

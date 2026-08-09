@@ -1,0 +1,82 @@
+<app-pantalla-marco titulo="Directorio" tituloEn="Terminal directory">
+  <div class="directorio">
+
+    <section class="plano">
+      <header class="panel-cabecera">
+        <span class="panel-titulo">Terminal A · Nivel 2</span>
+        <span class="panel-nota">Salidas y servicios · Departures &amp; services</span>
+      </header>
+
+      <div class="plano-lienzo">
+        <svg viewBox="0 0 700 320" class="plano-svg" role="img"
+             aria-label="Plano esquemático de la Terminal A">
+          <!-- Cuerpo del edificio -->
+          <rect x="40" y="90" width="620" height="140" class="edificio" />
+
+          <!-- Pasillo central -->
+          <rect x="40" y="145" width="620" height="30" class="pasillo" />
+          <text x="350" y="165" class="etiqueta-pasillo">PASILLO PRINCIPAL · MAIN CONCOURSE</text>
+
+          <!-- Puertas de embarque, arriba del pasillo -->
+          @for (p of puertas; track p.nombre) {
+            <g>
+              <rect [attr.x]="p.x" y="98" width="60" height="38" class="puerta" />
+              <text [attr.x]="p.x + 30" y="123" class="puerta-texto">{{ p.nombre }}</text>
+            </g>
+          }
+
+          <!-- Servicios, debajo del pasillo -->
+          <rect x="90" y="184" width="150" height="38" class="zona zona-comida" />
+          <text x="165" y="208" class="zona-texto">COMIDAS · FOOD</text>
+
+          <rect x="270" y="184" width="120" height="38" class="zona zona-servicio" />
+          <text x="330" y="208" class="zona-texto">SANITARIOS</text>
+
+          <rect x="420" y="184" width="230" height="38" class="zona zona-lounge" />
+          <text x="535" y="208" class="zona-texto">SALAS VIP · LOUNGES</text>
+
+          <!-- Punto donde está la pantalla -->
+          <circle cx="350" cy="262" r="12" class="aqui" />
+          <text x="350" y="292" class="aqui-texto">USTED ESTÁ AQUÍ · YOU ARE HERE</text>
+        </svg>
+      </div>
+    </section>
+
+    <aside class="lateral">
+      <section class="panel">
+        <header class="panel-cabecera">
+          <span class="panel-titulo">Leyenda</span>
+          <span class="panel-nota">Legend</span>
+        </header>
+        <ul class="leyenda">
+          @for (l of leyenda; track l.nombre) {
+            <li>
+              <span [class]="'marca marca-' + l.marca"></span>
+              <span class="leyenda-texto">
+                <span class="leyenda-nombre">{{ l.nombre }}</span>
+                <span class="leyenda-en">{{ l.nombreEn }}</span>
+              </span>
+              <span class="leyenda-ubicacion">{{ l.ubicacion }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="panel">
+        <header class="panel-cabecera">
+          <span class="panel-titulo">Servicios</span>
+          <span class="panel-nota">Quick services</span>
+        </header>
+        <ul class="servicios">
+          @for (s of servicios; track s.nombre) {
+            <li>
+              <span class="servicio-nombre">{{ s.nombre }}</span>
+              <span class="servicio-en">{{ s.nombreEn }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    </aside>
+
+  </div>
+</app-pantalla-marco>
