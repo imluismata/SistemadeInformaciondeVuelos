@@ -85,6 +85,17 @@
   }
 }
 
+.ayuda {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+
+  // Rojo mientras falta, verde cuando ya cumple: el usuario ve el progreso sin
+  // tener que pulsar nada.
+  &.ayuda-falta { color: var(--red); }
+  &.ayuda-ok    { color: #1a7a4a; }
+}
+
 .error {
   color: var(--red);
   font-size: 0.85rem;
