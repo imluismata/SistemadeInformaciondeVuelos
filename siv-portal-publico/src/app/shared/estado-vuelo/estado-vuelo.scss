@@ -1,0 +1,54 @@
+// El badge base (colores, forma) vive en styles.scss; aquí solo se apila el
+// rótulo en inglés debajo del español.
+.badge.badge-estado {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  padding: 0.25rem 0.7rem;
+}
+
+// Cada idioma ocupa su propia línea entera: sin esto, en una columna estrecha
+// "EN VUELO" se parte en dos renglones y el badge queda hecho una bola.
+.estado-es,
+.estado-en {
+  white-space: nowrap;
+}
+
+.estado-en {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+// Variante para las pantallas del aeropuerto: fondo claro, rótulo rectangular
+// (no píldora) y el código de color del diseño — azul marino para lo normal,
+// rojo para lo que exige atención, gris para lo que ya pasó.
+.badge.badge-estado.pantalla {
+  align-items: flex-start;
+  border-radius: 0;
+  padding: 0.5vh 0.7vw;
+  font-family: var(--p-mono);
+  font-size: 0.95vw;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+
+  .estado-en {
+    font-size: 0.7em;
+    letter-spacing: 0.14em;
+    opacity: 0.75;
+  }
+
+  // A tiempo y embarcando llevan bloque de color: son los dos estados que el
+  // pasajero busca de lejos.
+  &.on-time  { background: var(--p-navy); color: #fff; }
+  &.boarding { background: var(--p-rojo); color: #fff; }
+
+  // El resto van sin bloque, para que el tablero no parezca un semáforo.
+  &.delayed   { background: none; padding-left: 0; color: var(--p-rojo); font-weight: 700; }
+  &.arrived   { background: var(--p-panel-alt); color: var(--p-navy); }
+  &.departed,
+  &.cancelled,
+  &.default   { background: none; padding-left: 0; color: var(--p-apagado); }
+}
