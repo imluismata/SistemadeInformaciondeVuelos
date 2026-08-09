@@ -1,5 +1,7 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth';
+import { DispositivoService } from './dispositivo';
 import { NotificacionesService } from './notificaciones';
 import { Notificacion } from '../models/notificacion.model';
 
@@ -7,13 +9,19 @@ const INTERVALO_MS = 15000;   // cada cuánto se consulta a la API
 const AUTO_CIERRE_MS = 9000;  // cuánto dura visible cada pop-up
 
 /**
- * Sondea la API periódicamente en busca de notificaciones nuevas para el
- * usuario autenticado. Cuando detecta una que no había visto, la muestra como
- * pop-up (toast) y reproduce un sonido de alerta.
+ * Sondea la API periódicamente en busca de notificaciones nuevas. Cuando
+ * detecta una que no había visto, la muestra como pop-up (toast) y reproduce
+ * un sonido de alerta.
+ *
+ * Sirve a los dos tipos de visitante: si hay sesión, pregunta por las del
+ * usuario; si no, por las del id de este navegador (solo cuando ese id ya
+ * existe, es decir, cuando la persona ha seguido algún vuelo). Lo único que
+ * cambia es de dónde salen los datos; el resto del comportamiento es idéntico.
  */
 @Injectable({ providedIn: 'root' })
 export class NotificacionesPollingService {
   private readonly auth = inject(AuthService);
+  private readonly dispositivo = inject(DispositivoService);
   private readonly notificaciones = inject(NotificacionesService);
 
   /** Toasts visibles en pantalla en este momento. */
@@ -24,20 +32,32 @@ export class NotificacionesPollingService {
   private primeraPasada = true;
 
   constructor() {
-    // Arranca/detiene el sondeo según el estado de sesión.
+    // Arranca/detiene el sondeo según haya sesión o id de dispositivo.
     effect(() => {
+      // Las consultas van marcadas como de fondo: si la API falla, el usuario
+      // no debe acabar en la página de error por un sondeo que no pidió.
       const usuario = this.auth.usuarioActual();
-      if (usuario) this.iniciar(usuario.id);
-      else this.detener();
+      if (usuario) {
+        this.iniciar(() => this.notificaciones.obtenerPorUsuario(usuario.id, true));
+        return;
+      }
+
+      const dispositivoId = this.dispositivo.id();
+      if (dispositivoId) {
+        this.iniciar(() => this.notificaciones.obtenerPorDispositivo(dispositivoId, true));
+        return;
+      }
+
+      this.detener();
     });
   }
 
-  private iniciar(usuarioId: string): void {
+  private iniciar(fuente: () => Observable<Notificacion[]>): void {
     this.detener();
     this.primeraPasada = true;
     this.vistas.clear();
-    this.sondear(usuarioId);
-    this.timer = setInterval(() => this.sondear(usuarioId), INTERVALO_MS);
+    this.sondear(fuente);
+    this.timer = setInterval(() => this.sondear(fuente), INTERVALO_MS);
   }
 
   private detener(): void {
@@ -45,8 +65,8 @@ export class NotificacionesPollingService {
     this.toasts.set([]);
   }
 
-  private sondear(usuarioId: string): void {
-    this.notificaciones.obtenerPorUsuario(usuarioId).subscribe({
+  private sondear(fuente: () => Observable<Notificacion[]>): void {
+    fuente().subscribe({
       next: (todas) => {
         const noLeidas = todas.filter((n) => n.leidaEn === null);
         const nuevas = noLeidas.filter((n) => !this.vistas.has(n.id));
