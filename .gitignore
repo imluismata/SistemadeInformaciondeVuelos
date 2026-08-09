@@ -46,6 +46,9 @@ CLAUDE.md
 CLAUDE.md
 " .claude:commands:/"
 
+# Configuración local de herramientas, no del proyecto
+.claude/launch.json
+
 # Diseños de referencia (Stitch), no son código
 SIV.Intranet/diseno.html
 
