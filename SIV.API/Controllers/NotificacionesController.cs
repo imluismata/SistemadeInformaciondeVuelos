@@ -45,9 +45,15 @@ public class NotificacionesController : ControllerBase
     }
 
     // marca una notificacion como leida
+    // RNF-SEG-03: solo se puede marcar la propia. Sin esta comprobación, cualquier
+    // usuario con sesión podía marcar como leída la notificación de otro conociendo
+    // su id, que es el mismo IDOR que ya se cerró en las consultas.
     [HttpPatch("{id:guid}/leida")]
     public async Task<IActionResult> MarcarComoLeida(Guid id)
     {
+        if (!User.EsAdministrador() && !await EsSuyaAsync(id, User.ObtenerUsuarioId()))
+            return Forbid();
+
         await _servicio.MarcarComoLeidaAsync(id);
         return NoContent();
     }
@@ -74,10 +80,7 @@ public class NotificacionesController : ControllerBase
         if (!await EsDispositivoAnonimoAsync(request.DispositivoId))
             return Forbid();
 
-        // Sin esta comprobación, cualquiera podría marcar como leída una
-        // notificación ajena pasando su propio id de dispositivo.
-        var propias = await _servicio.ObtenerNotificacionesAsync(request.DispositivoId);
-        if (!propias.Any(n => n.Id == id))
+        if (!await EsSuyaAsync(id, request.DispositivoId))
             return Forbid();
 
         await _servicio.MarcarComoLeidaAsync(id);
@@ -93,6 +96,21 @@ public class NotificacionesController : ControllerBase
         if (id == Guid.Empty) return false;
         var contactos = await _usuarios.ObtenerContactosAsync([id]);
         return contactos.Count == 0;
+    }
+
+    /// <summary>
+    /// Comprueba que la notificación pertenezca a quien la está tocando. Vale
+    /// igual para el usuario con cuenta y para el visitante anónimo, porque para
+    /// el módulo de Notificaciones el destinatario es un id y punto.
+    /// </summary>
+    private async Task<bool> EsSuyaAsync(Guid notificacionId, Guid? propietarioId)
+    {
+        // Sin identidad no hay propiedad que comprobar: se niega.
+        if (propietarioId is not { } id || id == Guid.Empty) return false;
+        var propietario = id;
+
+        var propias = await _servicio.ObtenerNotificacionesAsync(propietario);
+        return propias.Any(n => n.Id == notificacionId);
     }
 }
 
