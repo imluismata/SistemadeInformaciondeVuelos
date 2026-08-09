@@ -1,0 +1,17 @@
+@if (hayImagen() && clave()) {
+  <!-- Los logos son marcas denominativas: ya llevan el nombre dentro, así que
+       repetirlo al lado sería decir dos veces lo mismo y robarle ancho al logo. -->
+  <img
+    [src]="ruta()"
+    [alt]="nombre() || clave()"
+    class="logo-img"
+    (error)="alFallar()"
+  >
+} @else {
+  <span class="logo-respaldo">
+    <span class="logo-codigo" [style.background]="color()">{{ clave() || '—' }}</span>
+    @if (nombre()) {
+      <span class="logo-nombre">{{ nombre() }}</span>
+    }
+  </span>
+}

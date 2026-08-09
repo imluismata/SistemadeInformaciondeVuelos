@@ -4,22 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { VuelosService } from '../../core/services/vuelos';
 import { VueloPublico } from '../../core/models/vuelo.model';
+import { ESTADOS_VUELO, etiquetaEstado } from '../../core/estados-vuelo';
+import { EstadoVuelo } from '../../shared/estado-vuelo/estado-vuelo';
+import { LogoAerolinea } from '../../shared/logo-aerolinea/logo-aerolinea';
 
 type Vista = 'todos' | 'salidas' | 'llegadas';
 
-export const ESTADOS: { valor: string; etiqueta: string }[] = [
-  { valor: 'Programado', etiqueta: 'Programado' },
-  { valor: 'Retrasado',  etiqueta: 'Retrasado' },
-  { valor: 'Embarcando', etiqueta: 'Embarcando' },
-  { valor: 'EnVuelo',    etiqueta: 'En vuelo' },
-  { valor: 'Aterrizado', etiqueta: 'Aterrizado' },
-  { valor: 'Completado', etiqueta: 'Completado' },
-  { valor: 'Cancelado',  etiqueta: 'Cancelado' },
-];
+// Los chips filtran por el estado real del dominio, pero se rotulan igual que
+// el badge (así el que filtra por "A tiempo" ve vuelos con badge "A tiempo").
+export const ESTADOS = ESTADOS_VUELO.map((valor) => ({
+  valor,
+  etiqueta: etiquetaEstado(valor).es,
+}));
 
 @Component({
   selector: 'app-buscar-vuelos',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, EstadoVuelo, LogoAerolinea],
   templateUrl: './buscar-vuelos.html',
   styleUrl: './buscar-vuelos.scss',
 })
@@ -37,7 +37,17 @@ export class BuscarVuelos implements OnInit {
   readonly vuelosFiltrados = computed(() => {
     const estado = this.estadoFiltro();
     const lista = this.vuelos();
-    return estado ? lista.filter((v) => v.estado === estado) : lista;
+    const filtrados = estado ? lista.filter((v) => v.estado === estado) : lista;
+
+    // Siempre por hora, el más temprano primero, como cualquier tablero de
+    // aeropuerto. En las llegadas manda la hora de llegada, no la de salida:
+    // al pasajero que espera a alguien le importa cuándo aterriza.
+    // La API ya los devuelve ordenados, pero se ordena también aquí para que el
+    // orden no dependa del endpoint que se haya usado (búsqueda, filtro...).
+    const porHora = (v: VueloPublico) =>
+      +new Date(this.vista() === 'llegadas' ? v.horarioLlegada : v.horarioSalida);
+
+    return [...filtrados].sort((a, b) => porHora(a) - porHora(b));
   });
 
   numero = '';
@@ -100,14 +110,5 @@ export class BuscarVuelos implements OnInit {
       next: (vuelos) => { this.vuelos.set(vuelos); this.cargando.set(false); },
       error: () => { this.error.set('No se pudo realizar la búsqueda.'); this.cargando.set(false); },
     });
-  }
-
-  getBadgeClass(estado: string): string {
-    const map: Record<string, string> = {
-      'Programado': 'on-time', 'EnVuelo': 'boarding', 'Aterrizado': 'arrived',
-      'Retrasado': 'delayed', 'Cancelado': 'cancelled', 'Embarcando': 'boarding',
-      'Completado': 'departed',
-    };
-    return map[estado] ?? 'default';
   }
 }

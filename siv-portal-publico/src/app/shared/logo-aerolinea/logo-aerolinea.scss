@@ -1,0 +1,58 @@
+// El componente se adapta al hueco que le dé quien lo usa: nunca se sale ni se
+// recorta. El alto lo marca la variable --logo-alto, que cada pantalla ajusta.
+:host {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.logo-img {
+  // El logo entero, sin recortes: se encoge para caber, no se desborda.
+  max-width: 100%;
+  max-height: var(--logo-alto, 2.2em);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+
+  // En tema oscuro los logos con letras azul marino se perderían contra el
+  // fondo, así que se les pone una base blanca, como en la señalética real.
+  :host-context([data-theme='oscuro']) & {
+    background: #fff;
+    padding: 0.15em 0.3em;
+    border-radius: 3px;
+  }
+}
+
+// Respaldo mientras una aerolínea no tenga su archivo: el código en su color de
+// marca y, al lado, el nombre — porque aquí sí hace falta escribirlo.
+.logo-respaldo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+}
+
+.logo-codigo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 2.2em;
+  padding: 0.15em 0.4em;
+  border-radius: 0.15em;
+  color: #fff;
+  font-family: var(--p-mono, ui-monospace, Consolas, monospace);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+}
+
+.logo-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

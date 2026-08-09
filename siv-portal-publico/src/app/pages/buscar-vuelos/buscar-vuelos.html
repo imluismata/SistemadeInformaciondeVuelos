@@ -63,13 +63,15 @@
         @for (vuelo of vuelosFiltrados(); track vuelo.id) {
           <tr>
             <td class="num-vuelo">{{ vuelo.numero }}</td>
-            <td>{{ vuelo.aerolinea }}</td>
+            <td class="celda-aerolinea">
+              <app-logo-aerolinea [codigo]="vuelo.aerolineaCodigo" [nombre]="vuelo.aerolinea" />
+            </td>
             <td>{{ vuelo.origen }}</td>
             <td>{{ vuelo.destino }}</td>
             <td>{{ vuelo.horarioSalida | date: 'dd/MM HH:mm' }}</td>
             <td>{{ vuelo.horarioLlegada | date: 'dd/MM HH:mm' }}</td>
             <td>{{ vuelo.puerta || '—' }}</td>
-            <td><span [class]="'badge ' + getBadgeClass(vuelo.estado)">{{ vuelo.estado }}</span></td>
+            <td><app-estado-vuelo [estado]="vuelo.estado" /></td>
             <td><a [routerLink]="['/vuelos', vuelo.id]" class="link-detalle">Detalle</a></td>
           </tr>
         }
