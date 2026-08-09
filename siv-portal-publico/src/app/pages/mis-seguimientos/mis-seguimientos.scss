@@ -49,7 +49,14 @@
   padding: 0.6rem 0;
   border-top: 1px solid var(--gray-border);
 
-  .notif-cuerpo { flex: 1; }
+  .notif-cuerpo {
+    flex: 1;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover .notif-ir { text-decoration: underline; }
+  }
 
   .notif-msg {
     margin: 0;
@@ -61,6 +68,14 @@
   .notif-fecha {
     font-size: 0.75rem;
     color: var(--text-muted);
+  }
+
+  .notif-ir {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--red);
   }
 
   .notif-cerrar {

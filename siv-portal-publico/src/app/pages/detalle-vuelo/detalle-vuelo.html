@@ -1,5 +1,15 @@
 <div class="detalle-wrap">
 
+  @if (mensajeCambio(); as cambio) {
+    <div class="aviso-cambio" role="status">
+      <span class="aviso-cambio-icono">🔔</span>
+      <div>
+        <p class="aviso-cambio-titulo">Esto fue lo que cambió</p>
+        <p class="aviso-cambio-msg">{{ cambio }}</p>
+      </div>
+    </div>
+  }
+
   @if (cargando()) {
     <div class="estado-msg">Cargando vuelo...</div>
   }
@@ -14,9 +24,13 @@
         <div>
           <p class="num-vuelo-tag">Vuelo {{ v.numero }}</p>
           <p class="ruta">{{ v.origen }} → {{ v.destino }}</p>
-          <h1>{{ v.aerolinea }}</h1>
+          <!-- El logo hace de título: lleva el nombre de la aerolínea dentro.
+               El h1 sigue existiendo para lectores de pantalla y buscadores. -->
+          <h1 class="aerolinea-titulo">
+            <app-logo-aerolinea [codigo]="v.aerolineaCodigo" [nombre]="v.aerolinea" />
+          </h1>
         </div>
-        <span [class]="'badge ' + getBadge(v.estado)">{{ v.estado }}</span>
+        <app-estado-vuelo [estado]="v.estado" />
       </div>
 
       <dl class="info-grid">
@@ -30,17 +44,23 @@
         <dd>{{ v.puerta || '—' }}</dd>
 
         <dt>Estado</dt>
-        <dd>{{ v.estado }}</dd>
+        <dd>{{ etiqueta().es }} <span class="estado-en-linea">/ {{ etiqueta().en }}</span></dd>
       </dl>
 
       <div class="detalle-acciones">
-        @if (auth.estaAutenticado()) {
-          <button type="button" class="btn-seguir" (click)="seguirVuelo()">
-            Seguir este vuelo
-          </button>
-        } @else {
+        <!-- Seguir ya no exige cuenta: sin sesión se usa el id de este navegador. -->
+        <button
+          type="button"
+          [class]="siguiendo() ? 'btn-seguir siguiendo' : 'btn-seguir'"
+          (click)="alternarSeguimiento()"
+        >
+          {{ siguiendo() ? 'Dejar de seguir' : 'Seguir este vuelo' }}
+        </button>
+
+        @if (!auth.estaAutenticado()) {
           <p class="aviso">
-            <a routerLink="/login">Inicia sesión</a> para seguir este vuelo y recibir notificaciones.
+            Sin cuenta te avisamos aquí, en esta página y en este navegador.
+            <a routerLink="/registro">Crea una cuenta</a> si además quieres los avisos por correo.
           </p>
         }
 

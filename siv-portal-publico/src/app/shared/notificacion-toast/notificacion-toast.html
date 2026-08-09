@@ -2,11 +2,19 @@
   @for (t of polling.toasts(); track t.id) {
     <div class="toast" role="alert">
       <div class="toast-icon">🔔</div>
-      <div class="toast-cuerpo">
+      <!-- Todo el cuerpo es el enlace: el pasajero hace clic en la notificación y
+           cae en el vuelo que cambió. El mensaje viaja en el state para que el
+           detalle pueda resaltar qué fue lo que pasó. -->
+      <a
+        class="toast-cuerpo"
+        [routerLink]="['/vuelos', t.vueloId]"
+        [state]="{ mensajeCambio: t.mensaje }"
+        (click)="polling.descartar(t.id)"
+      >
         <p class="toast-titulo">Cambio en tu vuelo</p>
         <p class="toast-msg">{{ t.mensaje }}</p>
-        <a routerLink="/mis-seguimientos" class="toast-link" (click)="polling.descartar(t.id)">Ver mis seguimientos →</a>
-      </div>
+        <span class="toast-link">Ver el vuelo →</span>
+      </a>
       <button type="button" class="toast-cerrar" (click)="polling.descartar(t.id)" aria-label="Cerrar">✕</button>
     </div>
   }

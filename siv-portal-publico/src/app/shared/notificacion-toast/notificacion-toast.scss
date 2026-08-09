@@ -28,6 +28,9 @@
 
 .toast-cuerpo {
   flex: 1;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
 
   .toast-titulo {
     margin: 0 0 0.2rem;
@@ -48,8 +51,9 @@
     font-weight: 600;
     color: var(--red);
     text-decoration: none;
-    &:hover { text-decoration: underline; }
   }
+
+  &:hover .toast-link { text-decoration: underline; }
 }
 
 .toast-cerrar {
