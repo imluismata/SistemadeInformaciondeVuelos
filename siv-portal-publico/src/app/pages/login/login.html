@@ -10,6 +10,9 @@
     @if (restablecida()) {
       <p class="aviso-ok">✓ Tu contraseña fue restablecida. Inicia sesión con la nueva.</p>
     }
+    @if (expirada()) {
+      <p class="aviso-sesion">Tu sesión expiró por seguridad. Vuelve a iniciar sesión.</p>
+    }
 
     <form class="formulario" (ngSubmit)="iniciarSesion()">
       <label>
