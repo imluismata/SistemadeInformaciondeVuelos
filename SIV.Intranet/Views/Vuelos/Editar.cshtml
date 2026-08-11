@@ -61,9 +61,10 @@
                 <span asp-validation-for="HorarioLlegada" class="text-xs text-secondary"></span>
             </div>
             <div>
-                <label asp-for="Puerta" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
-                <input asp-for="Puerta" placeholder="Ej. B12"
-                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                <label asp-for="PuertaId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <select asp-for="PuertaId" asp-items="Model.Puertas"
+                        class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                </select>
             </div>
         </div>
 

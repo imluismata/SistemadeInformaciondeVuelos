@@ -1,0 +1,362 @@
+@{
+    ViewData["Title"] = "Importar vuelos";
+    ViewData["Subtitulo"] = "Carga masiva desde CSV o Excel";
+}
+
+<a asp-action="Registrar" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary">
+    <span class="material-symbols-outlined text-base">arrow_back</span> Volver a nuevo vuelo
+</a>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant">
+        <h3 class="text-lg font-bold text-primary">Importar vuelos desde archivo</h3>
+        <p class="text-sm text-on-surface-variant mt-1">
+            Sube un <strong>.csv</strong> o <strong>.xlsx</strong>. La previsualización es
+            <strong>editable</strong>: corrige en la grilla, o usa el <span class="material-symbols-outlined text-sm align-middle">settings</span>
+            para abrir el formulario completo con esa fila precargada. Luego revalida e importa.
+        </p>
+    </div>
+
+    <div class="p-6 space-y-5">
+        @Html.AntiForgeryToken()
+
+        <div class="bg-surface-container-low border border-outline-variant rounded-lg p-4 text-sm text-on-surface-variant">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <span>
+                    Columnas: <span class="font-mono">numero, aerolinea, origen, destino, salida, llegada, puerta</span>.
+                    Aerolínea/aeropuertos/puerta por <strong>código</strong> (QF, SDQ, MIA, B5). Fecha: <span class="font-mono">2026-09-01 10:00</span>. La puerta es opcional.
+                </span>
+                <a asp-action="PlantillaImportacion" class="inline-flex items-center gap-1 text-primary hover:underline whitespace-nowrap">
+                    <span class="material-symbols-outlined text-base">download</span> Descargar plantilla
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <input type="file" id="archivo" accept=".csv,.xlsx"
+                   class="block text-sm text-on-surface file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-primary-container file:text-on-primary-container file:font-semibold hover:file:opacity-90" />
+            <button id="btn-previsualizar" type="button"
+                    class="bg-primary text-on-primary rounded-lg px-6 py-2.5 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                Previsualizar
+            </button>
+        </div>
+
+        <div id="mensaje" class="hidden text-sm rounded-lg px-4 py-3"></div>
+        <div id="resumen" class="hidden text-sm text-on-surface-variant"></div>
+
+        <div id="tabla-resultado" class="hidden overflow-x-auto border border-outline-variant rounded-lg">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="bg-surface-container-low border-b border-outline-variant">
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">#</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider"></th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Número</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Aerolínea</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Origen</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Destino</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Salida</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Llegada</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Puerta</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Estado</th>
+                        <th class="px-2 py-2.5 text-xs text-on-surface-variant uppercase tracking-wider">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody id="filas" class="divide-y divide-outline-variant"></tbody>
+            </table>
+        </div>
+
+        <div id="acciones" class="hidden flex flex-wrap gap-3 pt-2">
+            <button id="btn-validar" type="button"
+                    class="border border-outline text-on-surface rounded-lg px-6 py-2.5 font-semibold hover:bg-surface-container transition-colors disabled:opacity-50">
+                Validar cambios
+            </button>
+            <button id="btn-importar" type="button"
+                    class="bg-secondary text-white rounded-lg px-6 py-2.5 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                Importar válidas
+            </button>
+        </div>
+    </div>
+</div>
+
+@* ---------- Modal: formulario de vuelo con la fila precargada ---------- *@
+<div id="modal-editar" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl w-full max-w-2xl">
+        <div class="p-5 border-b border-outline-variant flex justify-between items-center">
+            <h3 class="text-lg font-bold text-primary">Editar vuelo · fila <span id="m-linea" class="font-mono"></span></h3>
+            <button id="m-cerrar" type="button" class="text-on-surface-variant hover:text-primary text-2xl leading-none">&times;</button>
+        </div>
+        <div class="p-5 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">Número de vuelo</label>
+                <input id="m-numero" placeholder="Ej. AA 949"
+                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">Aerolínea</label>
+                <select id="m-aerolinea" class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none"></select>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Origen</label>
+                    <select id="m-origen" class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Destino</label>
+                    <select id="m-destino" class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none"></select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Salida</label>
+                    <input id="m-salida" type="datetime-local" class="w-full rounded-lg border border-outline-variant px-3 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Llegada</label>
+                    <input id="m-llegada" type="datetime-local" class="w-full rounded-lg border border-outline-variant px-3 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Puerta</label>
+                    <select id="m-puerta" class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none"></select>
+                </div>
+            </div>
+        </div>
+        <div class="p-5 border-t border-outline-variant flex gap-3 justify-end">
+            <button id="m-cancelar" type="button" class="border border-outline text-on-surface rounded-lg px-5 py-2.5 font-semibold hover:bg-surface-container transition-colors">Cancelar</button>
+            <button id="m-guardar" type="button" class="bg-primary text-on-primary rounded-lg px-5 py-2.5 font-semibold hover:opacity-90 transition-opacity">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    const CAT = {
+        aerolineas: @Html.Raw(ViewBag.Aerolineas ?? "[]"),
+        aeropuertos: @Html.Raw(ViewBag.Aeropuertos ?? "[]"),
+        puertas: @Html.Raw(ViewBag.Puertas ?? "[]")
+    };
+
+    const inputArchivo = document.getElementById('archivo');
+    const btnPrev = document.getElementById('btn-previsualizar');
+    const btnVal = document.getElementById('btn-validar');
+    const btnImp = document.getElementById('btn-importar');
+    const acciones = document.getElementById('acciones');
+    const msg = document.getElementById('mensaje');
+    const resumen = document.getElementById('resumen');
+    const tabla = document.getElementById('tabla-resultado');
+    const cuerpo = document.getElementById('filas');
+    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+    const CAMPOS = ['numero', 'aerolinea', 'origen', 'destino', 'salida', 'llegada', 'puerta'];
+    const ANCHOS = { numero: 'w-24', aerolinea: 'w-20', origen: 'w-20', destino: 'w-20', salida: 'w-40', llegada: 'w-40', puerta: 'w-24' };
+
+    function mostrarMensaje(texto, tipo) {
+        msg.textContent = texto;
+        msg.className = 'text-sm rounded-lg px-4 py-3 ' +
+            (tipo === 'error' ? 'bg-red-50 border border-red-200 text-secondary'
+                              : 'bg-green-50 border border-green-200 text-green-700');
+        msg.classList.remove('hidden');
+    }
+    function ocultarMensaje() { msg.classList.add('hidden'); }
+
+    function celdaInput(valor, campo) {
+        const esc = (valor ?? '').replace(/"/g, '&quot;');
+        return '<td class="px-2 py-1.5"><input data-campo="' + campo + '" value="' + esc + '" ' +
+               'class="' + ANCHOS[campo] + ' rounded border border-outline-variant px-2 py-1 outline-none focus:ring-2 focus:ring-primary-container font-mono text-xs" /></td>';
+    }
+
+    function pintar(filasResultado, importado) {
+        cuerpo.innerHTML = '';
+        for (const r of filasResultado) {
+            const f = r.fila;
+            const tr = document.createElement('tr');
+            tr.className = 'data-row';
+            tr.dataset.linea = f.linea;
+
+            const estado = r.valido
+                ? '<span class="status-pill bg-green-100 text-green-700">' + (importado ? 'Importado' : 'Válido') + '</span>'
+                : '<span class="status-pill bg-red-100 text-red-700">Con error</span>';
+            const detalle = (r.errores && r.errores.length)
+                ? '<span class="text-secondary text-xs">' + r.errores.map(e => e.replace(/</g, '&lt;')).join(' ') + '</span>'
+                : '<span class="text-on-surface-variant">—</span>';
+            const engranaje = '<td class="px-2 py-1.5"><button type="button" class="btn-editar text-on-surface-variant hover:text-primary" ' +
+                'title="Editar en formulario"><span class="material-symbols-outlined text-lg">settings</span></button></td>';
+
+            tr.innerHTML =
+                '<td class="px-2 py-1.5 font-mono text-on-surface-variant">' + f.linea + '</td>' +
+                engranaje +
+                CAMPOS.map(c => celdaInput(f[c], c)).join('') +
+                '<td class="px-2 py-1.5 whitespace-nowrap">' + estado + '</td>' +
+                '<td class="px-2 py-1.5">' + detalle + '</td>';
+            cuerpo.appendChild(tr);
+        }
+        tabla.classList.remove('hidden');
+        acciones.classList.remove('hidden');
+    }
+
+    function recolectar() {
+        return Array.from(cuerpo.querySelectorAll('tr')).map(tr => {
+            const fila = { linea: parseInt(tr.dataset.linea, 10) };
+            tr.querySelectorAll('input[data-campo]').forEach(i => {
+                fila[i.dataset.campo] = i.value.trim() === '' ? null : i.value.trim();
+            });
+            return fila;
+        });
+    }
+
+    function actualizarResumen(resultado, importado) {
+        resumen.classList.remove('hidden');
+        resumen.textContent = importado
+            ? resultado.total + ' fila(s) · ' + resultado.importadas + ' importada(s) · ' +
+              (resultado.total - resultado.importadas) + ' pendiente(s).'
+            : resultado.total + ' fila(s) · ' + resultado.validas + ' válida(s) · ' +
+              (resultado.total - resultado.validas) + ' con error.';
+    }
+
+    async function postArchivo() {
+        const archivo = inputArchivo.files[0];
+        if (!archivo) { mostrarMensaje('Selecciona un archivo primero.', 'error'); return null; }
+        const datos = new FormData();
+        datos.append('archivo', archivo);
+        datos.append('__RequestVerificationToken', token);
+        const resp = await fetch('@Url.Action("PrevisualizarImportacion")', { method: 'POST', body: datos });
+        return resp.ok ? resp.json() : null;
+    }
+    async function postFilas(url, filas) {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+            body: JSON.stringify(filas)
+        });
+        return resp.ok ? resp.json() : null;
+    }
+
+    // Revalida el lote actual (tras editar en grilla o en el modal) y repinta.
+    async function revalidar() {
+        const r = await postFilas('@Url.Action("ValidarImportacion")', recolectar());
+        if (!r || !r.exito) { mostrarMensaje('No se pudo validar.', 'error'); return; }
+        pintar(r.resultado.filas, false);
+        actualizarResumen(r.resultado, false);
+    }
+
+    btnPrev.addEventListener('click', async function () {
+        ocultarMensaje(); resumen.classList.add('hidden'); tabla.classList.add('hidden'); acciones.classList.add('hidden');
+        btnPrev.disabled = true;
+        try {
+            const r = await postArchivo();
+            if (!r) { mostrarMensaje('No se pudo leer el archivo. ¿Es un .csv o .xlsx válido?', 'error'); return; }
+            if (!r.exito) { mostrarMensaje(r.error || 'El archivo no se pudo leer.', 'error'); return; }
+            pintar(r.resultado.filas, false);
+            actualizarResumen(r.resultado, false);
+        } finally { btnPrev.disabled = false; }
+    });
+
+    btnVal.addEventListener('click', async function () {
+        ocultarMensaje(); btnVal.disabled = true;
+        try {
+            await revalidar();
+            mostrarMensaje('Filas revalidadas.', 'ok');
+        } finally { btnVal.disabled = false; }
+    });
+
+    btnImp.addEventListener('click', async function () {
+        if (!confirm('¿Importar las filas válidas?')) return;
+        btnImp.disabled = true;
+        try {
+            const r = await postFilas('@Url.Action("ImportarFilas")', recolectar());
+            if (!r || !r.exito) { mostrarMensaje('La importación falló.', 'error'); return; }
+            const pendientes = r.resultado.filas.filter(f => !f.valido);
+            actualizarResumen(r.resultado, true);
+            if (pendientes.length === 0) {
+                cuerpo.innerHTML = ''; tabla.classList.add('hidden'); acciones.classList.add('hidden');
+                mostrarMensaje('¡Listo! ' + r.resultado.importadas + ' vuelo(s) importado(s).', 'ok');
+            } else {
+                pintar(pendientes, false);
+                mostrarMensaje(r.resultado.importadas + ' importado(s). Quedan ' + pendientes.length +
+                               ' con error: corrígelas y vuelve a importar.', 'error');
+            }
+        } finally { btnImp.disabled = false; }
+    });
+
+    // ---------- Modal (editor por fila) ----------
+    const modal = document.getElementById('modal-editar');
+    const mLinea = document.getElementById('m-linea');
+    const mNumero = document.getElementById('m-numero');
+    const mAerolinea = document.getElementById('m-aerolinea');
+    const mOrigen = document.getElementById('m-origen');
+    const mDestino = document.getElementById('m-destino');
+    const mSalida = document.getElementById('m-salida');
+    const mLlegada = document.getElementById('m-llegada');
+    const mPuerta = document.getElementById('m-puerta');
+    let filaEnEdicion = null;
+
+    function opciones(lista, placeholder) {
+        return '<option value="">' + placeholder + '</option>' +
+            lista.map(o => '<option value="' + o.codigo.replace(/"/g, '&quot;') + '">' + o.etiqueta + '</option>').join('');
+    }
+    mAerolinea.innerHTML = opciones(CAT.aerolineas, '— Selecciona una aerolínea —');
+    mOrigen.innerHTML = opciones(CAT.aeropuertos, '— Origen —');
+    mDestino.innerHTML = opciones(CAT.aeropuertos, '— Destino —');
+    mPuerta.innerHTML = opciones(CAT.puertas, '— Por asignar —');
+
+    // Selecciona un valor; si el código no existe en el catálogo, agrega una opción marcada
+    // para que el usuario vea el valor del archivo y lo corrija.
+    function ponerValor(select, valor) {
+        select.querySelectorAll('option.invalida').forEach(o => o.remove());
+        if (valor && !Array.from(select.options).some(o => o.value === valor)) {
+            const op = document.createElement('option');
+            op.value = valor; op.textContent = '⚠ ' + valor + ' (no está en el catálogo)';
+            op.className = 'invalida';
+            select.insertBefore(op, select.options[1] || null);
+        }
+        select.value = valor || '';
+    }
+    // "2026-10-02 08:00" -> "2026-10-02T08:00" (para datetime-local); vacío si no cuadra.
+    function aInput(v) {
+        const m = (v || '').match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
+        return m ? m[1] + 'T' + m[2] : '';
+    }
+    function aTexto(v) { return v ? v.replace('T', ' ') : ''; }
+
+    function abrirModal(tr) {
+        filaEnEdicion = tr;
+        const val = c => tr.querySelector('input[data-campo=' + c + ']').value;
+        mLinea.textContent = tr.dataset.linea;
+        mNumero.value = val('numero');
+        ponerValor(mAerolinea, val('aerolinea'));
+        ponerValor(mOrigen, val('origen'));
+        ponerValor(mDestino, val('destino'));
+        ponerValor(mPuerta, val('puerta'));
+        mSalida.value = aInput(val('salida'));
+        mLlegada.value = aInput(val('llegada'));
+        modal.classList.remove('hidden');
+    }
+    function cerrarModal() { modal.classList.add('hidden'); filaEnEdicion = null; }
+
+    // Delegación: clic en cualquier engranaje de la grilla.
+    cuerpo.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-editar');
+        if (btn) abrirModal(btn.closest('tr'));
+    });
+
+    document.getElementById('m-cerrar').addEventListener('click', cerrarModal);
+    document.getElementById('m-cancelar').addEventListener('click', cerrarModal);
+    modal.addEventListener('click', e => { if (e.target === modal) cerrarModal(); });
+
+    document.getElementById('m-guardar').addEventListener('click', async function () {
+        if (!filaEnEdicion) return;
+        const set = (c, v) => filaEnEdicion.querySelector('input[data-campo=' + c + ']').value = v;
+        set('numero', mNumero.value.trim());
+        set('aerolinea', mAerolinea.value.trim());
+        set('origen', mOrigen.value.trim());
+        set('destino', mDestino.value.trim());
+        set('salida', aTexto(mSalida.value));
+        set('llegada', aTexto(mLlegada.value));
+        set('puerta', mPuerta.value.trim());
+        cerrarModal();
+        ocultarMensaje();
+        await revalidar(); // refleja el estado de la fila editada al instante
+    });
+})();
+</script>
+}

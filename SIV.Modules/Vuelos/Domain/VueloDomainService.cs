@@ -24,7 +24,8 @@ internal sealed class VueloDomainService : IVueloDomainService
         Guid aeropuertoDestinoId,
         DateTime horarioSalida,
         DateTime horarioLlegada,
-        string? puerta = null)
+        Guid? puertaId = null,
+        string? puertaDescripcion = null)
     {
         if (string.IsNullOrWhiteSpace(numero))
             throw new ArgumentException("El número de vuelo es obligatorio.", nameof(numero));
@@ -49,7 +50,8 @@ internal sealed class VueloDomainService : IVueloDomainService
         vuelo.AeropuertoDestinoId = aeropuertoDestinoId;
         vuelo.HorarioSalida = horarioSalida;
         vuelo.HorarioLlegada = horarioLlegada;
-        vuelo.Puerta = string.IsNullOrWhiteSpace(puerta) ? null : puerta.Trim();
+        vuelo.PuertaId = puertaId;
+        vuelo.PuertaDescripcion = puertaDescripcion;
         vuelo.EstadoActual = EstadoVuelo.Programado;
         vuelo.CreadoEn = DateTime.UtcNow;
 
@@ -95,18 +97,17 @@ internal sealed class VueloDomainService : IVueloDomainService
         AjustarTiempo(vuelo, TipoCambioOperativo.Adelanto, adelanto, motivo, moverHaciaAdelante: false);
     }
 
-    public void RegistrarCambioDePuerta(Vuelo vuelo, string nuevaPuerta, string motivo)
+    public void RegistrarCambioDePuerta(Vuelo vuelo, Guid? nuevaPuertaId, string? nuevaPuertaDescripcion, string motivo)
     {
         ValidarMotivo(motivo);
         AsegurarEstadoOperativo(vuelo);
 
-        if (string.IsNullOrWhiteSpace(nuevaPuerta))
-            throw new ArgumentException("La nueva puerta es obligatoria.", nameof(nuevaPuerta));
+        var anterior = vuelo.PuertaDescripcion ?? "(sin asignar)";
+        vuelo.PuertaId = nuevaPuertaId;
+        vuelo.PuertaDescripcion = nuevaPuertaDescripcion;
+        var nueva = nuevaPuertaDescripcion ?? "(sin asignar)";
 
-        var anterior = vuelo.Puerta ?? "(sin asignar)";
-        vuelo.Puerta = nuevaPuerta.Trim();
-
-        vuelo.AgregarCambioOperativo(CrearCambio(vuelo.Id, TipoCambioOperativo.CambioDePuerta, motivo, anterior, vuelo.Puerta));
+        vuelo.AgregarCambioOperativo(CrearCambio(vuelo.Id, TipoCambioOperativo.CambioDePuerta, motivo, anterior, nueva));
     }
 
     public void Cancelar(Vuelo vuelo, string motivo)
@@ -127,7 +128,8 @@ internal sealed class VueloDomainService : IVueloDomainService
         Guid aeropuertoDestinoId,
         DateTime horarioSalida,
         DateTime horarioLlegada,
-        string? puerta,
+        Guid? puertaId,
+        string? puertaDescripcion,
         string motivo)
     {
         if (aerolineaId == Guid.Empty)
@@ -144,16 +146,17 @@ internal sealed class VueloDomainService : IVueloDomainService
 
         ValidarMotivo(motivo);
 
-        var valorAnterior = $"Aerolinea={vuelo.AerolineaId};Origen={vuelo.AeropuertoOrigenId};Destino={vuelo.AeropuertoDestinoId};Salida={vuelo.HorarioSalida:o};Llegada={vuelo.HorarioLlegada:o};Puerta={vuelo.Puerta ?? "(sin asignar)"}";
+        var valorAnterior = $"Aerolinea={vuelo.AerolineaId};Origen={vuelo.AeropuertoOrigenId};Destino={vuelo.AeropuertoDestinoId};Salida={vuelo.HorarioSalida:o};Llegada={vuelo.HorarioLlegada:o};Puerta={vuelo.PuertaDescripcion ?? "(sin asignar)"}";
 
         vuelo.AerolineaId = aerolineaId;
         vuelo.AeropuertoOrigenId = aeropuertoOrigenId;
         vuelo.AeropuertoDestinoId = aeropuertoDestinoId;
         vuelo.HorarioSalida = horarioSalida;
         vuelo.HorarioLlegada = horarioLlegada;
-        vuelo.Puerta = string.IsNullOrWhiteSpace(puerta) ? null : puerta.Trim();
+        vuelo.PuertaId = puertaId;
+        vuelo.PuertaDescripcion = puertaDescripcion;
 
-        var valorNuevo = $"Aerolinea={vuelo.AerolineaId};Origen={vuelo.AeropuertoOrigenId};Destino={vuelo.AeropuertoDestinoId};Salida={vuelo.HorarioSalida:o};Llegada={vuelo.HorarioLlegada:o};Puerta={vuelo.Puerta ?? "(sin asignar)"}";
+        var valorNuevo = $"Aerolinea={vuelo.AerolineaId};Origen={vuelo.AeropuertoOrigenId};Destino={vuelo.AeropuertoDestinoId};Salida={vuelo.HorarioSalida:o};Llegada={vuelo.HorarioLlegada:o};Puerta={vuelo.PuertaDescripcion ?? "(sin asignar)"}";
 
         vuelo.AgregarCambioOperativo(CrearCambio(vuelo.Id, TipoCambioOperativo.ActualizacionDatos, motivo, valorAnterior, valorNuevo));
     }

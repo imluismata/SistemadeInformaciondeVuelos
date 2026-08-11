@@ -152,3 +152,158 @@
         </table>
     }
 </div>
+
+<!-- Terminales -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Terminales</h3>
+            <p class="text-sm text-on-surface-variant">@Model.Terminales.Count registrada(s)</p>
+        </div>
+        @if (esAdmin)
+        {
+            <a asp-action="Terminal" class="flex items-center gap-1 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm hover:opacity-90 transition-all">
+                <span class="material-symbols-outlined text-sm">add</span> Nueva terminal
+            </a>
+        }
+    </div>
+
+    @if (!Model.Terminales.Any())
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay terminales registradas.</div>
+    }
+    else
+    {
+        <table class="w-full text-center border-collapse">
+            <thead>
+                <tr class="bg-surface-container-low border-b border-outline-variant">
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Nombre</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
+                    @if (esAdmin)
+                    {
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                @foreach (var t in Model.Terminales)
+                {
+                    <tr class="data-row">
+                        <td class="px-6 py-3.5 font-mono font-semibold">@t.Codigo</td>
+                        <td class="px-6 py-3.5">@t.Nombre</td>
+                        <td class="px-6 py-3.5">
+                            <span class="status-pill @(t.Activa ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
+                                @(t.Activa ? "Activa" : "Inactiva")
+                            </span>
+                        </td>
+                        @if (esAdmin)
+                        {
+                            <td class="px-6 py-3.5">
+                                <a asp-action="Terminal" asp-route-id="@t.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
+                                @if (t.Activa)
+                                {
+                                    <form asp-action="DesactivarTerminal" method="post" class="inline"
+                                          onsubmit="return confirm('¿Desactivar la terminal @t.Codigo?');">
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="ReactivarTerminal" method="post" class="inline"
+                                          onsubmit="return confirm('¿Reactivar la terminal @t.Codigo?');">
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="text-green-700 hover:underline text-sm">Activar</button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- Puertas -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Puertas</h3>
+            <p class="text-sm text-on-surface-variant">@Model.Puertas.Count registrada(s)</p>
+        </div>
+        @if (esAdmin)
+        {
+            <a asp-action="Puerta" class="flex items-center gap-1 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm hover:opacity-90 transition-all">
+                <span class="material-symbols-outlined text-sm">add</span> Nueva puerta
+            </a>
+        }
+    </div>
+
+    @if (!Model.Puertas.Any())
+    {
+        <div class="p-8 text-center text-on-surface-variant">No hay puertas registradas.</div>
+    }
+    else
+    {
+        <table class="w-full text-center border-collapse">
+            <thead>
+                <tr class="bg-surface-container-low border-b border-outline-variant">
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Código</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Terminal</th>
+                    <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
+                    @if (esAdmin)
+                    {
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-center">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                @foreach (var p in Model.Puertas.OrderBy(x => x.TerminalNombre ?? "￿").ThenBy(x => x.Codigo))
+                {
+                    <tr class="data-row">
+                        <td class="px-6 py-3.5 font-mono font-semibold">@p.Codigo</td>
+                        <td class="px-6 py-3.5">
+                            @if (p.EsRampa)
+                            {
+                                <span class="status-pill bg-amber-100 text-amber-700">Rampa abierta</span>
+                            }
+                            else
+                            {
+                                @p.TerminalNombre
+                            }
+                        </td>
+                        <td class="px-6 py-3.5">
+                            <span class="status-pill @(p.Activa ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600")">
+                                @(p.Activa ? "Activa" : "Inactiva")
+                            </span>
+                        </td>
+                        @if (esAdmin)
+                        {
+                            <td class="px-6 py-3.5">
+                                <a asp-action="Puerta" asp-route-id="@p.Id" class="text-primary hover:underline text-sm mr-3">Editar</a>
+                                @if (p.Activa)
+                                {
+                                    <form asp-action="DesactivarPuerta" method="post" class="inline"
+                                          onsubmit="return confirm('¿Desactivar la puerta @p.Codigo?');">
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        <button type="submit" class="text-secondary hover:underline text-sm">Desactivar</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="ReactivarPuerta" method="post" class="inline"
+                                          onsubmit="return confirm('¿Reactivar la puerta @p.Codigo?');">
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        <button type="submit" class="text-green-700 hover:underline text-sm">Activar</button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

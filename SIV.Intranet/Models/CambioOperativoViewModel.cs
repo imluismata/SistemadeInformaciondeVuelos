@@ -21,7 +21,7 @@ public sealed class CambioOperativoViewModel
     public string? Duracion { get; set; }
 
     [Display(Name = "Nueva puerta")]
-    public string? NuevaPuerta { get; set; }
+    public Guid? NuevaPuertaId { get; set; }
 
     public static IReadOnlyList<string> TiposDisponibles { get; } =
         ["Retraso", "Adelanto", "CambioDePuerta", "Cancelacion"];

@@ -12,3 +12,12 @@ public sealed record ActualizarAeropuertoCommand(string Codigo, string Nombre, s
 
 public sealed record DesactivarAeropuertoCommand();
 
+public sealed record RegistrarTerminalCommand(string Codigo, string Nombre, Guid AeropuertoId);
+
+public sealed record ActualizarTerminalCommand(string Codigo, string Nombre);
+
+// TerminalId nulo = puerta remota (rampa abierta).
+public sealed record RegistrarPuertaCommand(string Codigo, Guid? TerminalId);
+
+public sealed record ActualizarPuertaCommand(string Codigo, Guid? TerminalId);
+

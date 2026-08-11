@@ -12,7 +12,9 @@ public sealed record ResultadoLogin(string Token, UsuarioLogin Usuario);
 
 public sealed record UsuarioLogin(Guid Id, string Nombre, string Email, string Rol);
 
-// Elemento de GET /api/vuelos
+// Elemento de GET /api/vuelos. 'Puerta' es la descripción ya resuelta
+// ("A5 · Terminal A"); 'PuertaId' es la referencia para preseleccionar en los
+// formularios.
 public sealed record VueloApi(
     Guid Id,
     string Numero,
@@ -21,6 +23,7 @@ public sealed record VueloApi(
     Guid AeropuertoDestinoId,
     DateTime HorarioSalida,
     DateTime HorarioLlegada,
+    Guid? PuertaId,
     string? Puerta,
     string EstadoActual);
 
@@ -33,6 +36,7 @@ public sealed record VueloDetalleApi(
     Guid AeropuertoDestinoId,
     DateTime HorarioSalida,
     DateTime HorarioLlegada,
+    Guid? PuertaId,
     string? Puerta,
     string EstadoActual,
     IReadOnlyList<HistorialEstadoApi> HistorialEstados,
@@ -56,3 +60,23 @@ public sealed record CambioOperativoApi(
 public sealed record AerolineaApi(Guid Id, string Codigo, string Nombre, bool Activa);
 
 public sealed record AeropuertoApi(Guid Id, string Codigo, string Nombre, string Pais, bool Activo);
+
+// Fila de importación (todos los campos como texto): se muestra y edita en la previsualización.
+public sealed record FilaVueloApi(
+    int Linea, string? Numero, string? Aerolinea, string? Origen, string? Destino,
+    string? Salida, string? Llegada, string? Puerta);
+
+// Resultado por fila: la fila + si está apta + errores.
+public sealed record FilaImportacionApi(FilaVueloApi Fila, bool Valido, IReadOnlyList<string> Errores);
+
+public sealed record ImportacionResultadoApi(int Total, int Validas, int Importadas, IReadOnlyList<FilaImportacionApi> Filas);
+
+// Envoltura de la intranet: éxito/error del llamado + el resultado si hubo.
+public sealed record ImportacionRespuesta(bool Exito, string? Error, ImportacionResultadoApi? Resultado);
+
+// GET /api/catalogo/terminales y /puertas
+public sealed record TerminalApi(Guid Id, string Codigo, string Nombre, Guid AeropuertoId, bool Activa);
+
+// 'TerminalNombre' viene resuelto; es nulo cuando la puerta es una rampa abierta
+// (EsRampa == true).
+public sealed record PuertaApi(Guid Id, string Codigo, Guid? TerminalId, string? TerminalNombre, bool EsRampa, bool Activa);

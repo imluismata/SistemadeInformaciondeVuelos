@@ -42,6 +42,7 @@ public sealed class CuentaController : Controller
         // (este último para reenviarlo a la API en cada petición).
         var claims = new List<Claim>
         {
+            new(ClaimTypes.NameIdentifier, resultado.Usuario.Id.ToString()),
             new(ClaimTypes.Name, resultado.Usuario.Nombre),
             new(ClaimTypes.Role, resultado.Usuario.Rol),
             new(TokenHandler.ClaimToken, resultado.Token)

@@ -77,6 +77,13 @@ internal sealed class VueloRepository(SivDbContext db) : IVueloRepository
             (v.AeropuertoOrigenId == aeropuertoId || v.AeropuertoDestinoId == aeropuertoId)
             && !EstadosFinales.Contains(v.EstadoActual));
 
+    public async Task<IReadOnlyList<Vuelo>> ObtenerActivosPorPuertaAsync(Guid puertaId, Guid? excluirVueloId)
+        => await db.Vuelos
+            .Where(v => v.PuertaId == puertaId
+                     && !EstadosFinales.Contains(v.EstadoActual)
+                     && (excluirVueloId == null || v.Id != excluirVueloId))
+            .ToListAsync();
+
     public async Task GuardarAsync(Vuelo vuelo)
     {
         var existe = await db.Vuelos.AnyAsync(v => v.Id == vuelo.Id);

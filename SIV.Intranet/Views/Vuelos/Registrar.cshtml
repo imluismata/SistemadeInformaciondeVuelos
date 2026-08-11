@@ -5,9 +5,16 @@
 }
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden max-w-3xl">
-    <div class="p-6 border-b border-outline-variant">
-        <h3 class="text-lg font-bold text-primary">Datos del vuelo</h3>
-        <p class="text-sm text-on-surface-variant">El vuelo se registra en estado <strong>Programado</strong>.</p>
+    <div class="p-6 border-b border-outline-variant flex justify-between items-start gap-4 flex-wrap">
+        <div>
+            <h3 class="text-lg font-bold text-primary">Datos del vuelo</h3>
+            <p class="text-sm text-on-surface-variant">El vuelo se registra en estado <strong>Programado</strong>.</p>
+        </div>
+        @* Alternativa a la carga manual: importar varios vuelos de una vez. *@
+        <a asp-action="Importar"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors text-sm whitespace-nowrap">
+            <span class="material-symbols-outlined text-base">upload_file</span> Importar desde CSV/Excel
+        </a>
     </div>
 
     <form asp-action="Registrar" method="post" class="p-6 space-y-5">
@@ -62,9 +69,10 @@
                 <span asp-validation-for="HorarioLlegada" class="text-xs text-secondary"></span>
             </div>
             <div>
-                <label asp-for="Puerta" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
-                <input asp-for="Puerta" placeholder="Ej. B12"
-                       class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none" />
+                <label asp-for="PuertaId" class="block text-sm font-medium text-on-surface-variant mb-1"></label>
+                <select asp-for="PuertaId" asp-items="Model.Puertas"
+                        class="w-full rounded-lg border border-outline-variant px-4 py-2.5 focus:ring-2 focus:ring-primary-container outline-none">
+                </select>
             </div>
         </div>
 

@@ -29,6 +29,8 @@ public static class DependencyInjection
 
         services.AddScoped<IVueloRepository, VueloRepository>();
         services.AddScoped<ICatalogoRepository, CatalogoRepository>();
+        // Lector de archivos de importación de vuelos (CSV/Excel), puerto del módulo Vuelos.
+        services.AddScoped<Modules.Vuelos.Application.ILectorVuelosImportados, Importacion.LectorVuelosImportados>();
         services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
 
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();

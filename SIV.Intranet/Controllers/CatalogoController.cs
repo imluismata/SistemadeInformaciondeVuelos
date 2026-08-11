@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SIV.Intranet.Models;
 using SIV.Intranet.Services;
 
@@ -29,7 +30,9 @@ public sealed class CatalogoController : Controller
         var modelo = new CatalogoViewModel
         {
             Aerolineas = await _catalogo.ObtenerAerolineasAsync(),
-            Aeropuertos = await _catalogo.ObtenerAeropuertosAsync()
+            Aeropuertos = await _catalogo.ObtenerAeropuertosAsync(),
+            Terminales = await _catalogo.ObtenerTerminalesAsync(),
+            Puertas = await _catalogo.ObtenerPuertasAsync()
         };
 
         return View(modelo);
@@ -161,6 +164,155 @@ public sealed class CatalogoController : Controller
         MostrarResultado(resultado, "Aeropuerto reactivado.");
         return RedirectToAction(nameof(Index));
     }
+
+    // ---------- Terminales ----------
+
+    [HttpGet]
+    [Authorize(Roles = RolAdmin)]
+    public async Task<IActionResult> Terminal(Guid? id)
+    {
+        var aeropuertos = await OpcionesAeropuertosAsync();
+
+        if (id is null)
+            return View(new TerminalViewModel { Aeropuertos = aeropuertos });
+
+        var existente = (await _catalogo.ObtenerTerminalesAsync()).FirstOrDefault(t => t.Id == id);
+        if (existente is null)
+            return NotFound();
+
+        return View(new TerminalViewModel
+        {
+            Id = existente.Id,
+            Codigo = existente.Codigo,
+            Nombre = existente.Nombre,
+            AeropuertoId = existente.AeropuertoId,
+            Aeropuertos = aeropuertos
+        });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Terminal(TerminalViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            modelo.Aeropuertos = await OpcionesAeropuertosAsync();
+            return View(modelo);
+        }
+
+        var resultado = await _catalogo.GuardarTerminalAsync(modelo);
+        if (!resultado.Exito)
+        {
+            ModelState.AddModelError(string.Empty, resultado.Error!);
+            modelo.Aeropuertos = await OpcionesAeropuertosAsync();
+            return View(modelo);
+        }
+
+        TempData["Exito"] = modelo.EsEdicion
+            ? $"Terminal {modelo.Codigo} actualizada."
+            : $"Terminal {modelo.Codigo} registrada.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DesactivarTerminal(Guid id)
+    {
+        MostrarResultado(await _catalogo.DesactivarTerminalAsync(id), "Terminal desactivada.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReactivarTerminal(Guid id)
+    {
+        MostrarResultado(await _catalogo.ReactivarTerminalAsync(id), "Terminal reactivada.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ---------- Puertas ----------
+
+    [HttpGet]
+    [Authorize(Roles = RolAdmin)]
+    public async Task<IActionResult> Puerta(Guid? id)
+    {
+        var terminales = await OpcionesTerminalesAsync();
+
+        if (id is null)
+            return View(new PuertaViewModel { Terminales = terminales });
+
+        var existente = (await _catalogo.ObtenerPuertasAsync()).FirstOrDefault(p => p.Id == id);
+        if (existente is null)
+            return NotFound();
+
+        return View(new PuertaViewModel
+        {
+            Id = existente.Id,
+            Codigo = existente.Codigo,
+            TerminalId = existente.TerminalId,
+            Terminales = terminales
+        });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Puerta(PuertaViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            modelo.Terminales = await OpcionesTerminalesAsync();
+            return View(modelo);
+        }
+
+        var resultado = await _catalogo.GuardarPuertaAsync(modelo);
+        if (!resultado.Exito)
+        {
+            ModelState.AddModelError(string.Empty, resultado.Error!);
+            modelo.Terminales = await OpcionesTerminalesAsync();
+            return View(modelo);
+        }
+
+        TempData["Exito"] = modelo.EsEdicion
+            ? $"Puerta {modelo.Codigo} actualizada."
+            : $"Puerta {modelo.Codigo} registrada.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DesactivarPuerta(Guid id)
+    {
+        MostrarResultado(await _catalogo.DesactivarPuertaAsync(id), "Puerta desactivada.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RolAdmin)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReactivarPuerta(Guid id)
+    {
+        MostrarResultado(await _catalogo.ReactivarPuertaAsync(id), "Puerta reactivada.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    // Aeropuertos activos para el desplegable del formulario de terminal.
+    private async Task<IEnumerable<SelectListItem>> OpcionesAeropuertosAsync()
+        => (await _catalogo.ObtenerAeropuertosAsync())
+            .Where(a => a.Activo)
+            .Select(a => new SelectListItem($"{a.Codigo} — {a.Nombre}", a.Id.ToString()));
+
+    // Terminales activas para el desplegable del formulario de puerta.
+    private async Task<IEnumerable<SelectListItem>> OpcionesTerminalesAsync()
+        => (await _catalogo.ObtenerTerminalesAsync())
+            .Where(t => t.Activa)
+            .Select(t => new SelectListItem(t.Nombre, t.Id.ToString()));
 
     private void MostrarResultado(ResultadoOperacion resultado, string mensajeExito)
     {

@@ -9,7 +9,7 @@ public sealed record RegistrarVueloCommand(
     Guid AeropuertoDestinoId,
     DateTime HorarioSalida,
     DateTime HorarioLlegada,
-    string? Puerta = null);
+    Guid? PuertaId = null);
 
 public sealed record ActualizarEstadoVueloCommand(EstadoVuelo EstadoNuevo);
 
@@ -17,7 +17,7 @@ public sealed record RegistrarCambioOperativoCommand(
     TipoCambioOperativo Tipo,
     string Motivo,
     TimeSpan? Duracion = null,
-    string? NuevaPuerta = null);
+    Guid? NuevaPuertaId = null);
 
 public sealed record ActualizarDatosVueloCommand(
     Guid AerolineaId,
@@ -25,6 +25,6 @@ public sealed record ActualizarDatosVueloCommand(
     Guid AeropuertoDestinoId,
     DateTime HorarioSalida,
     DateTime HorarioLlegada,
-    string? Puerta,
+    Guid? PuertaId,
     string Motivo);
 

@@ -38,7 +38,7 @@ public sealed class EditarVueloViewModel
     public DateTime HorarioLlegada { get; set; }
 
     [Display(Name = "Puerta")]
-    public string? Puerta { get; set; }
+    public Guid? PuertaId { get; set; }
 
     [Required(ErrorMessage = "El motivo del cambio es obligatorio.")]
     [Display(Name = "Motivo del cambio")]
@@ -46,6 +46,7 @@ public sealed class EditarVueloViewModel
 
     public IEnumerable<SelectListItem> Aerolineas { get; set; } = [];
     public IEnumerable<SelectListItem> Aeropuertos { get; set; } = [];
+    public IEnumerable<SelectListItem> Puertas { get; set; } = [];
 }
 
 /// <summary>

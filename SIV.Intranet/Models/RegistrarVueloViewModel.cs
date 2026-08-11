@@ -35,10 +35,13 @@ public sealed class RegistrarVueloViewModel
     [DataType(DataType.DateTime)]
     public DateTime HorarioLlegada { get; set; } = DateTime.Today.AddHours(11);
 
+    // La puerta se elige del catálogo (opcional). Se guarda su Id; el backend
+    // resuelve y almacena la descripción ("A5 · Terminal A").
     [Display(Name = "Puerta")]
-    public string? Puerta { get; set; }
+    public Guid? PuertaId { get; set; }
 
     // Opciones para los <select>; no forman parte de los datos enviados.
     public IEnumerable<SelectListItem> Aerolineas { get; set; } = [];
     public IEnumerable<SelectListItem> Aeropuertos { get; set; } = [];
+    public IEnumerable<SelectListItem> Puertas { get; set; } = [];
 }

@@ -71,4 +71,44 @@ internal sealed class CatalogoRepository(SivDbContext db) : ICatalogoRepository
             await db.SaveChangesAsync();
         }
     }
+
+    // ---------- Terminales ----------
+    public async Task<IReadOnlyList<Terminal>> ObtenerTerminalesAsync()
+        => await db.Terminales.ToListAsync();
+
+    public async Task<Terminal?> ObtenerTerminalPorIdAsync(Guid id)
+        => await db.Terminales.FindAsync(id);
+
+    public async Task<Terminal?> ObtenerTerminalPorCodigoAsync(string codigo)
+        => await db.Terminales.FirstOrDefaultAsync(t => t.Codigo == codigo);
+
+    public async Task GuardarTerminalAsync(Terminal terminal)
+    {
+        if (db.Entry(terminal).State == EntityState.Detached)
+        {
+            var existe = await db.Terminales.AnyAsync(t => t.Id == terminal.Id);
+            if (!existe) db.Terminales.Add(terminal); else db.Terminales.Update(terminal);
+        }
+        await db.SaveChangesAsync();
+    }
+
+    // ---------- Puertas ----------
+    public async Task<IReadOnlyList<Puerta>> ObtenerPuertasAsync()
+        => await db.Puertas.ToListAsync();
+
+    public async Task<Puerta?> ObtenerPuertaPorIdAsync(Guid id)
+        => await db.Puertas.FindAsync(id);
+
+    public async Task<Puerta?> ObtenerPuertaPorCodigoAsync(string codigo)
+        => await db.Puertas.FirstOrDefaultAsync(p => p.Codigo == codigo);
+
+    public async Task GuardarPuertaAsync(Puerta puerta)
+    {
+        if (db.Entry(puerta).State == EntityState.Detached)
+        {
+            var existe = await db.Puertas.AnyAsync(p => p.Id == puerta.Id);
+            if (!existe) db.Puertas.Add(puerta); else db.Puertas.Update(puerta);
+        }
+        await db.SaveChangesAsync();
+    }
 }

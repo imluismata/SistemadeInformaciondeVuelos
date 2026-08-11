@@ -40,9 +40,12 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(new OpenApiSecurityRequirement { [esquema] = Array.Empty<string>() });
 });
 
+// Código del aeropuerto base (AILA = SDQ); se resuelve una sola vez y se comparte.
+var codigoAeropuertoBase = builder.Configuration.GetSection("AeropuertoBase")["Codigo"] ?? "SDQ";
+
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddVuelosModule();
-builder.Services.AddCatalogoModule();
+builder.Services.AddCatalogoModule(codigoAeropuertoBase);
 builder.Services.AddAuditoriaModule();
 builder.Services.AddReportesModule();
 builder.Services.AddModules();
@@ -114,6 +117,11 @@ using (var scope = app.Services.CreateScope())
         await usuarios.AsegurarAdminInicialAsync(new CrearUsuarioInternoDto(
             adminCfg["Nombre"] ?? "Administrador SIV", adminEmail, adminPassword, RolUsuario.Administrador));
     }
+
+    // Bootstrap: crea las terminales y puertas base del aeropuerto (AILA/SDQ) si aún
+    // no existen. Idempotente: no duplica nada en arranques posteriores.
+    var catalogo = scope.ServiceProvider.GetRequiredService<SIV.Modules.Catalogo.Application.ICatalogoService>();
+    await catalogo.AsegurarPuertasBaseAsync(codigoAeropuertoBase);
 }
 
 app.UseMiddleware<SIV.API.Middleware.ExceptionMiddleware>();

@@ -115,7 +115,7 @@ internal class ConsultaPublicaRepository(SivDbContext context, OpcionesAeropuert
             aeropuertos.GetValueOrDefault(v.AeropuertoDestinoId, "—"),
             v.HorarioSalida,
             v.HorarioLlegada,
-            v.Puerta,
+            v.PuertaDescripcion,
             v.EstadoActual.ToString()
         )).ToList();
     }

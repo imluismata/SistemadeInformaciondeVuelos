@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIV.Infrastructure;
 
@@ -11,9 +12,11 @@ using SIV.Infrastructure;
 namespace SIV.Infrastructure.Migrations
 {
     [DbContext(typeof(SivDbContext))]
-    partial class SivDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808225118_CatalogoPuertasYTerminales")]
+    partial class CatalogoPuertasYTerminales
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -329,12 +332,9 @@ namespace SIV.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("PuertaDescripcion")
-                        .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
-
-                    b.Property<Guid?>("PuertaId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Puerta")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 

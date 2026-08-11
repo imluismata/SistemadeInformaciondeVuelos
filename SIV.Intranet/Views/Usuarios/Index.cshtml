@@ -1,7 +1,11 @@
+@using System.Security.Claims
 @model IReadOnlyList<SIV.Intranet.Models.UsuarioApi>
 @{
     ViewData["Title"] = "Usuarios";
     ViewData["Subtitulo"] = "Personal del sistema";
+
+    // Id del usuario en sesión: se usa para no ofrecerle eliminar su propia cuenta.
+    var miId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
     // Color del distintivo según el rol, para leer la tabla de un vistazo.
     string ClaseRol(string rol) => rol switch
@@ -39,6 +43,7 @@
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Correo</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Rol</th>
                         <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider">Creado</th>
+                        <th class="px-6 py-3 text-sm text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant">
@@ -51,6 +56,23 @@
                                 <span class="status-pill @ClaseRol(u.Rol)">@u.Rol</span>
                             </td>
                             <td class="px-6 py-3.5 font-mono text-sm text-on-surface-variant">@u.CreadoEn.AHoraLocal().ToString("dd/MM/yyyy")</td>
+                            <td class="px-6 py-3.5 text-right">
+                                @if (miId == u.Id.ToString())
+                                {
+                                    <span class="text-xs text-on-surface-variant italic">Tu cuenta</span>
+                                }
+                                else
+                                {
+                                    @* Borrado permanente: la confirmación deja claro que no es reversible. *@
+                                    <form asp-action="Eliminar" method="post" class="inline"
+                                          onsubmit="return confirm('¿Eliminar de forma permanente la cuenta de @u.Nombre (@u.Email)? Esta acción no se puede deshacer.');">
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button type="submit" class="inline-flex items-center gap-1 text-secondary hover:underline text-sm">
+                                            <span class="material-symbols-outlined text-base">delete</span> Eliminar
+                                        </button>
+                                    </form>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>

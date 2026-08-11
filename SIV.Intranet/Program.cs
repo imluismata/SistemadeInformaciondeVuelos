@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(opciones =>
     opciones.Filters.Add<SIV.Intranet.Filters.ApiNoDisponibleFilter>());
 
+// Permite enviar el token antiforgery por cabecera, para los POST JSON hechos por fetch
+// (la previsualización editable de importación), donde el cuerpo son las filas.
+builder.Services.AddAntiforgery(opciones => opciones.HeaderName = "RequestVerificationToken");
+
 // Acceso al HttpContext para leer el token del usuario en el TokenHandler.
 builder.Services.AddHttpContextAccessor();
 

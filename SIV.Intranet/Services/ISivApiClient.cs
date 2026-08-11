@@ -24,6 +24,17 @@ public interface ICatalogoApi
     Task<ResultadoOperacion> GuardarAeropuertoAsync(AeropuertoViewModel aeropuerto);
     Task<ResultadoOperacion> DesactivarAeropuertoAsync(Guid id);
     Task<ResultadoOperacion> ReactivarAeropuertoAsync(Guid id);
+
+    Task<IReadOnlyList<TerminalApi>> ObtenerTerminalesAsync();
+    Task<IReadOnlyList<PuertaApi>> ObtenerPuertasAsync();
+
+    Task<ResultadoOperacion> GuardarTerminalAsync(TerminalViewModel terminal);
+    Task<ResultadoOperacion> DesactivarTerminalAsync(Guid id);
+    Task<ResultadoOperacion> ReactivarTerminalAsync(Guid id);
+
+    Task<ResultadoOperacion> GuardarPuertaAsync(PuertaViewModel puerta);
+    Task<ResultadoOperacion> DesactivarPuertaAsync(Guid id);
+    Task<ResultadoOperacion> ReactivarPuertaAsync(Guid id);
 }
 
 public interface IAuditoriaApi
@@ -41,12 +52,19 @@ public interface IVuelosApi
     Task<ResultadoOperacion> ActualizarAsync(EditarVueloViewModel vuelo);
     Task<ResultadoOperacion> CambiarEstadoAsync(Guid id, string estadoNuevo);
     Task<ResultadoOperacion> RegistrarCambioOperativoAsync(Guid id, CambioOperativoViewModel cambio);
+
+    // Importación masiva CSV/Excel: previsualizar el archivo, revalidar filas editadas e importar.
+    Task<ImportacionRespuesta> PrevisualizarImportacionAsync(Stream contenido, string nombreArchivo);
+    Task<ImportacionRespuesta> ValidarFilasAsync(IEnumerable<FilaVueloApi> filas);
+    Task<ImportacionRespuesta> ImportarFilasAsync(IEnumerable<FilaVueloApi> filas);
 }
 
 public interface IUsuariosApi
 {
     Task<IReadOnlyList<UsuarioApi>> ObtenerTodosAsync();
     Task<ResultadoOperacion> CrearInternoAsync(CrearUsuarioViewModel usuario);
+    // Elimina una cuenta de forma permanente (la API hace borrado definitivo).
+    Task<ResultadoOperacion> EliminarAsync(Guid id);
 }
 
 public interface IReportesApi

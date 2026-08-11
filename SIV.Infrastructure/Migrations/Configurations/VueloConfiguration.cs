@@ -26,7 +26,8 @@ internal class VueloConfiguration : IEntityTypeConfiguration<Vuelo>
         builder.Property(v => v.AeropuertoDestinoId).IsRequired();
         builder.Property(v => v.HorarioSalida).IsRequired();
         builder.Property(v => v.HorarioLlegada).IsRequired();
-        builder.Property(v => v.Puerta).HasMaxLength(10);
+        builder.Property(v => v.PuertaId);
+        builder.Property(v => v.PuertaDescripcion).HasMaxLength(60);
 
         builder.Property(v => v.EstadoActual)
             .IsRequired()

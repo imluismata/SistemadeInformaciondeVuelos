@@ -8,6 +8,7 @@ public sealed record VueloDto(
     Guid AeropuertoDestinoId,
     DateTime HorarioSalida,
     DateTime HorarioLlegada,
+    Guid? PuertaId,
     string? Puerta,
     string EstadoActual,
     IReadOnlyList<HistorialEstadoDto> HistorialEstados,

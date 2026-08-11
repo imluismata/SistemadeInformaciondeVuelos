@@ -75,4 +75,66 @@ public sealed class CatalogoController : ControllerBase
         await _service.ReactivarAeropuertoAsync(id);
         return NoContent();
     }
+
+    // ==================== Terminales ====================
+    [HttpGet("terminales")]
+    public async Task<IActionResult> ObtenerTerminales()
+        => Ok(await _service.ObtenerTerminalesAsync());
+
+    [HttpPost("terminales")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> RegistrarTerminal([FromBody] RegistrarTerminalCommand command)
+        => Ok(await _service.RegistrarTerminalAsync(command));
+
+    [HttpPut("terminales/{id:guid}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ActualizarTerminal(Guid id, [FromBody] ActualizarTerminalCommand command)
+        => Ok(await _service.ActualizarTerminalAsync(id, command));
+
+    [HttpDelete("terminales/{id:guid}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> DesactivarTerminal(Guid id)
+    {
+        await _service.DesactivarTerminalAsync(id);
+        return NoContent();
+    }
+
+    [HttpPatch("terminales/{id:guid}/activar")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ReactivarTerminal(Guid id)
+    {
+        await _service.ReactivarTerminalAsync(id);
+        return NoContent();
+    }
+
+    // ==================== Puertas ====================
+    [HttpGet("puertas")]
+    public async Task<IActionResult> ObtenerPuertas()
+        => Ok(await _service.ObtenerPuertasAsync());
+
+    [HttpPost("puertas")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> RegistrarPuerta([FromBody] RegistrarPuertaCommand command)
+        => Ok(await _service.RegistrarPuertaAsync(command));
+
+    [HttpPut("puertas/{id:guid}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ActualizarPuerta(Guid id, [FromBody] ActualizarPuertaCommand command)
+        => Ok(await _service.ActualizarPuertaAsync(id, command));
+
+    [HttpDelete("puertas/{id:guid}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> DesactivarPuerta(Guid id)
+    {
+        await _service.DesactivarPuertaAsync(id);
+        return NoContent();
+    }
+
+    [HttpPatch("puertas/{id:guid}/activar")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ReactivarPuerta(Guid id)
+    {
+        await _service.ReactivarPuertaAsync(id);
+        return NoContent();
+    }
 }

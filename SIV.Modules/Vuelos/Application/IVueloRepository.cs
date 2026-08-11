@@ -16,4 +16,9 @@ internal interface IVueloRepository
     // aeropuerto todavía tiene vuelos no finalizados asociados.
     Task<bool> ExistenVuelosActivosPorAerolineaAsync(Guid aerolineaId);
     Task<bool> ExistenVuelosActivosPorAeropuertoAsync(Guid aeropuertoId);
+
+    // Vuelos no finalizados asignados a una puerta (los finalizados ya no la ocupan),
+    // excluyendo opcionalmente uno para no compararlo consigo mismo al editar. Sirve para
+    // validar que dos vuelos no ocupen la misma puerta en ventanas solapadas.
+    Task<IReadOnlyList<Vuelo>> ObtenerActivosPorPuertaAsync(Guid puertaId, Guid? excluirVueloId);
 }

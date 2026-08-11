@@ -103,6 +103,48 @@ public sealed class CatalogoApi : ICatalogoApi
 
     public async Task<ResultadoOperacion> ReactivarAeropuertoAsync(Guid id)
         => await RespuestaApi.InterpretarAsync(await _http.PatchAsync($"api/catalogo/aeropuertos/{id}/activar", null));
+
+    public async Task<IReadOnlyList<TerminalApi>> ObtenerTerminalesAsync()
+        => await _http.GetFromJsonAsync<List<TerminalApi>>("api/catalogo/terminales") ?? [];
+
+    public async Task<IReadOnlyList<PuertaApi>> ObtenerPuertasAsync()
+        => await _http.GetFromJsonAsync<List<PuertaApi>>("api/catalogo/puertas") ?? [];
+
+    public async Task<ResultadoOperacion> GuardarTerminalAsync(TerminalViewModel terminal)
+    {
+        // En alta se envía el aeropuerto; en edición el backend no lo cambia.
+        var respuesta = terminal.EsEdicion
+            ? await _http.PutAsJsonAsync($"api/catalogo/terminales/{terminal.Id}",
+                new { codigo = terminal.Codigo, nombre = terminal.Nombre })
+            : await _http.PostAsJsonAsync("api/catalogo/terminales",
+                new { codigo = terminal.Codigo, nombre = terminal.Nombre, aeropuertoId = terminal.AeropuertoId });
+
+        return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+
+    public async Task<ResultadoOperacion> DesactivarTerminalAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.DeleteAsync($"api/catalogo/terminales/{id}"));
+
+    public async Task<ResultadoOperacion> ReactivarTerminalAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.PatchAsync($"api/catalogo/terminales/{id}/activar", null));
+
+    public async Task<ResultadoOperacion> GuardarPuertaAsync(PuertaViewModel puerta)
+    {
+        // TerminalId nulo = rampa abierta (posición remota).
+        var cuerpo = new { codigo = puerta.Codigo, terminalId = puerta.TerminalId };
+
+        var respuesta = puerta.EsEdicion
+            ? await _http.PutAsJsonAsync($"api/catalogo/puertas/{puerta.Id}", cuerpo)
+            : await _http.PostAsJsonAsync("api/catalogo/puertas", cuerpo);
+
+        return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+
+    public async Task<ResultadoOperacion> DesactivarPuertaAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.DeleteAsync($"api/catalogo/puertas/{id}"));
+
+    public async Task<ResultadoOperacion> ReactivarPuertaAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.PatchAsync($"api/catalogo/puertas/{id}/activar", null));
 }
 
 public sealed class AuditoriaApiClient : IAuditoriaApi
@@ -181,7 +223,7 @@ public sealed class VuelosApi : IVuelosApi
             aeropuertoDestinoId = vuelo.AeropuertoDestinoId,
             horarioSalida = vuelo.HorarioSalida,
             horarioLlegada = vuelo.HorarioLlegada,
-            puerta = vuelo.Puerta
+            puertaId = vuelo.PuertaId
         });
 
         return await RespuestaApi.InterpretarAsync(respuesta);
@@ -196,7 +238,7 @@ public sealed class VuelosApi : IVuelosApi
             aeropuertoDestinoId = v.AeropuertoDestinoId,
             horarioSalida = v.HorarioSalida,
             horarioLlegada = v.HorarioLlegada,
-            puerta = v.Puerta,
+            puertaId = v.PuertaId,
             motivo = v.Motivo
         });
 
@@ -216,10 +258,41 @@ public sealed class VuelosApi : IVuelosApi
             tipo = cambio.Tipo,
             motivo = cambio.Motivo,
             duracion = string.IsNullOrWhiteSpace(cambio.Duracion) ? null : cambio.Duracion,
-            nuevaPuerta = string.IsNullOrWhiteSpace(cambio.NuevaPuerta) ? null : cambio.NuevaPuerta
+            nuevaPuertaId = cambio.NuevaPuertaId
         });
 
         return await RespuestaApi.InterpretarAsync(respuesta);
+    }
+
+    // Sube el archivo como multipart; la API lo lee una sola vez y devuelve las filas + su estado.
+    public async Task<ImportacionRespuesta> PrevisualizarImportacionAsync(Stream contenido, string nombreArchivo)
+    {
+        using var formulario = new MultipartFormDataContent();
+        using var archivo = new StreamContent(contenido);
+        formulario.Add(archivo, "archivo", nombreArchivo);
+        return await InterpretarImportacionAsync(
+            await _http.PostAsync("api/vuelos/importacion/previsualizar", formulario));
+    }
+
+    // Revalida las filas ya editadas, sin guardar.
+    public async Task<ImportacionRespuesta> ValidarFilasAsync(IEnumerable<FilaVueloApi> filas)
+        => await InterpretarImportacionAsync(
+            await _http.PostAsJsonAsync("api/vuelos/importacion/validar", filas));
+
+    // Importa las filas válidas.
+    public async Task<ImportacionRespuesta> ImportarFilasAsync(IEnumerable<FilaVueloApi> filas)
+        => await InterpretarImportacionAsync(
+            await _http.PostAsJsonAsync("api/vuelos/importacion", filas));
+
+    // Traduce la respuesta: si fue exitosa, devuelve el resultado; si no (p. ej. formato no
+    // soportado), extrae el mensaje de error del cuerpo.
+    private static async Task<ImportacionRespuesta> InterpretarImportacionAsync(HttpResponseMessage respuesta)
+    {
+        if (respuesta.IsSuccessStatusCode)
+            return new ImportacionRespuesta(true, null, await respuesta.Content.ReadFromJsonAsync<ImportacionResultadoApi>());
+
+        var fallo = await RespuestaApi.InterpretarAsync(respuesta);
+        return new ImportacionRespuesta(false, fallo.Error, null);
     }
 }
 
@@ -245,6 +318,9 @@ public sealed class UsuariosApiClient : IUsuariosApi
         var respuesta = await _http.PostAsJsonAsync("api/usuarios", cuerpo);
         return await RespuestaApi.InterpretarAsync(respuesta);
     }
+
+    public async Task<ResultadoOperacion> EliminarAsync(Guid id)
+        => await RespuestaApi.InterpretarAsync(await _http.DeleteAsync($"api/usuarios/{id}"));
 }
 
 public sealed class ActividadApiClient : IActividadApi

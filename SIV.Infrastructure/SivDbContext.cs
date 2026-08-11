@@ -14,6 +14,8 @@ public class SivDbContext(DbContextOptions<SivDbContext> options) : DbContext(op
     internal DbSet<Vuelo> Vuelos => Set<Vuelo>();
     internal DbSet<Aerolinea> Aerolineas => Set<Aerolinea>();
     internal DbSet<Aeropuerto> Aeropuertos => Set<Aeropuerto>();
+    internal DbSet<Terminal> Terminales => Set<Terminal>();
+    internal DbSet<Puerta> Puertas => Set<Puerta>();
     internal DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
     internal DbSet<Notificacion> Notificaciones => Set<Notificacion>();
     internal DbSet<Usuario> Usuarios => Set<Usuario>();

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIV.Intranet.Models;
@@ -42,6 +43,27 @@ public sealed class UsuariosController : Controller
         }
 
         TempData["Exito"] = $"Usuario {modelo.Email} creado con rol {modelo.Rol}.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // Elimina una cuenta de forma permanente (borrado definitivo en la API). No se permite
+    // que el administrador elimine su propia cuenta, para no quedarse fuera del sistema.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(Guid id)
+    {
+        if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == id.ToString())
+        {
+            TempData["Error"] = "No puedes eliminar tu propia cuenta.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var resultado = await _usuarios.EliminarAsync(id);
+        if (resultado.Exito)
+            TempData["Exito"] = "Usuario eliminado.";
+        else
+            TempData["Error"] = resultado.Error;
+
         return RedirectToAction(nameof(Index));
     }
 }

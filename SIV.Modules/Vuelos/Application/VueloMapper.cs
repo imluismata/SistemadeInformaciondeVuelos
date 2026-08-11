@@ -15,7 +15,8 @@ internal static class VueloMapper
             vuelo.AeropuertoDestinoId,
             vuelo.HorarioSalida,
             vuelo.HorarioLlegada,
-            vuelo.Puerta,
+            vuelo.PuertaId,
+            vuelo.PuertaDescripcion,
             vuelo.EstadoActual.ToString(),
             vuelo.HistorialEstados
                 .OrderBy(h => h.OcurridoEn)

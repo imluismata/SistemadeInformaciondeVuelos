@@ -11,7 +11,8 @@ internal interface IVueloDomainService
         Guid aeropuertoDestinoId,
         DateTime horarioSalida,
         DateTime horarioLlegada,
-        string? puerta = null);
+        Guid? puertaId = null,
+        string? puertaDescripcion = null);
 
     void CambiarEstado(Vuelo vuelo, EstadoVuelo nuevoEstado);
 
@@ -19,7 +20,9 @@ internal interface IVueloDomainService
 
     void RegistrarAdelanto(Vuelo vuelo, TimeSpan adelanto, string motivo);
 
-    void RegistrarCambioDePuerta(Vuelo vuelo, string nuevaPuerta, string motivo);
+    // La existencia de la puerta la valida VueloService (vía ICatalogoConsulta) y le
+    // pasa la descripción ya resuelta; el dominio solo aplica el cambio.
+    void RegistrarCambioDePuerta(Vuelo vuelo, Guid? nuevaPuertaId, string? nuevaPuertaDescripcion, string motivo);
 
     void Cancelar(Vuelo vuelo, string motivo);
 
@@ -30,6 +33,7 @@ internal interface IVueloDomainService
         Guid aeropuertoDestinoId,
         DateTime horarioSalida,
         DateTime horarioLlegada,
-        string? puerta,
+        Guid? puertaId,
+        string? puertaDescripcion,
         string motivo);
 }

@@ -15,4 +15,14 @@ internal interface ICatalogoRepository
     Task<Aeropuerto?> ObtenerAeropuertoPorCodigoAsync(string codigo);
     Task GuardarAeropuertoAsync(Aeropuerto aeropuerto);
     Task EliminarAeropuertoAsync(Guid id);
+
+    Task<IReadOnlyList<Terminal>> ObtenerTerminalesAsync();
+    Task<Terminal?> ObtenerTerminalPorIdAsync(Guid id);
+    Task<Terminal?> ObtenerTerminalPorCodigoAsync(string codigo);
+    Task GuardarTerminalAsync(Terminal terminal);
+
+    Task<IReadOnlyList<Puerta>> ObtenerPuertasAsync();
+    Task<Puerta?> ObtenerPuertaPorIdAsync(Guid id);
+    Task<Puerta?> ObtenerPuertaPorCodigoAsync(string codigo);
+    Task GuardarPuertaAsync(Puerta puerta);
 }
