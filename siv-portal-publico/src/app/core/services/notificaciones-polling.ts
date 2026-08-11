@@ -27,13 +27,30 @@ export class NotificacionesPollingService {
   /** Toasts visibles en pantalla en este momento. */
   readonly toasts = signal<Notificacion[]>([]);
 
+  /**
+   * Si hay alguien mostrando los avisos. Lo enciende y apaga el propio
+   * componente del pop-up al aparecer y desaparecer.
+   *
+   * Sin esto, el sondeo corría en toda la aplicación, incluidas las pantallas
+   * de la terminal, que no muestran pop-ups: se preguntaba a la API cada 15
+   * segundos para tirar la respuesta a la basura. El que necesita los datos es
+   * quien pide que se busquen.
+   */
+  private readonly activo = signal(false);
+
   private readonly vistas = new Set<string>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private primeraPasada = true;
 
   constructor() {
-    // Arranca/detiene el sondeo según haya sesión o id de dispositivo.
+    // Arranca/detiene el sondeo según haya alguien mirando y sesión o id de
+    // dispositivo con el que preguntar.
     effect(() => {
+      if (!this.activo()) {
+        this.detener();
+        return;
+      }
+
       // Las consultas van marcadas como de fondo: si la API falla, el usuario
       // no debe acabar en la página de error por un sondeo que no pidió.
       const usuario = this.auth.usuarioActual();
@@ -51,6 +68,12 @@ export class NotificacionesPollingService {
       this.detener();
     });
   }
+
+  /** Lo llama el componente del pop-up cuando aparece en pantalla. */
+  activar(): void { this.activo.set(true); }
+
+  /** Y cuando desaparece, por ejemplo al entrar a una pantalla de terminal. */
+  desactivar(): void { this.activo.set(false); }
 
   private iniciar(fuente: () => Observable<Notificacion[]>): void {
     this.detener();
