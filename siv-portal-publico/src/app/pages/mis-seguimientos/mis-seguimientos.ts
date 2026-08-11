@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
 import { SeguimientoService } from '../../core/services/seguimiento';
-import { NotificacionesService } from '../../core/services/notificaciones';
 import { Seguimiento } from '../../core/models/seguimiento.model';
-import { Notificacion } from '../../core/models/notificacion.model';
 
+/**
+ * Solo los vuelos que sigue el usuario. Los avisos de cambios viven aparte, en
+ * /notificaciones — antes se mostraban también aquí en un panel propio, pero
+ * era la misma información dos veces con dos diseños distintos.
+ */
 @Component({
   selector: 'app-mis-seguimientos',
   imports: [CommonModule, RouterLink],
@@ -16,16 +19,10 @@ import { Notificacion } from '../../core/models/notificacion.model';
 export class MisSeguimientos implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly seguimientoService = inject(SeguimientoService);
-  private readonly notificacionesService = inject(NotificacionesService);
   private readonly router = inject(Router);
 
   readonly seguimientos = signal<Seguimiento[]>([]);
   readonly cargando = signal(true);
-
-  readonly notificaciones = signal<Notificacion[]>([]);
-  readonly noLeidas = computed(() =>
-    this.notificaciones().filter((n) => n.leidaEn === null)
-  );
 
   ngOnInit(): void {
     const usuario = this.auth.usuarioActual();
@@ -35,25 +32,6 @@ export class MisSeguimientos implements OnInit {
       next: (s) => { this.seguimientos.set(s); this.cargando.set(false); },
       error: () => this.cargando.set(false),
     });
-
-    this.notificacionesService.obtenerPorUsuario(usuario.id).subscribe({
-      next: (n) => this.notificaciones.set(
-        n.sort((a, b) => +new Date(b.generadaEn) - +new Date(a.generadaEn))
-      ),
-      error: () => {},
-    });
-  }
-
-  descartar(notificacion: Notificacion): void {
-    this.notificacionesService.marcarComoLeida(notificacion.id).subscribe(() =>
-      this.notificaciones.update((lista) =>
-        lista.map((n) => (n.id === notificacion.id ? { ...n, leidaEn: new Date().toISOString() } : n))
-      )
-    );
-  }
-
-  descartarTodas(): void {
-    this.noLeidas().forEach((n) => this.descartar(n));
   }
 
   cancelar(seguimiento: Seguimiento): void {
