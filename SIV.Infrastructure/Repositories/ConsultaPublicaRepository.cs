@@ -13,17 +13,27 @@ namespace SIV.Infrastructure.Repositories;
 internal class ConsultaPublicaRepository(SivDbContext context, OpcionesAeropuerto opcionesAeropuerto)
     : IConsultaPublicaRepository
 {
-    // Ventana móvil de 24 horas: entre 24 h en el pasado (para seguir visibles
-    // hasta 24 h después de culminados) y 24 h en el futuro.
-    private static (DateTime inferior, DateTime superior) VentanaVeinticuatroHoras()
+    // Sin fecha: ventana móvil de 24 horas (para el tablero en vivo, entre 24h
+    // en el pasado y 24h en el futuro). Con fecha: ese día completo, de 00:00 a
+    // 23:59:59 — quien pide explícitamente "el sábado" no quiere que el
+    // resultado dependa de qué hora es "ahora"; antes esta ventana se aplicaba
+    // siempre, así que buscar un día fuera de las 24h vigentes devolvía vacío
+    // aunque hubiera vuelos ese día.
+    private static (DateTime inferior, DateTime superior) Ventana(DateTime? fecha)
     {
+        if (fecha.HasValue)
+        {
+            var dia = fecha.Value.Date;
+            return (dia, dia.AddDays(1).AddTicks(-1));
+        }
+
         var ahora = DateTime.Now;
         return (ahora.AddHours(-24), ahora.AddHours(24));
     }
 
-    public async Task<IEnumerable<VueloPublicoDto>> ObtenerVuelosActivosAsync()
+    public async Task<IEnumerable<VueloPublicoDto>> ObtenerVuelosActivosAsync(DateTime? fecha = null)
     {
-        var (inferior, superior) = VentanaVeinticuatroHoras();
+        var (inferior, superior) = Ventana(fecha);
 
         var vuelos = await context.Vuelos
             .Where(v => v.HorarioLlegada >= inferior && v.HorarioSalida <= superior)
@@ -33,12 +43,12 @@ internal class ConsultaPublicaRepository(SivDbContext context, OpcionesAeropuert
         return await MapearAsync(vuelos);
     }
 
-    public async Task<IEnumerable<VueloPublicoDto>> ObtenerSalidasAsync()
+    public async Task<IEnumerable<VueloPublicoDto>> ObtenerSalidasAsync(DateTime? fecha = null)
     {
         var aeropuertoBaseId = await ObtenerIdAeropuertoBaseAsync();
         if (aeropuertoBaseId is null) return [];
 
-        var (inferior, superior) = VentanaVeinticuatroHoras();
+        var (inferior, superior) = Ventana(fecha);
 
         // Salidas = vuelos que despegan DESDE el aeropuerto base (AILA).
         var vuelos = await context.Vuelos
@@ -50,12 +60,12 @@ internal class ConsultaPublicaRepository(SivDbContext context, OpcionesAeropuert
         return await MapearAsync(vuelos);
     }
 
-    public async Task<IEnumerable<VueloPublicoDto>> ObtenerLlegadasAsync()
+    public async Task<IEnumerable<VueloPublicoDto>> ObtenerLlegadasAsync(DateTime? fecha = null)
     {
         var aeropuertoBaseId = await ObtenerIdAeropuertoBaseAsync();
         if (aeropuertoBaseId is null) return [];
 
-        var (inferior, superior) = VentanaVeinticuatroHoras();
+        var (inferior, superior) = Ventana(fecha);
 
         // Llegadas = vuelos que aterrizan EN el aeropuerto base (AILA).
         var vuelos = await context.Vuelos
