@@ -1,5 +1,7 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth';
+import { DispositivoService } from './dispositivo';
 import { NotificacionesService } from './notificaciones';
 import { Notificacion } from '../models/notificacion.model';
 
@@ -7,37 +9,78 @@ const INTERVALO_MS = 15000;   // cada cuánto se consulta a la API
 const AUTO_CIERRE_MS = 9000;  // cuánto dura visible cada pop-up
 
 /**
- * Sondea la API periódicamente en busca de notificaciones nuevas para el
- * usuario autenticado. Cuando detecta una que no había visto, la muestra como
- * pop-up (toast) y reproduce un sonido de alerta.
+ * Sondea la API periódicamente en busca de notificaciones nuevas. Cuando
+ * detecta una que no había visto, la muestra como pop-up (toast) y reproduce
+ * un sonido de alerta.
+ *
+ * Sirve a los dos tipos de visitante: si hay sesión, pregunta por las del
+ * usuario; si no, por las del id de este navegador (solo cuando ese id ya
+ * existe, es decir, cuando la persona ha seguido algún vuelo). Lo único que
+ * cambia es de dónde salen los datos; el resto del comportamiento es idéntico.
  */
 @Injectable({ providedIn: 'root' })
 export class NotificacionesPollingService {
   private readonly auth = inject(AuthService);
+  private readonly dispositivo = inject(DispositivoService);
   private readonly notificaciones = inject(NotificacionesService);
 
   /** Toasts visibles en pantalla en este momento. */
   readonly toasts = signal<Notificacion[]>([]);
+
+  /**
+   * Si hay alguien mostrando los avisos. Lo enciende y apaga el propio
+   * componente del pop-up al aparecer y desaparecer.
+   *
+   * Sin esto, el sondeo corría en toda la aplicación, incluidas las pantallas
+   * de la terminal, que no muestran pop-ups: se preguntaba a la API cada 15
+   * segundos para tirar la respuesta a la basura. El que necesita los datos es
+   * quien pide que se busquen.
+   */
+  private readonly activo = signal(false);
 
   private readonly vistas = new Set<string>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private primeraPasada = true;
 
   constructor() {
-    // Arranca/detiene el sondeo según el estado de sesión.
+    // Arranca/detiene el sondeo según haya alguien mirando y sesión o id de
+    // dispositivo con el que preguntar.
     effect(() => {
+      if (!this.activo()) {
+        this.detener();
+        return;
+      }
+
+      // Las consultas van marcadas como de fondo: si la API falla, el usuario
+      // no debe acabar en la página de error por un sondeo que no pidió.
       const usuario = this.auth.usuarioActual();
-      if (usuario) this.iniciar(usuario.id);
-      else this.detener();
+      if (usuario) {
+        this.iniciar(() => this.notificaciones.obtenerPorUsuario(usuario.id, true));
+        return;
+      }
+
+      const dispositivoId = this.dispositivo.id();
+      if (dispositivoId) {
+        this.iniciar(() => this.notificaciones.obtenerPorDispositivo(dispositivoId, true));
+        return;
+      }
+
+      this.detener();
     });
   }
 
-  private iniciar(usuarioId: string): void {
+  /** Lo llama el componente del pop-up cuando aparece en pantalla. */
+  activar(): void { this.activo.set(true); }
+
+  /** Y cuando desaparece, por ejemplo al entrar a una pantalla de terminal. */
+  desactivar(): void { this.activo.set(false); }
+
+  private iniciar(fuente: () => Observable<Notificacion[]>): void {
     this.detener();
     this.primeraPasada = true;
     this.vistas.clear();
-    this.sondear(usuarioId);
-    this.timer = setInterval(() => this.sondear(usuarioId), INTERVALO_MS);
+    this.sondear(fuente);
+    this.timer = setInterval(() => this.sondear(fuente), INTERVALO_MS);
   }
 
   private detener(): void {
@@ -45,8 +88,8 @@ export class NotificacionesPollingService {
     this.toasts.set([]);
   }
 
-  private sondear(usuarioId: string): void {
-    this.notificaciones.obtenerPorUsuario(usuarioId).subscribe({
+  private sondear(fuente: () => Observable<Notificacion[]>): void {
+    fuente().subscribe({
       next: (todas) => {
         const noLeidas = todas.filter((n) => n.leidaEn === null);
         const nuevas = noLeidas.filter((n) => !this.vistas.has(n.id));

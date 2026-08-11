@@ -28,9 +28,19 @@
     </a>
     @if (auth.estaAutenticado()) {
       <a routerLink="/mis-seguimientos" routerLinkActive="active" class="nav-item" (click)="cerrar()">
-        <span class="nav-icon">🔔</span> Mis seguimientos
+        <span class="nav-icon">✓</span> Mis seguimientos
       </a>
     }
+    @if (tieneNotificaciones()) {
+      <a routerLink="/notificaciones" routerLinkActive="active" class="nav-item" (click)="cerrar()">
+        <span class="nav-icon">🔔</span> Notificaciones
+      </a>
+    }
+    <!-- Lleva al panel donde están todas las pantallas; desde ahí cada una se
+         abre en su propia pestaña, porque van a pantalla completa y sin menú. -->
+    <a routerLink="/pantallas" routerLinkActive="active" class="nav-item" (click)="cerrar()">
+      <span class="nav-icon">📺</span> Pantallas
+    </a>
   </nav>
 
   <div class="sidebar-footer">

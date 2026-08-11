@@ -4,6 +4,35 @@
   margin: 0 auto;
 }
 
+// Banner que aparece solo cuando se entra desde una notificación.
+.aviso-cambio {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--white);
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  .aviso-cambio-icono { font-size: 1.2rem; line-height: 1.2; }
+
+  .aviso-cambio-titulo {
+    margin: 0 0 0.15rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--heading);
+  }
+
+  .aviso-cambio-msg {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+}
+
 .estado-msg {
   color: var(--text-muted);
   padding: 2rem 0;
@@ -39,6 +68,17 @@
     font-weight: 700;
     margin: 0;
   }
+
+  // El encabezado es azul marino; el logo va sobre una base blanca para que las
+  // marcas oscuras (JetBlue, Copa) no se pierdan contra el fondo.
+  .aerolinea-titulo {
+    --logo-alto: 2.2rem;
+    display: inline-flex;
+    background: #fff;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    max-width: 260px;
+  }
 }
 
 .info-grid {
@@ -64,6 +104,8 @@
 
   dd { color: var(--text); }
 
+  .estado-en-linea { color: var(--text-muted); font-size: 0.85rem; }
+
   dt:last-of-type, dd:last-of-type { border-bottom: none; }
 }
 
@@ -83,12 +125,20 @@
   cursor: pointer;
 
   &:hover { background: var(--navy-mid); }
+
+  // Ya lo sigue: el botón pasa a ser la acción contraria, en tono secundario.
+  &.siguiendo {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid var(--red);
+    &:hover { background: var(--red); color: #fff; }
+  }
 }
 
 .aviso {
   color: var(--text-muted);
   font-size: 0.9rem;
-  margin: 0;
+  margin: 0.75rem 0 0;
 
   a { color: var(--red); font-weight: 600; text-decoration: none;
     &:hover { text-decoration: underline; }

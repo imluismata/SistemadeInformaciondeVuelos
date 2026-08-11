@@ -140,6 +140,13 @@
 
   .num-vuelo { font-weight: 600; color: var(--heading); }
 
+  // El logo de la aerolínea ya trae el nombre; se le da alto de línea y un
+  // ancho máximo para que no empuje al resto de las columnas.
+  .celda-aerolinea {
+    --logo-alto: 1.6rem;
+    max-width: 150px;
+  }
+
   .link-detalle {
     color: var(--red);
     text-decoration: none;

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SIV.API.Auth;
+using SIV.API.Seguridad;
 using SIV.Infrastructure;
 using SIV.Modules;
 using SIV.Modules.Auditoria.Application;
@@ -83,6 +84,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// Límite de intentos por IP en login, códigos y escritura anónima (fuerza bruta).
+builder.Services.AddLimitesDePeticiones();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PortalPublico", policy =>
@@ -127,6 +131,9 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<SIV.API.Middleware.ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors("PortalPublico");
+// Va después de CORS para que la respuesta 429 también lleve sus cabeceras y el
+// portal pueda leer el motivo en vez de un error opaco de red.
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

@@ -8,24 +8,59 @@
     <form class="formulario" (ngSubmit)="registrar()">
       <label>
         Nombre completo
-        <input type="text" name="nombre" placeholder="Tu nombre" required [(ngModel)]="nombre" />
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Tu nombre"
+          required
+          [ngModel]="nombre()"
+          (ngModelChange)="nombre.set($event)"
+        />
       </label>
 
       <label>
         Correo electrónico
-        <input type="email" name="email" placeholder="correo@ejemplo.com" required [(ngModel)]="email" />
+        <input
+          type="email"
+          name="email"
+          placeholder="correo@ejemplo.com"
+          required
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
       </label>
 
       <label>
         Contraseña
-        <input type="password" name="password" placeholder="••••••••" required [(ngModel)]="password" />
+        <input
+          type="password"
+          name="password"
+          placeholder="••••••••"
+          required
+          [minlength]="minimoPassword"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+
+        <!-- El aviso cambia mientras escribe: dice cuánto falta y confirma
+             cuando ya cumple, en vez de esperar a que pulse el botón. -->
+        @if (password().length === 0) {
+          <span class="ayuda">Mínimo {{ minimoPassword }} caracteres</span>
+        } @else if (faltan() > 0) {
+          <span class="ayuda ayuda-falta">
+            Te {{ faltan() === 1 ? 'falta' : 'faltan' }} {{ faltan() }}
+            {{ faltan() === 1 ? 'carácter' : 'caracteres' }}
+          </span>
+        } @else {
+          <span class="ayuda ayuda-ok">Longitud correcta</span>
+        }
       </label>
 
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
 
-      <button type="submit" [disabled]="enviando()">
+      <button type="submit" [disabled]="!puedeEnviar() || enviando()">
         {{ enviando() ? 'Creando cuenta...' : 'Crear cuenta' }}
       </button>
     </form>

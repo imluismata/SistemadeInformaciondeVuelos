@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SIV.API.Auth;
+using SIV.API.Seguridad;
 using SIV.Modules.Usuarios.Application.Dtos;
 using SIV.Modules.Usuarios.Application.Interfaces;
 
@@ -26,6 +28,9 @@ public sealed class AuthController : ControllerBase
     /// vive en un solo lugar (DRY). La validación de credenciales la hace el módulo
     /// Usuarios; este controlador solo orquesta y emite el token (SRP).
     /// </summary>
+    // Sin límite de intentos, este endpoint es el sitio natural para probar
+    // contraseñas a fuerza bruta (RNF-SEG).
+    [EnableRateLimiting(LimitesPeticiones.Login)]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AuthLoginRequest request)
     {

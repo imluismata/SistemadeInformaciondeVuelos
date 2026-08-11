@@ -24,4 +24,21 @@ export class SeguimientoService {
   obtenerPorUsuario(usuarioId: string): Observable<SeguimientoModel[]> {
     return this.http.get<SeguimientoModel[]>(`${this.baseUrl}/usuario/${usuarioId}`);
   }
+
+  // ── Visitante sin cuenta: mismas operaciones, identificado por el id del
+  // navegador en vez de por el token. El backend usa el mismo servicio.
+
+  registrarAnonimo(dispositivoId: string, vueloId: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/anonimo`, { dispositivoId, vueloId });
+  }
+
+  cancelarAnonimo(dispositivoId: string, vueloId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/anonimo`, {
+      body: { dispositivoId, vueloId },
+    });
+  }
+
+  obtenerPorDispositivo(dispositivoId: string): Observable<SeguimientoModel[]> {
+    return this.http.get<SeguimientoModel[]>(`${this.baseUrl}/anonimo/${dispositivoId}`);
+  }
 }

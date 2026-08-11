@@ -1,0 +1,25 @@
+<app-pantalla-marco titulo="Señalización" tituloEn="Wayfinding">
+  <div class="senales">
+    @for (i of indicaciones; track i.destino) {
+      <section [class]="i.principal ? 'senal principal' : 'senal'">
+        <!-- La flecha es un SVG propio: no depende de ninguna fuente de iconos
+             externa, así que la pantalla se ve igual aunque no haya internet. -->
+        <svg [class]="'flecha ' + i.direccion" viewBox="0 0 100 100" aria-hidden="true">
+          <polygon points="8,40 58,40 58,16 94,50 58,84 58,60 8,60" />
+        </svg>
+
+        <div class="senal-texto">
+          <p class="senal-destino">{{ i.destino }}</p>
+          <p class="senal-destino-en">{{ i.destinoEn }}</p>
+          <p class="senal-detalle">{{ i.detalle }}</p>
+
+          <ul class="senal-servicios">
+            @for (s of i.servicios; track s) {
+              <li>{{ s }}</li>
+            }
+          </ul>
+        </div>
+      </section>
+    }
+  </div>
+</app-pantalla-marco>

@@ -5,24 +5,6 @@
 
 <div class="contenido">
 
-  @if (noLeidas().length > 0) {
-    <div class="notif-panel">
-      <div class="notif-head">
-        <span class="notif-titulo">🔔 {{ noLeidas().length }} cambio(s) en tus vuelos</span>
-        <button type="button" class="notif-limpiar" (click)="descartarTodas()">Marcar todas como leídas</button>
-      </div>
-      @for (n of noLeidas(); track n.id) {
-        <div class="notif-item">
-          <div class="notif-cuerpo">
-            <p class="notif-msg">{{ n.mensaje }}</p>
-            <span class="notif-fecha">{{ n.generadaEn | date: 'dd/MM/yyyy HH:mm' }}</span>
-          </div>
-          <button type="button" class="notif-cerrar" (click)="descartar(n)" aria-label="Descartar">✕</button>
-        </div>
-      }
-    </div>
-  }
-
   @if (cargando()) {
     <div class="estado-msg">Cargando...</div>
   }

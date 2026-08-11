@@ -22,9 +22,14 @@ export class Login {
   readonly enviando = signal(false);
   readonly verificado = signal(this.route.snapshot.queryParamMap.get('verificado') === '1');
   readonly restablecida = signal(this.route.snapshot.queryParamMap.get('restablecida') === '1');
+  /** Llega con ?expirada=1 cuando el interceptor cerró la sesión por un 401. */
+  readonly expirada = signal(this.route.snapshot.queryParamMap.get('expirada') === '1');
 
   iniciarSesion(): void {
     this.error.set(null);
+    // Ya se dio por enterada del aviso de sesión vencida; dejarlo puesto junto a
+    // un error de credenciales confunde sobre cuál de los dos es el problema.
+    this.expirada.set(false);
     this.enviando.set(true);
 
     this.usuariosService.login({ email: this.email, password: this.password }).subscribe({

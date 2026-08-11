@@ -1,0 +1,112 @@
+<app-pantalla-marco titulo="Embarque" tituloEn="Boarding gate">
+  <div class="embarque">
+
+    <!-- Columna izquierda: la puerta y el vuelo -->
+    <section class="principal">
+      <div class="bloque-puerta">
+        <p class="etiqueta">Puerta · Gate</p>
+        <p class="puerta-numero">{{ puerta() }}</p>
+      </div>
+
+      @if (vuelo(); as v) {
+        <div class="bloque-destino">
+          <p class="etiqueta">Destino · Destination</p>
+          <p class="destino-nombre">
+            @if (destino(); as d) {
+              {{ d.ciudad }}
+            } @else {
+              {{ v.destino }}
+            }
+            <span class="destino-codigo">{{ v.destinoCodigo }}</span>
+          </p>
+        </div>
+
+        <div class="bloque-datos">
+          <div class="dato">
+            <p class="etiqueta">Vuelo · Flight</p>
+            <p class="dato-valor">{{ v.numero }}</p>
+            <div class="dato-logo">
+              <app-logo-aerolinea [codigo]="v.aerolineaCodigo" [nombre]="v.aerolinea" />
+            </div>
+          </div>
+
+          <div class="dato">
+            <p class="etiqueta">Salida · Scheduled</p>
+            <p class="dato-valor">{{ v.horarioSalida | date: 'HH:mm' }}</p>
+            <p class="dato-nota">{{ v.horarioSalida | date: 'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+      } @else if (!cargando()) {
+        <div class="sin-vuelo">
+          <p class="sin-vuelo-texto">Sin vuelo asignado</p>
+          <p class="sin-vuelo-en">No flight assigned to this gate</p>
+        </div>
+      }
+    </section>
+
+    <!-- Columna derecha: estado, cuenta atrás y clima del destino -->
+    <aside class="lateral">
+      <div class="tarjeta tarjeta-estado">
+        <p class="etiqueta">Estado · Status</p>
+        @if (vuelo(); as v) {
+          <app-estado-vuelo [estado]="v.estado" variante="pantalla" />
+        } @else {
+          <p class="dato-valor apagado">—</p>
+        }
+      </div>
+
+      <div class="tarjeta">
+        <p class="etiqueta">Sale en · Departs in</p>
+        @if (cuentaAtras(); as c) {
+          <div class="cuenta">
+            <span class="cuenta-caja">{{ c.horas }}</span>
+            <span class="cuenta-sep">:</span>
+            <span class="cuenta-caja">{{ c.minutos }}</span>
+          </div>
+          <p class="cuenta-unidades"><span>Horas</span><span>Minutos</span></p>
+        } @else {
+          <p class="dato-valor apagado">—</p>
+        }
+      </div>
+
+      <div class="tarjeta">
+        <p class="etiqueta">Clima en destino · Weather</p>
+        @if (clima(); as c) {
+          <div class="clima">
+            <!-- Dibujo propio, sin librería de iconos: la pantalla no depende de
+                 que cargue una fuente externa. -->
+            <svg class="clima-icono" viewBox="0 0 64 64" aria-hidden="true">
+              @if (c.icono === 'sol') {
+                <circle cx="32" cy="32" r="14" class="sol" />
+                <g class="rayos">
+                  <rect x="30" y="4" width="4" height="10" />
+                  <rect x="30" y="50" width="4" height="10" />
+                  <rect x="4" y="30" width="10" height="4" />
+                  <rect x="50" y="30" width="10" height="4" />
+                </g>
+              } @else {
+                <circle cx="24" cy="26" r="11" class="sol" />
+                <path d="M18 44 a11 11 0 0 1 2-21 a15 15 0 0 1 28 5 a9 9 0 0 1 -2 16 z" class="nube" />
+                @if (c.icono === 'lluvia') {
+                  <g class="gotas">
+                    <rect x="22" y="48" width="3" height="10" rx="1.5" />
+                    <rect x="32" y="48" width="3" height="10" rx="1.5" />
+                    <rect x="42" y="48" width="3" height="10" rx="1.5" />
+                  </g>
+                }
+              }
+            </svg>
+
+            <div class="clima-texto">
+              <p class="clima-temp">{{ c.temperatura }}°C</p>
+              <p class="clima-desc">{{ c.descripcion }}</p>
+            </div>
+          </div>
+        } @else {
+          <p class="dato-valor apagado">No disponible</p>
+        }
+      </div>
+    </aside>
+
+  </div>
+</app-pantalla-marco>

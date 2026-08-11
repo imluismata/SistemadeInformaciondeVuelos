@@ -1,0 +1,59 @@
+<div class="page-header">
+  <h1>Notificaciones</h1>
+  <p>
+    Todo lo que ha cambiado en los vuelos que sigues, de lo más antiguo a lo más reciente
+  </p>
+</div>
+
+<div class="contenido">
+
+  @if (noLeidas() > 0) {
+    <div class="barra">
+      <span class="conteo">{{ noLeidas() }} sin leer</span>
+      <button type="button" class="btn-marcar" (click)="marcarTodas()">
+        Marcar todas como leídas
+      </button>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="estado-msg">Cargando notificaciones...</div>
+  }
+
+  @if (!cargando() && sinIdentidad()) {
+    <div class="vacio">
+      <p>Aún no sigues ningún vuelo, así que no hay nada que avisarte.</p>
+      <a routerLink="/vuelos" class="btn-buscar">Buscar vuelos</a>
+    </div>
+  }
+
+  @if (!cargando() && !sinIdentidad() && notificaciones().length === 0) {
+    <div class="vacio">
+      <p>No tienes notificaciones todavía. Te avisaremos si cambia alguno de tus vuelos.</p>
+      <a routerLink="/vuelos" class="btn-buscar">Buscar vuelos</a>
+    </div>
+  }
+
+  @if (notificaciones().length > 0) {
+    <ul class="linea-tiempo">
+      @for (n of notificaciones(); track n.id) {
+        <li [class]="n.leidaEn === null ? 'aviso no-leida' : 'aviso'">
+          <button type="button" class="aviso-boton" (click)="abrir(n)">
+            <span class="aviso-hora">
+              <span class="hora">{{ n.generadaEn | date: 'HH:mm' }}</span>
+              <span class="fecha">{{ n.generadaEn | date: 'dd/MM/yyyy' }}</span>
+            </span>
+            <span class="aviso-cuerpo">
+              <span class="aviso-msg">{{ n.mensaje }}</span>
+              <span class="aviso-ir">Ver el cambio en el vuelo →</span>
+            </span>
+            @if (n.leidaEn === null) {
+              <span class="punto" aria-label="Sin leer"></span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+</div>

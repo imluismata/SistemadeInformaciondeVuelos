@@ -1,0 +1,39 @@
+<div class="pantalla marco">
+
+  <header class="marco-cabecera">
+    <div class="marca">
+      <img src="logocompleto.png" alt="Quisqueya Flight Hub" class="marca-logo">
+      <div class="marca-texto">
+        <span class="marca-aeropuerto">Las Américas · SDQ</span>
+        <span class="marca-ciudad">Santo Domingo, República Dominicana</span>
+      </div>
+    </div>
+
+    @if (titulo()) {
+      <h1 class="marco-titulo">
+        <span class="titulo-es">{{ titulo() }}</span>
+        @if (tituloEn()) {
+          <span class="titulo-en">{{ tituloEn() }}</span>
+        }
+      </h1>
+    }
+
+    <div class="marco-reloj">
+      <span class="reloj-hora">{{ reloj() | date: 'HH:mm:ss' }}</span>
+      <span class="reloj-fecha">{{ reloj() | date: 'dd/MM/yyyy' }} · AST</span>
+    </div>
+  </header>
+
+  <main class="marco-cuerpo">
+    <ng-content />
+  </main>
+
+  <footer class="marco-pie">
+    <p class="aviso-seguridad">
+      Aviso de seguridad: no deje su equipaje desatendido en ningún momento
+      <span class="aviso-en">Security advisory: never leave your luggage unattended</span>
+    </p>
+    <p class="pie-marca">Quisqueya Flight Hub · Sistema de Información de Vuelos</p>
+  </footer>
+
+</div>

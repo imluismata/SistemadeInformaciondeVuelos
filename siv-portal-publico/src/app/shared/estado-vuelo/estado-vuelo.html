@@ -1,0 +1,6 @@
+<span [class]="'badge badge-estado ' + variante() + ' ' + etiqueta().clase">
+  <span class="estado-es">{{ etiqueta().es }}</span>
+  @if (etiqueta().en) {
+    <span class="estado-en">{{ etiqueta().en }}</span>
+  }
+</span>
